@@ -1,0 +1,24 @@
+{
+  "name": "jobs-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "India jobs content platform — ingest pipeline, shared schema, web app (monorepo).",
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "ingest": "pnpm --filter @jobs/ingest run ingest",
+    "fetch": "pnpm --filter @jobs/ingest run fetch",
+    "draft": "pnpm --filter @jobs/ingest run draft",
+    "fetch:dry": "pnpm --filter @jobs/ingest run fetch:dry",
+    "draft:nollm": "pnpm --filter @jobs/ingest run draft:nollm"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

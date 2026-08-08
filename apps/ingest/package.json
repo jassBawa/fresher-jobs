@@ -1,0 +1,19 @@
+{
+  "name": "@jobs/ingest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Fetch job postings, extract facts, draft original posts. Zero npm dependencies.",
+  "scripts": {
+    "ingest": "node src/fetch.mjs && node src/draft.mjs",
+    "fetch": "node src/fetch.mjs",
+    "draft": "node src/draft.mjs",
+    "fetch:dry": "node src/fetch.mjs --dry",
+    "draft:nollm": "node src/draft.mjs --no-llm",
+    "typecheck": "echo \"no types — .mjs scripts\"",
+    "lint": "echo \"no lint configured\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

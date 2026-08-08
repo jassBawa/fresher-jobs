@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobs.dev/schemas/fact-record.json",
+  "title": "FactRecord",
+  "description": "Facts extracted from a source posting. Facts only — no prose, no source wording. Provenance is a citation, not content.",
+  "type": "object",
+  "required": [
+    "company",
+    "role",
+    "jobType",
+    "batchYears",
+    "qualifications",
+    "experienceRequired",
+    "salary",
+    "locations",
+    "lastDateToApply",
+    "applyUrl",
+    "skills",
+    "requirements",
+    "responsibilities",
+    "discoveredVia",
+    "discoveredAt",
+    "extractedAt"
+  ],
+  "properties": {
+    "company": { "type": "string" },
+    "role": { "type": "string" },
+    "jobType": {
+      "type": ["string", "null"],
+      "enum": ["full-time", "internship", "contract", "trainee", null]
+    },
+    "batchYears": { "type": "array", "items": { "type": "string" } },
+    "qualifications": { "type": "array", "items": { "type": "string" } },
+    "experienceRequired": { "type": ["string", "null"] },
+    "salary": { "type": ["string", "null"] },
+    "locations": { "type": "array", "items": { "type": "string" } },
+    "lastDateToApply": { "type": ["string", "null"] },
+    "applyUrl": { "type": ["string", "null"] },
+    "skills": { "type": "array", "items": { "type": "string" } },
+    "requirements": { "type": "array", "items": { "type": "string" } },
+    "responsibilities": { "type": "array", "items": { "type": "string" } },
+    "discoveredVia": { "type": "string", "format": "uri" },
+    "discoveredAt": { "type": "string" },
+    "extractedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobs.dev/schemas/draft-post.json",
+  "title": "DraftFrontmatter",
+  "description": "YAML frontmatter of a draft post in data/drafts/*.md.",
+  "type": "object",
+  "required": [
+    "title",
+    "description",
+    "slug",
+    "status",
+    "company",
+    "role",
+    "generatedBy",
+    "createdAt"
+  ],
+  "properties": {
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "slug": { "type": "string" },
+    "status": { "type": "string", "enum": ["draft", "published"] },
+    "company": { "type": "string" },
+    "role": { "type": "string" },
+    "jobType": { "type": "string", "enum": ["full-time", "internship", "contract", "trainee"] },
+    "batchYears": { "type": "array", "items": { "type": "string" } },
+    "locations": { "type": "array", "items": { "type": "string" } },
+    "salary": { "type": "string" },
+    "lastDateToApply": { "type": "string" },
+    "applyUrl": { "type": "string", "format": "uri" },
+    "skills": { "type": "array", "items": { "type": "string" } },
+    "generatedBy": { "type": "string", "enum": ["llm+template", "template"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "sourceRef": { "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}
