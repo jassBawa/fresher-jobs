@@ -10,6 +10,7 @@
     "draft": "node src/draft.mjs",
     "fetch:dry": "node src/fetch.mjs --dry",
     "draft:nollm": "node src/draft.mjs --no-llm",
+    "promote": "node scripts/promote.mjs",
     "typecheck": "echo \"no types — .mjs scripts\"",
     "lint": "echo \"no lint configured\""
   },

@@ -1,0 +1,14 @@
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img,
+picture,
+video {
+  max-width: 100%;
+  height: auto;
+}

@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const jobs = await getCollection('jobs', ({ data }) => data.status === 'published');
+
+const sorted = jobs.sort((a, b) => (a.data.createdAt < b.data.createdAt ? 1 : -1));
+---
+
+<Base title="Fresher Jobs — Latest Off Campus & Walk-in Jobs in India">
+	<h1>Latest fresher jobs in India</h1>
+
+	{
+		sorted.length === 0 ? (
+			<p>No published openings yet. Check back soon.</p>
+		) : (
+			<ul>
+				{
+					sorted.map((job) => (
+						<li>
+							<a href={`/jobs/${job.data.slug}/`}>
+								<strong>{job.data.title}</strong>
+							</a>
+							<span>
+								{' '}
+								{job.data.locations?.join(', ') ?? ''}
+								{job.data.salary ? ` · ${job.data.salary}` : ''}
+							</span>
+							<p>{job.data.description}</p>
+						</li>
+					))
+				}
+			</ul>
+		)
+	}
+</Base>

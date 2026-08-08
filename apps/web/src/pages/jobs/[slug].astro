@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export const getStaticPaths = async () => {
+	const jobs = await getCollection('jobs', ({ data }) => data.status === 'published');
+	return jobs.map((job) => ({
+		params: { slug: job.data.slug },
+		props: { job },
+	}));
+};
+
+const { job } = Astro.props;
+const { Content } = await render(job);
+const fm = job.data;
+---
+
+<Base title={fm.title} description={fm.description}>
+	<article>
+		<h1>{fm.title}</h1>
+		<p>
+			<strong>{fm.company}</strong> · {fm.role}
+			{fm.locations?.length ? ` · ${fm.locations.join(', ')}` : ''}
+		</p>
+		{fm.salary && <p>
+			<strong>Salary:</strong> {fm.salary}
+		</p>}
+		{fm.lastDateToApply && <p>
+			<strong>Last date:</strong> {fm.lastDateToApply}
+		</p>}
+		{fm.applyUrl && (
+			<p>
+				<a href={fm.applyUrl} rel="nofollow sponsored">
+					Apply now
+				</a>
+			</p>
+		)}
+
+		<Content />
+	</article>
+</Base>

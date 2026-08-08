@@ -22,8 +22,10 @@ blogging/                    pnpm + Turborepo monorepo
 │   ├── src/fetch.mjs        pulls facts from the source, writes data/facts/
 │   ├── src/draft.mjs        turns each facts file into a draft in data/drafts/
 │   ├── src/lib/llm.mjs      model provider selection
+│   ├── scripts/promote.mjs  flips a draft's status to published
 │   └── data/                facts/, drafts/, state.json
-├── packages/schema/         shared TypeScript types + JSON Schema (@jobs/schema)
+├── apps/web/                static site (@jobs/web) — home, /jobs/[slug], sitemap
+├── packages/schema/         shared TypeScript types + JSON Schema + zod (@jobs/schema)
 ├── docs/                    research, strategy, decisions
 └── package.json             root scripts (turbo, typescript as devDependencies)
 ```

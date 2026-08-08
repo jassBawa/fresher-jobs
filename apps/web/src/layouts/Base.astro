@@ -1,0 +1,77 @@
+---
+interface Props {
+	title: string;
+	description?: string;
+	robots?: string; // e.g. "noindex, follow" — set per page
+}
+
+const {
+	title,
+	description = 'Fresh job openings for freshers and early-career candidates in India.',
+	robots = 'index, follow',
+} = Astro.props;
+
+const SITE = Astro.site ?? new URL('/');
+const canonical = new URL(Astro.url.pathname, SITE);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="robots" content={robots} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="stylesheet" href="/styles/global.css" />
+		<style>
+			body {
+				font-family: system-ui, -apple-system, sans-serif;
+				margin: 0;
+				color: #1c1917;
+				line-height: 1.6;
+			}
+			.site-header {
+				border-bottom: 1px solid #e7e5e4;
+				padding: 1rem 1.25rem;
+			}
+			.site-header a {
+				text-decoration: none;
+				color: inherit;
+				font-weight: 600;
+			}
+			.site-header .brand {
+				font-size: 1.1rem;
+			}
+			.wrap {
+				max-width: 720px;
+				margin: 0 auto;
+				padding: 0 1.25rem;
+			}
+			.site-footer {
+				border-top: 1px solid #e7e5e4;
+				margin-top: 3rem;
+				padding: 1.25rem;
+				font-size: 0.85rem;
+				color: #78716c;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="wrap">
+				<a class="brand" href="/">Fresher Jobs</a>
+			</div>
+		</header>
+		<main class="wrap">
+			<slot />
+		</main>
+		<footer class="site-footer">
+			<div class="wrap">
+				Fresher Jobs · fresh openings for freshers in India
+			</div>
+		</footer>
+	</body>
+</html>

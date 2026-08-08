@@ -85,3 +85,54 @@ export interface DraftPost {
   /** Markdown body — everything after the closing `---`. */
   body: string;
 }
+
+// ------------------------------------------------------------------ zod schemas
+// Runtime validation for content entering the site. Used by apps/web's content
+// collection to reject malformed drafts at build time.
+
+import { z } from "zod";
+
+export const jobTypeSchema = z.enum(JOB_TYPES).nullable();
+export const draftStatusSchema = z.enum(DRAFT_STATUSES);
+export const generatedBySchema = z.enum(GENERATED_BY);
+
+export const factRecordSchema = z.object({
+  company: z.string(),
+  role: z.string(),
+  jobType: jobTypeSchema,
+  batchYears: z.array(z.string()),
+  qualifications: z.array(z.string()),
+  experienceRequired: z.string().nullable(),
+  salary: z.string().nullable(),
+  locations: z.array(z.string()),
+  lastDateToApply: z.string().nullable(),
+  applyUrl: z.string().url().nullable(),
+  skills: z.array(z.string()),
+  requirements: z.array(z.string()),
+  responsibilities: z.array(z.string()),
+  discoveredVia: z.string().url(),
+  discoveredAt: z.string(),
+  extractedAt: z.string(),
+});
+
+export const draftFrontmatterSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  slug: z.string(),
+  status: draftStatusSchema,
+  company: z.string(),
+  role: z.string(),
+  jobType: jobTypeSchema.optional(),
+  batchYears: z.array(z.string()).optional(),
+  locations: z.array(z.string()).optional(),
+  salary: z.string().optional(),
+  lastDateToApply: z.string().optional(),
+  applyUrl: z.string().url().optional(),
+  skills: z.array(z.string()).optional(),
+  generatedBy: generatedBySchema,
+  createdAt: z.string(),
+  sourceRef: z.string().url().optional(),
+});
+
+export type DraftFrontmatterZod = z.infer<typeof draftFrontmatterSchema>;
+export type FactRecordZod = z.infer<typeof factRecordSchema>;
