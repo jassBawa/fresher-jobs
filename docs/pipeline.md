@@ -141,7 +141,7 @@ sourceRef: "https://freshersdunia.in/…"
 | 2 | **Cerebras** | `llama3.1-8b` | Free tier, fastest |
 | 3 | **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
 | 4 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Free models |
-| — | **Ollama** | `qwen3:4b` | Local. Opt in with `LLM_PROVIDER=ollama` |
+| — | **Ollama** | `qwen2.5:3b` | Local. Opt in with `LLM_PROVIDER=ollama`. Non-reasoning model — qwen3's thinking blocks break strict JSON |
 | 5 | OpenAI | `gpt-5-nano` | Paid |
 | 6 | Anthropic | `claude-haiku-4-5-20251001` | Paid |
 
@@ -156,7 +156,7 @@ API because strict JSON mode is more reliable there.
 
 ## Configuration
 
-All optional except a key. See `.env.example`.
+All optional except a key. See `apps/ingest/.env.example`.
 
 | Variable | Default | Purpose |
 |---|---|---|

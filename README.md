@@ -34,7 +34,7 @@ blogging/                    pnpm + Turborepo monorepo
 
 ```bash
 pnpm install            # installs turbo + typescript at the root
-cp .env.example .env    # add one API key
+cp apps/ingest/.env.example apps/ingest/.env   # add one API key
 pnpm run ingest         # fetch + draft
 ```
 
@@ -76,7 +76,7 @@ Ordered cheapest and fastest first; the first key found wins.
 | **Cerebras** | `llama3.1-8b` | Free tier, fastest available |
 | **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Genuinely free models |
-| **Ollama** | `qwen3:4b` | Local. No key, no cost, no rate limit. Set `LLM_PROVIDER=ollama` |
+| **Ollama** | `qwen2.5:3b` | Local. No key, no cost, no rate limit. Set `LLM_PROVIDER=ollama`. Use qwen2.5 (not qwen3 — its thinking blocks break strict JSON) |
 | OpenAI / Anthropic | `gpt-5-nano` / `claude-haiku-4-5` | Paid fallbacks |
 
 At 25 postings/day this runs comfortably inside a free tier. A larger model buys
@@ -116,7 +116,7 @@ sourceRef: "https://..."
 
 ## Configuration
 
-All optional, all in `.env`:
+All optional, all in `apps/ingest/.env`:
 
 | Variable | Default | Purpose |
 |---|---|---|
