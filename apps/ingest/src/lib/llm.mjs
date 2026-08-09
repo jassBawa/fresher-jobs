@@ -158,47 +158,57 @@ export function activeProvider() {
   return (cached = found);
 }
 
+// A reasoning model answers with its scratchpad first, wrapped in a tag pair.
+// Built from parts so the literal tags can't be eaten by anything that rewrites
+// HTML in this file.
+const THINK = "think(?:ing)?";
+const THINK_BLOCK = new RegExp(`<${THINK}\\b[^>]*>[\\s\\S]*?</${THINK}>`, "gi");
+const THINK_OPEN = new RegExp(`<${THINK}\\b[^>]*>`, "i");
+
+const isRateLimit = (err) => / 429:|rate limited/i.test(err.message);
+
+/** Pull a JSON value out of a model response that may carry a reasoning block,
+ *  a markdown fence, or plain chatter around the answer. Exported for tests. */
+export function parseJSON(text = "") {
+  // Drop complete reasoning blocks. If one is left open the response was cut
+  // off mid-thought and there is no answer in it to salvage — say so plainly
+  // rather than parsing a brace out of the model's scratchpad.
+  const body = text.replace(THINK_BLOCK, "");
+  if (THINK_OPEN.test(body)) throw new Error("response truncated inside a reasoning block");
+
+  const unfenced = body.match(/```(?:json)?\s*([\s\S]*?)```/)?.[1] ?? body;
+
+  const start = unfenced.search(/[[{]/);
+  if (start === -1) throw new Error("no JSON in response");
+  const close = unfenced.lastIndexOf(unfenced[start] === "{" ? "}" : "]");
+  if (close <= start) throw new Error("unterminated JSON in response");
+  return JSON.parse(unfenced.slice(start, close + 1));
+}
+
 /** Ask for JSON, parse defensively. Retries once on malformed output and
  *  retries 429 rate limits with backoff until it succeeds or times out. */
 export async function askJSON(prompt, { maxTokens = 1200, retries = 1 } = {}) {
   const name = activeProvider();
   const p = P[name];
   const model = p.model();
+  const attempt = async () => parseJSON(await p.call(model, p.key(), prompt, maxTokens));
 
   let lastErr;
-  for (let attempt = 0; attempt <= retries; attempt++) {
+  for (let i = 0; i <= retries; i++) {
     try {
-      const text = await p.call(model, p.key(), prompt, maxTokens);
-      // Small models sometimes wrap JSON in prose, a fence, or a  thinking block.
-      const body = (text.match(/```(?:json)?\s*([\s\S]*?)```/)?.[1] ?? text).replace(
-        / thinking[\s\S]*?<\/think>/gi,
-        ""
-      );
-      const start = body.search(/[[{]/);
-      if (start === -1) throw new Error("no JSON in response");
-      const close = body.lastIndexOf(body[start] === "{" ? "}" : "]");
-      return JSON.parse(body.slice(start, close + 1));
+      return await attempt();
     } catch (err) {
       lastErr = err;
-      const rateLimited = / 429:|rate limited/i.test(err.message);
-      if (!rateLimited) continue;
+      if (!isRateLimit(err)) continue; // malformed output — just ask again
       // Wait out the window, then keep trying until the overall deadline.
       const wait = Number((err.message.match(/retry after (\d+)s/) || [])[1] || 30) * 1000;
-      for (let i = 0; i < 20; i++) {
+      for (let j = 0; j < 20; j++) {
         await sleep(wait);
         try {
-          const text = await p.call(model, p.key(), prompt, maxTokens);
-          const body = (text.match(/```(?:json)?\s*([\s\S]*?)```/)?.[1] ?? text).replace(
-            / thinking[\s\S]*?<\/think>/gi,
-            ""
-          );
-          const start = body.search(/[[{]/);
-          if (start === -1) throw new Error("no JSON in response");
-          const close = body.lastIndexOf(body[start] === "{" ? "}" : "]");
-          return JSON.parse(body.slice(start, close + 1));
+          return await attempt();
         } catch (e2) {
           lastErr = e2;
-          if (!/ 429:|rate limited/i.test(e2.message)) throw e2; // non-rate errors fail fast
+          if (!isRateLimit(e2)) break; // non-rate errors stop the wait-out loop
         }
       }
     }
