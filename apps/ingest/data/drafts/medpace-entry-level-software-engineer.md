@@ -13,6 +13,7 @@ applyUrl: "https://careers.medpace.com/jobs/11927?lang=en-us&iis=Job%20Board&iis
 skills: ["C#", "Angular", "Webservices", "GraphQL", "Git", "relational databases", "Entity Framework", "Azure DevOps"]
 generatedBy: "template"
 createdAt: "2026-08-12T17:45:03.815Z"
+postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/medpace-off-campus-drive-2026/"
 ---
 

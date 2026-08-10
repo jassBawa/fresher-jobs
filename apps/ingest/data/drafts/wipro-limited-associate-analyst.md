@@ -13,6 +13,7 @@ applyUrl: "https://careers.wipro.com/job/Associate-analyst/190184-en_US"
 skills: ["Customer handling and problem-solving skills", "Basic technical support knowledge", "Analytical thinking and troubleshooting ability"]
 generatedBy: "template"
 createdAt: "2026-08-12T17:45:03.816Z"
+postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/wipro-off-campus-hiring-2026-2/"
 ---
 

@@ -13,6 +13,7 @@ applyUrl: "https://www.harman.com/"
 skills: ["C", "C++", "Java", "Android", "Embedded Systems"]
 generatedBy: "llm+template"
 createdAt: "2026-08-12T18:02:34.519Z"
+postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/harman-off-campus-internship-2026/"
 ---
 

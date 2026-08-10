@@ -14,6 +14,7 @@ applyUrl: "https://www.corporate.carrier.com"
 skills: ["BMS platforms", "HVAC systems", "Automation controls", "Networking and control protocols", "AI-driven tools", "Data analytics", "Microsoft Excel"]
 generatedBy: "template"
 createdAt: "2026-08-12T17:42:13.579Z"
+postedAt: "2026-08-12"
 sourceRef: "https://freshersdunia.in/carrier-global-off-campus-recruitment-2026/"
 ---
 

@@ -14,6 +14,7 @@
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { askJSON, providerBanner } from "./lib/llm.mjs";
 import { buildDraft, fallbackProse } from "./lib/render.mjs";
+import { toIsoDay } from "./lib/dates.mjs";
 
 const FACTS_DIR = "data/facts";
 const DRAFTS_DIR = "data/drafts";
@@ -94,6 +95,7 @@ async function main() {
       slug,
       usedLLM,
       createdAt: new Date().toISOString(),
+      postedAt: toIsoDay(facts.discoveredAt),
     });
 
     await writeFile(`${DRAFTS_DIR}/${slug}.md`, doc);

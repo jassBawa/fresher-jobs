@@ -11,6 +11,7 @@
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { askJSON, providerBanner } from "./lib/llm.mjs";
 import { preExtract } from "./lib/extract.mjs";
+import { parseApplyByDate } from "./lib/dates.mjs";
 
 const SOURCE = process.env.SOURCE_BASE || "https://freshersdunia.in";
 const PER_RUN = Number(process.env.MAX_POSTS_PER_RUN || 15);
@@ -150,6 +151,10 @@ async function main() {
         salary: facts.salary ?? null,
         locations: facts.locations ?? [],
         lastDateToApply: facts.lastDateToApply ?? null,
+        // Machine-readable form of the above, null whenever the source said
+        // something like "ASAP" instead of naming a date. The site retires
+        // those on a freshness horizon rather than a deadline.
+        applyByDate: parseApplyByDate(facts.lastDateToApply),
         applyUrl: facts.applyUrl ?? pre.bestApplyUrl,
         skills: facts.skills ?? [],
         requirements: facts.requirements ?? [],

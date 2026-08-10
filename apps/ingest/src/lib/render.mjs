@@ -87,7 +87,7 @@ export const yaml = (v) => {
  * "" and is dropped. The body's blank lines are structural (markdown needs
  * them) and must survive.
  */
-export function buildDraft({ facts, prose, slug, usedLLM, createdAt }) {
+export function buildDraft({ facts, prose, slug, usedLLM, createdAt, postedAt = null }) {
   const frontmatter = [
     `title: ${yaml(prose.title)}`,
     `description: ${yaml(prose.meta)}`,
@@ -100,10 +100,14 @@ export function buildDraft({ facts, prose, slug, usedLLM, createdAt }) {
     facts.locations?.length ? `locations: ${yaml(facts.locations)}` : "",
     facts.salary ? `salary: ${yaml(facts.salary)}` : "",
     facts.lastDateToApply ? `lastDateToApply: ${yaml(facts.lastDateToApply)}` : "",
+    facts.applyByDate ? `applyByDate: ${yaml(facts.applyByDate)}` : "",
     facts.applyUrl ? `applyUrl: ${yaml(facts.applyUrl)}` : "",
     facts.skills?.length ? `skills: ${yaml(facts.skills)}` : "",
     `generatedBy: ${yaml(usedLLM ? "llm+template" : "template")}`,
     `createdAt: ${yaml(createdAt)}`,
+    // When the employer announced it, not when we drafted it. Both the
+    // freshness horizon and JSON-LD datePosted key off this.
+    postedAt ? `postedAt: ${yaml(postedAt)}` : "",
     facts.discoveredVia ? `sourceRef: ${yaml(facts.discoveredVia)}` : "",
   ].filter((l) => l !== "");
 

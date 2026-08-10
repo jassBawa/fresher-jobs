@@ -14,6 +14,7 @@
     "salary",
     "locations",
     "lastDateToApply",
+    "applyByDate",
     "applyUrl",
     "skills",
     "requirements",
@@ -34,7 +35,16 @@
     "experienceRequired": { "type": ["string", "null"] },
     "salary": { "type": ["string", "null"] },
     "locations": { "type": "array", "items": { "type": "string" } },
-    "lastDateToApply": { "type": ["string", "null"] },
+    "lastDateToApply": {
+      "type": ["string", "null"],
+      "description": "The deadline as the source stated it — often \"ASAP\" or \"Rolling Basis\"."
+    },
+    "applyByDate": {
+      "type": ["string", "null"],
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "lastDateToApply normalized. Null when the source named no unambiguous date, which is the common case."
+    },
     "applyUrl": { "type": ["string", "null"] },
     "skills": { "type": "array", "items": { "type": "string" } },
     "requirements": { "type": "array", "items": { "type": "string" } },

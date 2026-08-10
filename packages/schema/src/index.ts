@@ -35,7 +35,15 @@ export interface FactRecord {
   experienceRequired: string | null;
   salary: string | null;
   locations: string[];
+  /** The deadline exactly as the source stated it — often "ASAP" or "Rolling". */
   lastDateToApply: string | null;
+  /**
+   * `lastDateToApply` normalized to `YYYY-MM-DD`, or null when the source named
+   * no unambiguous date. Most postings in this vertical have no real deadline,
+   * so a null here is normal and the site retires the listing on a freshness
+   * horizon measured from `postedAt` instead.
+   */
+  applyByDate: string | null;
   applyUrl: string | null;
   skills: string[];
   requirements: string[];
@@ -72,10 +80,16 @@ export interface DraftFrontmatter {
   locations?: string[];
   salary?: string;
   lastDateToApply?: string;
+  /** Deadline as `YYYY-MM-DD`. Absent when the source named no real date. */
+  applyByDate?: string;
   applyUrl?: string;
   skills?: string[];
   generatedBy: GeneratedBy;
+  /** When the draft was written. */
   createdAt: string;
+  /** When the employer announced the opening, as `YYYY-MM-DD`. Drives both the
+   *  freshness horizon and JSON-LD `datePosted`. */
+  postedAt?: string;
   sourceRef?: string;
 }
 
@@ -96,6 +110,12 @@ export const jobTypeSchema = z.enum(JOB_TYPES).nullable();
 export const draftStatusSchema = z.enum(DRAFT_STATUSES);
 export const generatedBySchema = z.enum(GENERATED_BY);
 
+/** A calendar day, `YYYY-MM-DD`. Kept distinct from the full ISO timestamps so
+ *  a stray `new Date().toISOString()` cannot land in a date-only field. */
+export const isoDaySchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "expected a YYYY-MM-DD date");
+
 export const factRecordSchema = z.object({
   company: z.string(),
   role: z.string(),
@@ -106,6 +126,7 @@ export const factRecordSchema = z.object({
   salary: z.string().nullable(),
   locations: z.array(z.string()),
   lastDateToApply: z.string().nullable(),
+  applyByDate: isoDaySchema.nullable(),
   applyUrl: z.string().url().nullable(),
   skills: z.array(z.string()),
   requirements: z.array(z.string()),
@@ -127,10 +148,12 @@ export const draftFrontmatterSchema = z.object({
   locations: z.array(z.string()).optional(),
   salary: z.string().optional(),
   lastDateToApply: z.string().optional(),
+  applyByDate: isoDaySchema.optional(),
   applyUrl: z.string().url().optional(),
   skills: z.array(z.string()).optional(),
   generatedBy: generatedBySchema,
   createdAt: z.string(),
+  postedAt: isoDaySchema.optional(),
   sourceRef: z.string().url().optional(),
 });
 
