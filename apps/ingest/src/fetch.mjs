@@ -4,9 +4,13 @@
 // fields out of it, then dropped. It is never written to disk and never reaches
 // the draft stage. Only facts (company, role, eligibility, dates, apply link) and
 // a provenance URL are persisted.
+//
+// The rule-based half of the extraction lives in lib/extract.mjs; this file is
+// the I/O around it.
 
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { askJSON, providerBanner } from "./lib/llm.mjs";
+import { preExtract } from "./lib/extract.mjs";
 
 const SOURCE = process.env.SOURCE_BASE || "https://freshersdunia.in";
 const PER_RUN = Number(process.env.MAX_POSTS_PER_RUN || 15);
@@ -25,95 +29,6 @@ async function fetchPosts(page = 1, perPage = 20) {
   });
   if (!res.ok) throw new Error(`source returned HTTP ${res.status}`);
   return res.json();
-}
-
-// ------------------------------------------------- deterministic pre-extraction
-// Cheap, reliable facts pulled by rule so the model doesn't have to guess them.
-
-const decode = (s = "") =>
-  s
-    .replace(/&#8211;|&ndash;/g, "-")
-    .replace(/&#8217;|&rsquo;/g, "'")
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&[a-z]+;|&#\d+;/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-const toText = (html = "") =>
-  decode(
-    html
-      .replace(/<script[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[\s\S]*?<\/style>/gi, "")
-      .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, "\n")
-      .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<[^>]+>/g, " ")
-  );
-
-function preExtract(post) {
-  const html = post.content?.rendered || "";
-  const title = decode(post.title?.rendered || "");
-
-  // Outbound links, minus the source's own domain and social/sharing noise.
-  const host = new URL(SOURCE).hostname.replace(/^www\./, "");
-  const links = [...html.matchAll(/href=["']([^"']+)["']/gi)]
-    .map((m) => m[1].replace(/&amp;/g, "&").replace(/&#0?38;/g, "&"))
-    .filter((u) => /^https?:\/\//i.test(u))
-    .filter((u) => {
-      try {
-        const h = new URL(u).hostname.replace(/^www\./, "");
-        return (
-          h !== host &&
-          !/(facebook|twitter|x\.com|linkedin|whatsapp|telegram|instagram|youtube|pinterest|gravatar)\./i.test(h)
-        );
-      } catch {
-        return false;
-      }
-    });
-
-  // Rank candidate links so a real requisition page beats a bare homepage.
-  // The source mixes both, and sometimes leaves search-redirect junk behind.
-  const ATS = /(greenhouse|lever\.co|ashbyhq|myworkdayjobs|workday|eightfold|oraclecloud|taleo|icims|smartrecruiters|successfactors|keka|darwinbox|zohorecruit|peoplestrong)/i;
-  const DETAIL = /(jobdetail|job[-_/]?id|requisition|\/job\/|\/jobs\/|\/apply|careers?\/.+)/i;
-
-  const score = (u) => {
-    let s = 0;
-    if (ATS.test(u)) s += 100;
-    if (DETAIL.test(u)) s += 40;
-    if (/careers?\./i.test(u)) s += 20;
-    if (/\?|=/.test(u)) s += 5; // query strings usually mean a specific posting
-    try {
-      if (new URL(u).pathname.replace(/\/$/, "") === "") s -= 60; // bare homepage
-    } catch {}
-    return s;
-  };
-
-  const cleanUrl = (u) => {
-    try {
-      const url = new URL(u);
-      // strip tracking the source left behind
-      for (const k of [...url.searchParams.keys()]) {
-        if (/^(utm_|fbclid|gclid|ref|source$)/i.test(k)) url.searchParams.delete(k);
-      }
-      return url.toString();
-    } catch {
-      return u;
-    }
-  };
-
-  const ranked = [...new Set(links)]
-    .filter((u) => !/google\.[a-z.]+\/search/i.test(u)) // search-redirect junk
-    .map(cleanUrl)
-    .sort((a, b) => score(b) - score(a));
-
-  const text = toText(html);
-  return {
-    title,
-    candidateApplyUrls: ranked.slice(0, 8),
-    bestApplyUrl: ranked.length && score(ranked[0]) > 0 ? ranked[0] : null,
-    batchYears: [...new Set((text.match(/\b20(1[89]|2[0-9])\b/g) || []))].sort(),
-    text: text.slice(0, 6000), // held in memory only
-  };
 }
 
 // ------------------------------------------------------------- fact extraction
@@ -201,7 +116,7 @@ async function main() {
   let skipped = 0;
 
   for (const post of fresh) {
-    const pre = preExtract(post);
+    const pre = preExtract(post, { sourceBase: SOURCE });
     const label = pre.title.slice(0, 58);
 
     if (DRY) {

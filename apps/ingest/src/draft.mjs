@@ -7,15 +7,16 @@
 // table, the lists, the apply block. Templates are more accurate than a model at
 // restating structured data, and they cost nothing. The model is asked for one
 // small JSON object of connective prose (~150 tokens), not a whole article.
+// The rendering itself lives in lib/render.mjs; this file is the I/O around it.
 //
 // Run with --no-llm to render from templates alone and skip the model entirely.
 
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { askJSON, providerBanner } from "./lib/llm.mjs";
+import { buildDraft, fallbackProse } from "./lib/render.mjs";
 
 const FACTS_DIR = "data/facts";
 const DRAFTS_DIR = "data/drafts";
-const SITE = process.env.SITE_NAME || "Your Jobs Site";
 const NO_LLM = process.argv.includes("--no-llm") || process.env.NO_LLM === "1";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -39,77 +40,6 @@ Return JSON:
 FACTS:
 {{FACTS}}`;
 
-// ------------------------------------------------------------------ templates
-const list = (arr) => arr.filter(Boolean).map((x) => `- ${x}`).join("\n");
-const yr = (a = []) => a.filter((y) => /^20\d\d$/.test(String(y))).sort();
-
-function quickFacts(f) {
-  const rows = [
-    ["Company", f.company],
-    ["Role", f.role],
-    ["Qualification", f.qualifications?.join(", ")],
-    ["Batch", yr(f.batchYears).join(", ")],
-    ["Experience", f.experienceRequired],
-    ["Location", f.locations?.join(", ")],
-    ["Salary", f.salary],
-    ["Job type", f.jobType],
-    ["Last date", f.lastDateToApply],
-  ].filter(([, v]) => v && String(v).trim());
-
-  return [
-    "| | |",
-    "|---|---|",
-    ...rows.map(([k, v]) => `| **${k}** | ${v} |`),
-  ].join("\n");
-}
-
-function renderBody(f, prose) {
-  const out = [];
-
-  out.push(quickFacts(f), "");
-
-  const who = [];
-  if (yr(f.batchYears).length) who.push(`**Batch:** ${yr(f.batchYears).join(", ")} graduates`);
-  if (f.qualifications?.length) who.push(`**Qualification:** ${f.qualifications.join(", ")}`);
-  if (f.experienceRequired) who.push(`**Experience:** ${f.experienceRequired}`);
-  if (who.length) out.push("## Who Can Apply", "", who.join("  \n"), "");
-
-  if (prose.about) out.push("## About the Role", "", prose.about, "");
-
-  const need = [...(f.skills || []), ...(f.requirements || [])];
-  if (need.length) out.push("## What You Need", "", list(need), "");
-
-  if (f.responsibilities?.length)
-    out.push("## What You'll Do", "", list(f.responsibilities), "");
-
-  const apply = [];
-  if (f.applyUrl) apply.push(`Applications are submitted on ${f.company}'s official careers page.`, "");
-  if (f.lastDateToApply) apply.push(`**Last date to apply:** ${f.lastDateToApply}`, "");
-  if (f.applyUrl) apply.push(`[Apply for ${f.role} at ${f.company}](${f.applyUrl})`, "");
-  if (apply.length) out.push("## How to Apply", "", ...apply);
-
-  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
-}
-
-// Deterministic fallback copy, used with --no-llm or if the model call fails.
-function fallbackProse(f) {
-  const batch = yr(f.batchYears);
-  const where = f.locations?.length ? ` in ${f.locations.join(", ")}` : "";
-  const who = batch.length ? `${batch.join(", ")} batch` : "eligible candidates";
-  return {
-    title: `${f.company} ${f.role} ${batch.at(-1) || ""}`.trim().slice(0, 65),
-    meta: `${f.company} is hiring for ${f.role}${where}. Open to ${who}.`.slice(0, 155),
-    summary: `${f.company} is hiring for the role of ${f.role}${where}. The opening is open to ${who}.`,
-    about: "",
-  };
-}
-
-const yaml = (v) => {
-  if (v == null) return "";
-  if (Array.isArray(v)) return `[${v.map((x) => JSON.stringify(String(x))).join(", ")}]`;
-  return JSON.stringify(String(v));
-};
-
 // ----------------------------------------------------------------------- main
 async function main() {
   await mkdir(DRAFTS_DIR, { recursive: true });
@@ -118,7 +48,7 @@ async function main() {
   try {
     files = (await readdir(FACTS_DIR)).filter((f) => f.endsWith(".json"));
   } catch {
-    console.error(`\n  ✗ no ${FACTS_DIR} yet — run "npm run fetch" first\n`);
+    console.error(`\n  ✗ no ${FACTS_DIR} yet — run "pnpm run fetch" first\n`);
     process.exit(1);
   }
 
@@ -158,34 +88,13 @@ async function main() {
     }
     if (!usedLLM) templated++;
 
-    // Filter applies to the frontmatter only — conditional lines collapse to "".
-    // The body's blank lines are structural (markdown needs them) and must survive.
-    const frontmatter = [
-      `title: ${yaml(prose.title)}`,
-      `description: ${yaml(prose.meta)}`,
-      `slug: ${yaml(slug)}`,
-      "status: draft",
-      `company: ${yaml(facts.company)}`,
-      `role: ${yaml(facts.role)}`,
-      facts.jobType ? `jobType: ${yaml(facts.jobType)}` : "",
-      yr(facts.batchYears).length ? `batchYears: ${yaml(yr(facts.batchYears))}` : "",
-      facts.locations?.length ? `locations: ${yaml(facts.locations)}` : "",
-      facts.salary ? `salary: ${yaml(facts.salary)}` : "",
-      facts.lastDateToApply ? `lastDateToApply: ${yaml(facts.lastDateToApply)}` : "",
-      facts.applyUrl ? `applyUrl: ${yaml(facts.applyUrl)}` : "",
-      facts.skills?.length ? `skills: ${yaml(facts.skills)}` : "",
-      `generatedBy: ${yaml(usedLLM ? "llm+template" : "template")}`,
-      `createdAt: ${yaml(new Date().toISOString())}`,
-      `sourceRef: ${yaml(discoveredVia)}`,
-    ].filter((l) => l !== "");
-
-    const doc =
-      ["---", ...frontmatter, "---"].join("\n") +
-      "\n\n" +
-      prose.summary +
-      "\n\n" +
-      renderBody(facts, prose) +
-      "\n";
+    const doc = buildDraft({
+      facts,
+      prose,
+      slug,
+      usedLLM,
+      createdAt: new Date().toISOString(),
+    });
 
     await writeFile(`${DRAFTS_DIR}/${slug}.md`, doc);
     console.log(`  ✓ draft  ${prose.title.slice(0, 58)}`);
