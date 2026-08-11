@@ -1,0 +1,96 @@
+---
+/**
+ * schema.org JobPosting markup.
+ *
+ * Deliberately incomplete in two places:
+ *
+ * `baseSalary` is omitted. The source states figures like "₹4 to 6 LPA
+ * (Expected)" — an aggregator's guess, not the employer's number. Publishing a
+ * guess as structured salary data is the kind of mismatch Google penalizes, and
+ * it would be a promise to the reader we cannot keep. The figure still appears
+ * in the visible page, labelled as expected.
+ *
+ * `directApply` is omitted rather than set false. It describes whether the
+ * application can be completed at the URL in the markup; our apply link hands
+ * off to the employer's ATS, which makes the honest answer "it depends on their
+ * flow" — and a wrong declaration costs rich-result eligibility.
+ *
+ * Emitted only for listings that are indexable and unexpired: a noindex page
+ * cannot produce a rich result, and Google asks that filled postings lose their
+ * markup rather than linger.
+ */
+import type { DraftFrontmatter } from '@jobs/schema';
+import { expiresOn } from '../lib/listings';
+
+interface Props {
+	fm: DraftFrontmatter;
+	/** Raw markdown body, used to build a fuller description than the meta tag. */
+	body: string;
+	canonical: URL | string;
+}
+
+const { fm, body, canonical } = Astro.props;
+
+const EMPLOYMENT_TYPE: Record<string, string> = {
+	'full-time': 'FULL_TIME',
+	internship: 'INTERN',
+	contract: 'CONTRACTOR',
+	trainee: 'FULL_TIME',
+};
+
+/** Markdown stripped back to readable prose. Google accepts HTML here, but the
+ *  table pipes and heading hashes are noise in a rich result. */
+const asPlainText = (md: string): string =>
+	md
+		.replace(/^\|.*\|$/gm, '') // quick-facts table
+		.replace(/^#{1,6}\s*/gm, '')
+		.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+		.replace(/[*_`>]/g, '')
+		.replace(/\n{2,}/g, '\n')
+		.trim();
+
+const description = [fm.description, asPlainText(body)].filter(Boolean).join('\n\n').slice(0, 5000);
+
+const validThrough = expiresOn(fm);
+
+const jobLocations = (fm.locations ?? []).map((city) => ({
+	'@type': 'Place',
+	address: {
+		'@type': 'PostalAddress',
+		addressLocality: city,
+		addressCountry: 'IN',
+	},
+}));
+
+// Google requires title, description, datePosted, hiringOrganization and
+// jobLocation. Emitting a partial JobPosting is worse than emitting none.
+const complete = Boolean(fm.title && description && fm.postedAt && fm.company && jobLocations.length);
+
+const schema = complete
+	? {
+			'@context': 'https://schema.org/',
+			'@type': 'JobPosting',
+			title: fm.role || fm.title,
+			description,
+			datePosted: fm.postedAt,
+			...(validThrough ? { validThrough } : {}),
+			...(fm.jobType && EMPLOYMENT_TYPE[fm.jobType]
+				? { employmentType: EMPLOYMENT_TYPE[fm.jobType] }
+				: {}),
+			identifier: {
+				'@type': 'PropertyValue',
+				name: fm.company,
+				value: fm.slug,
+			},
+			hiringOrganization: {
+				'@type': 'Organization',
+				name: fm.company,
+			},
+			jobLocation: jobLocations,
+			...(fm.skills?.length ? { skills: fm.skills.join(', ') } : {}),
+			url: String(canonical),
+		}
+	: null;
+---
+
+{schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}

@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { isExpired, listingRobots, expiresOn, today } from '../../lib/listings';
+import JobPostingSchema from '../../components/JobPostingSchema.astro';
+import { isExpired, isIndexable, listingRobots, expiresOn, today } from '../../lib/listings';
 
 export const getStaticPaths = async () => {
 	const jobs = await getCollection('jobs', ({ data }) => data.status === 'published');
@@ -20,9 +21,18 @@ const fm = job.data;
 const on = today();
 const expired = isExpired(fm, on);
 const closedOn = expiresOn(fm);
+const canonical = new URL(Astro.url.pathname, Astro.site ?? new URL('/'));
 ---
 
 <Base title={fm.title} description={fm.description} robots={listingRobots(fm, on)}>
+	{
+		!expired && isIndexable(fm, on) && (
+			<Fragment slot="head">
+				<JobPostingSchema fm={fm} body={job.body ?? ''} canonical={canonical} />
+			</Fragment>
+		)
+	}
+
 	<article>
 		{
 			expired && (
