@@ -21,6 +21,7 @@
  */
 import type { DraftFrontmatter } from '@jobs/schema';
 import { expiresOn } from '../lib/listings';
+import { normalizeCity, isState } from '../lib/clusters';
 
 interface Props {
 	fm: DraftFrontmatter;
@@ -53,11 +54,14 @@ const description = [fm.description, asPlainText(body)].filter(Boolean).join('\n
 
 const validThrough = expiresOn(fm);
 
-const jobLocations = (fm.locations ?? []).map((city) => ({
+// Postings list states in the same field as cities — "Maharashtra" turns up
+// alongside "Pune". A state is not a locality, so it goes in addressRegion
+// where it belongs rather than claiming a city of that name exists.
+const jobLocations = (fm.locations ?? []).map((raw) => ({
 	'@type': 'Place',
 	address: {
 		'@type': 'PostalAddress',
-		addressLocality: city,
+		...(isState(raw) ? { addressRegion: normalizeCity(raw) } : { addressLocality: normalizeCity(raw) }),
 		addressCountry: 'IN',
 	},
 }));

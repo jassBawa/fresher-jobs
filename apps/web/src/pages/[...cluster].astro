@@ -1,0 +1,54 @@
+---
+/**
+ * Every cluster page, from one route.
+ *
+ * These are the pages meant to rank (D5): "software engineer jobs in bengaluru",
+ * "wipro jobs", "2026 batch jobs". Individual listings mostly sit behind
+ * noindex and feed these.
+ *
+ * Route priority puts the static pages and /jobs/[slug] ahead of this rest
+ * parameter, and getStaticPaths only emits the cluster paths, so nothing here
+ * shadows an existing route.
+ */
+import Base from '../layouts/Base.astro';
+import JobList from '../components/JobList.astro';
+import { buildClusters, clusterRobots, clusterIsIndexable } from '../lib/clusters';
+import { liveListings } from '../lib/site';
+
+export const getStaticPaths = async () => {
+	const jobs = await liveListings();
+	const bySlug = new Map(jobs.map((job) => [job.data.slug, job.data]));
+
+	return buildClusters(jobs.map((job) => job.data)).map((cluster) => ({
+		params: { cluster: cluster.path },
+		props: {
+			cluster,
+			listings: cluster.slugs.map((slug) => bySlug.get(slug)).filter((fm) => fm !== undefined),
+		},
+	}));
+};
+
+const { cluster, listings } = Astro.props;
+---
+
+<Base title={cluster.title} description={cluster.description} robots={clusterRobots(cluster)}>
+	<h1>{cluster.heading}</h1>
+	<p class="count">
+		{listings.length} open {listings.length === 1 ? 'position' : 'positions'}
+		{!clusterIsIndexable(cluster) && <span class="thin"> · too few to list in search yet</span>}
+	</p>
+
+	<JobList listings={listings} />
+
+	<p><a href="/">← All fresher jobs</a></p>
+</Base>
+
+<style>
+	.count {
+		color: #78716c;
+		font-size: 0.9rem;
+	}
+	.thin {
+		font-style: italic;
+	}
+</style>

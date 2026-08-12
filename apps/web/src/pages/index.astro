@@ -1,36 +1,80 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import JobList from '../components/JobList.astro';
+import { buildClusters, type Cluster, type ClusterKind } from '../lib/clusters';
+import { liveListings } from '../lib/site';
 
-const jobs = await getCollection('jobs', ({ data }) => data.status === 'published');
+const jobs = await liveListings();
+const listings = jobs.map((job) => job.data);
+const clusters = buildClusters(listings);
 
-const sorted = jobs.sort((a, b) => (a.data.createdAt < b.data.createdAt ? 1 : -1));
+const GROUPS: ReadonlyArray<{ kind: ClusterKind; label: string }> = [
+	{ kind: 'role', label: 'By role' },
+	{ kind: 'city', label: 'By city' },
+	{ kind: 'batch', label: 'By batch' },
+	{ kind: 'company', label: 'By company' },
+];
+
+const group = (kind: ClusterKind): Cluster[] => clusters.filter((c) => c.kind === kind);
 ---
 
 <Base title="Fresher Jobs — Latest Off Campus & Walk-in Jobs in India">
 	<h1>Latest fresher jobs in India</h1>
 
+	<JobList
+		listings={listings}
+		empty="No published openings yet. Check back soon."
+	/>
+
 	{
-		sorted.length === 0 ? (
-			<p>No published openings yet. Check back soon.</p>
-		) : (
-			<ul>
-				{
-					sorted.map((job) => (
-						<li>
-							<a href={`/jobs/${job.data.slug}/`}>
-								<strong>{job.data.title}</strong>
-							</a>
-							<span>
-								{' '}
-								{job.data.locations?.join(', ') ?? ''}
-								{job.data.salary ? ` · ${job.data.salary}` : ''}
-							</span>
-							<p>{job.data.description}</p>
-						</li>
-					))
-				}
-			</ul>
+		clusters.length > 0 && (
+			<nav class="browse">
+				<h2>Browse</h2>
+				{GROUPS.map(({ kind, label }) =>
+					group(kind).length ? (
+						<div class="facet">
+							<h3>{label}</h3>
+							<ul>
+								{group(kind).map((c) => (
+									<li>
+										<a href={`/${c.path}/`}>{c.heading}</a> <span>{c.slugs.length}</span>
+									</li>
+								))}
+							</ul>
+						</div>
+					) : null
+				)}
+			</nav>
 		)
 	}
 </Base>
+
+<style>
+	.browse {
+		border-top: 1px solid #e7e5e4;
+		margin-top: 2rem;
+		padding-top: 1rem;
+	}
+	.browse h2 {
+		font-size: 1rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: #78716c;
+	}
+	.facet h3 {
+		font-size: 0.9rem;
+		margin-bottom: 0.25rem;
+	}
+	.facet ul {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 1rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1rem;
+	}
+	.facet span {
+		color: #a8a29e;
+		font-size: 0.8rem;
+	}
+</style>

@@ -1,0 +1,64 @@
+---
+import type { DraftFrontmatter } from '@jobs/schema';
+
+interface Props {
+	listings: DraftFrontmatter[];
+	empty?: string;
+}
+
+const { listings, empty = 'No openings here right now.' } = Astro.props;
+
+/** The one line that decides whether the reader clicks: who it is open to. */
+const eligibility = (fm: DraftFrontmatter): string =>
+	[
+		fm.batchYears?.length ? `${fm.batchYears.join(', ')} batch` : '',
+		fm.locations?.length ? fm.locations.slice(0, 3).join(', ') : '',
+		fm.salary ?? '',
+	]
+		.filter(Boolean)
+		.join(' · ');
+---
+
+{
+	listings.length === 0 ? (
+		<p>{empty}</p>
+	) : (
+		<ul class="jobs">
+			{listings.map((fm) => (
+				<li>
+					<a href={`/jobs/${fm.slug}/`}>{fm.title}</a>
+					<p class="meta">{eligibility(fm)}</p>
+					<p class="summary">{fm.description}</p>
+				</li>
+			))}
+		</ul>
+	)
+}
+
+<style>
+	.jobs {
+		list-style: none;
+		padding: 0;
+		margin: 1.5rem 0;
+	}
+	.jobs li {
+		border-bottom: 1px solid #e7e5e4;
+		padding: 1rem 0;
+	}
+	.jobs li:last-child {
+		border-bottom: 0;
+	}
+	.jobs a {
+		font-weight: 600;
+		color: #1c1917;
+	}
+	.meta {
+		margin: 0.25rem 0 0;
+		font-size: 0.85rem;
+		color: #78716c;
+	}
+	.summary {
+		margin: 0.35rem 0 0;
+		font-size: 0.95rem;
+	}
+</style>

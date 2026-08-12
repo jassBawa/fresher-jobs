@@ -44,6 +44,62 @@ export const slugify = (s: string): string =>
 		.replace(/^-|-$/g, '');
 
 /**
+ * Indian cities are routinely written under both their current and colonial
+ * names, and postings mix them freely. Left alone this splits one city across
+ * two URLs — the first build produced /jobs-in-bangalore and
+ * /jobs-in-bengaluru side by side, each too thin to index, when together they
+ * clear the bar. Near-duplicate cluster pages are also exactly what D5 is
+ * trying to avoid.
+ */
+const CITY_ALIASES: Readonly<Record<string, string>> = {
+	bangalore: 'Bengaluru',
+	bengaluru: 'Bengaluru',
+	bombay: 'Mumbai',
+	calcutta: 'Kolkata',
+	madras: 'Chennai',
+	gurgaon: 'Gurugram',
+	poona: 'Pune',
+	trivandrum: 'Thiruvananthapuram',
+	cochin: 'Kochi',
+	vizag: 'Visakhapatnam',
+	mysore: 'Mysuru',
+	mangalore: 'Mangaluru',
+	baroda: 'Vadodara',
+	pondicherry: 'Puducherry',
+	secunderabad: 'Hyderabad',
+	'new delhi': 'Delhi',
+	'delhi ncr': 'Delhi',
+	ncr: 'Delhi',
+	noida: 'Noida',
+	'greater noida': 'Noida',
+};
+
+/** States and union territories, which postings list in the same field as
+ *  cities. They are still worth clustering, but they are not localities — the
+ *  distinction matters for postal addresses in structured data. */
+export const INDIAN_STATES: ReadonlySet<string> = new Set([
+	'andhra pradesh', 'arunachal pradesh', 'assam', 'bihar', 'chhattisgarh', 'goa',
+	'gujarat', 'haryana', 'himachal pradesh', 'jharkhand', 'karnataka', 'kerala',
+	'madhya pradesh', 'maharashtra', 'manipur', 'meghalaya', 'mizoram', 'nagaland',
+	'odisha', 'punjab', 'rajasthan', 'sikkim', 'tamil nadu', 'telangana', 'tripura',
+	'uttar pradesh', 'uttarakhand', 'west bengal', 'jammu and kashmir', 'ladakh',
+	'puducherry', 'chandigarh', 'andaman and nicobar islands', 'lakshadweep',
+	'dadra and nagar haveli and daman and diu',
+]);
+
+const titleCase = (s: string): string => s.replace(/\b[a-z]/g, (c) => c.toUpperCase());
+
+/** Resolve a location string to one canonical display name. */
+export function normalizeCity(raw: string): string {
+	const key = raw.toLowerCase().replace(/\s+/g, ' ').trim();
+	return CITY_ALIASES[key] ?? titleCase(key);
+}
+
+/** True when a location names a state rather than a city. */
+export const isState = (raw: string): boolean =>
+	INDIAN_STATES.has(raw.toLowerCase().replace(/\s+/g, ' ').trim());
+
+/**
  * Role families. A raw job title is too sparse to cluster on — "Graduate
  * Engineer Trainee", "Associate Engineer" and "SDE I" are one intent expressed
  * three ways, and grouping by exact string would yield clusters of one.
@@ -76,8 +132,6 @@ export function roleFamily(fm: Pick<DraftFrontmatter, 'role' | 'jobType'>): { sl
 	}
 	return null;
 }
-
-const titleCase = (s: string): string => s.replace(/\b[a-z]/g, (c) => c.toUpperCase());
 
 type Listing = DraftFrontmatter;
 
@@ -113,10 +167,10 @@ export function buildClusters(listings: Listing[]): Cluster[] {
 			);
 		}
 
-		for (const city of cities) {
-			const citySlug = slugify(city);
+		for (const rawCity of cities) {
+			const cityName = normalizeCity(rawCity);
+			const citySlug = slugify(cityName);
 			if (!citySlug) continue;
-			const cityName = titleCase(city);
 
 			add(
 				{
