@@ -143,7 +143,9 @@ export const draftFrontmatterSchema = z.object({
   status: draftStatusSchema,
   company: z.string(),
   role: z.string(),
-  jobType: jobTypeSchema.optional(),
+  // Not `jobTypeSchema` — that one is nullable because a facts record writes an
+  // explicit null. Frontmatter omits the key instead, so null never appears.
+  jobType: z.enum(JOB_TYPES).optional(),
   batchYears: z.array(z.string()).optional(),
   locations: z.array(z.string()).optional(),
   salary: z.string().optional(),
@@ -159,3 +161,24 @@ export const draftFrontmatterSchema = z.object({
 
 export type DraftFrontmatterZod = z.infer<typeof draftFrontmatterSchema>;
 export type FactRecordZod = z.infer<typeof factRecordSchema>;
+
+// ------------------------------------------------------- contract agreement
+// The interfaces above and the zod schemas below them are two hand-maintained
+// views of one contract, and they have already drifted once: the frontmatter
+// schema reused the nullable jobType meant for facts records, so every consumer
+// typed against the interface failed to compile against the collection.
+//
+// These assertions fail the build the moment the two disagree again.
+
+// Mutual-assignability is not enough here: an optional property added to one
+// side only is assignable in both directions, so `A extends B extends A` would
+// wave through exactly the drift most likely to happen. Comparing the two types
+// as conditional-type identities distinguishes optionality.
+type Exact<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
+
+const _draftContractsAgree: Exact<DraftFrontmatterZod, DraftFrontmatter> = true;
+const _factContractsAgree: Exact<FactRecordZod, FactRecord> = true;
+
+void _draftContractsAgree;
+void _factContractsAgree;
