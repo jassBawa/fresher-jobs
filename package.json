@@ -13,7 +13,9 @@
     "fetch": "pnpm --filter @jobs/ingest run fetch",
     "draft": "pnpm --filter @jobs/ingest run draft",
     "fetch:dry": "pnpm --filter @jobs/ingest run fetch:dry",
-    "draft:nollm": "pnpm --filter @jobs/ingest run draft:nollm"
+    "draft:nollm": "pnpm --filter @jobs/ingest run draft:nollm",
+    "promote": "pnpm --filter @jobs/ingest run promote",
+    "drafts": "pnpm --filter @jobs/ingest run promote --list"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

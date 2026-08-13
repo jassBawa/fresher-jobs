@@ -30,6 +30,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
+        # A placeholder origin on purpose. This job asks "does it compile"; the
+        # real origin is enforced in deploy.yml, which passes vars.SITE_URL and
+        # fails the build if it is unset.
+        env:
+          SITE: https://ci.invalid
         run: pnpm run build
 
       - name: Typecheck
