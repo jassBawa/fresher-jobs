@@ -29,8 +29,16 @@ export const toText = (html = "") =>
 const ATS =
   /(greenhouse|lever\.co|ashbyhq|myworkdayjobs|workday|eightfold|oraclecloud|taleo|icims|smartrecruiters|successfactors|keka|darwinbox|zohorecruit|peoplestrong)/i;
 const DETAIL = /(jobdetail|job[-_/]?id|requisition|\/job\/|\/jobs\/|\/apply|careers?\/.+)/i;
-const SOCIAL =
-  /(facebook|twitter|x\.com|linkedin|whatsapp|telegram|instagram|youtube|pinterest|gravatar)\./i;
+// Share widgets, not destinations. Two patterns because the short forms share
+// no substring with the service they belong to — wa.me is WhatsApp and t.me is
+// Telegram, and both were slipping through a name-based filter into the apply
+// URL candidates.
+const SOCIAL_NAMED =
+  /(facebook|twitter|linkedin|whatsapp|telegram|instagram|youtube|pinterest|gravatar|reddit|threads|tumblr)\./i;
+const SOCIAL_SHORT =
+  /^(x\.com|fb\.com|fb\.me|wa\.me|t\.me|youtu\.be|lnkd\.in|bit\.ly|tinyurl\.com|goo\.gl)$/i;
+
+const isSocial = (host) => SOCIAL_NAMED.test(host) || SOCIAL_SHORT.test(host);
 
 export function scoreApplyUrl(u) {
   let s = 0;
@@ -68,7 +76,7 @@ export function rankApplyUrls(html = "", sourceBase) {
     .filter((u) => {
       try {
         const h = new URL(u).hostname.replace(/^www\./, "");
-        return h !== host && !SOCIAL.test(h);
+        return h !== host && !isSocial(h);
       } catch {
         return false;
       }

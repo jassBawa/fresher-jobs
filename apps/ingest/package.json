@@ -12,7 +12,8 @@
     "draft:nollm": "node src/draft.mjs --no-llm",
     "promote": "node scripts/promote.mjs",
     "typecheck": "echo \"no types — .mjs scripts\"",
-    "lint": "echo \"no lint configured\""
+    "lint": "echo \"no lint configured\"",
+    "test": "node --test \"test/*.test.mjs\""
   },
   "engines": {
     "node": ">=20"

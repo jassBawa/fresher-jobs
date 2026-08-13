@@ -8,6 +8,7 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "ingest": "pnpm --filter @jobs/ingest run ingest",
     "fetch": "pnpm --filter @jobs/ingest run fetch",
     "draft": "pnpm --filter @jobs/ingest run draft",

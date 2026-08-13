@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
-    "lint": "echo \"no lint configured\""
+    "lint": "echo \"no lint configured\"",
+    "test": "node --test \"test/*.test.ts\""
   },
   "dependencies": {
     "@jobs/schema": "workspace:*",

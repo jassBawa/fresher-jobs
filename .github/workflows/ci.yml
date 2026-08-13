@@ -35,5 +35,8 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Test
+        run: pnpm run test
+
       - name: Verify schema JSON is valid
         run: node -e "for (const f of ['packages/schema/src/fact-record.schema.json','packages/schema/src/draft-post.schema.json']) JSON.parse(require('fs').readFileSync(f,'utf8')); console.log('schemas ok')"

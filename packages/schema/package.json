@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"no lint configured\""
+    "lint": "echo \"no lint configured\"",
+    "test": "echo \"no tests — the contract assertions are checked by tsc\""
   },
   "dependencies": {
     "zod": "^4.4.3"
