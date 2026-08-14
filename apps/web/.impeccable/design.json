@@ -1,0 +1,485 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-14T00:00:00Z",
+  "title": "Design System: PehlaJob",
+  "extensions": {
+    "colorMeta": {
+      "live": {
+        "role": "primary",
+        "displayName": "Committed Green",
+        "canonical": "#0b6b35",
+        "tonalRamp": [
+          "#031a0d",
+          "#052a15",
+          "#07401f",
+          "#09552a",
+          "#0b6b35",
+          "#2d8a55",
+          "#68b287",
+          "#c6e2d2"
+        ]
+      },
+      "live-field-press": {
+        "role": "primary",
+        "displayName": "Press Green",
+        "canonical": "#095a2c",
+        "tonalRamp": [
+          "#031a0d",
+          "#052a15",
+          "#07401f",
+          "#095a2c",
+          "#0b6b35",
+          "#2d8a55",
+          "#68b287",
+          "#c6e2d2"
+        ]
+      },
+      "on-field": {
+        "role": "primary",
+        "displayName": "Field White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#12161a",
+          "#2c343c",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8",
+          "#f4f6f8",
+          "#ffffff"
+        ]
+      },
+      "live-on": {
+        "role": "primary",
+        "displayName": "Field Reverse",
+        "canonical": "#eaf4ee",
+        "tonalRamp": [
+          "#0d2417",
+          "#153a26",
+          "#215237",
+          "#356b4d",
+          "#5d8f74",
+          "#8fb8a1",
+          "#c2dbcd",
+          "#eaf4ee"
+        ]
+      },
+      "live-on-2": {
+        "role": "primary",
+        "displayName": "Field Reverse Two",
+        "canonical": "#cfe3d7",
+        "tonalRamp": [
+          "#0d2417",
+          "#153a26",
+          "#215237",
+          "#356b4d",
+          "#5d8f74",
+          "#8fb8a1",
+          "#cfe3d7",
+          "#eaf4ee"
+        ]
+      },
+      "soon": {
+        "role": "secondary",
+        "displayName": "Deadline Amber",
+        "canonical": "#8a4700",
+        "tonalRamp": [
+          "#2b1600",
+          "#412100",
+          "#572d00",
+          "#6f3900",
+          "#8a4700",
+          "#ad6a1f",
+          "#cf9a5c",
+          "#eccfad"
+        ]
+      },
+      "closed": {
+        "role": "secondary",
+        "displayName": "Closed Slate",
+        "canonical": "#59636d",
+        "tonalRamp": [
+          "#1a1f24",
+          "#282f35",
+          "#373f47",
+          "#48515a",
+          "#59636d",
+          "#7d8791",
+          "#a8b1b9",
+          "#d9dee2"
+        ]
+      },
+      "closed-on-2": {
+        "role": "secondary",
+        "displayName": "Closed Reverse Two",
+        "canonical": "#dbdfe3",
+        "tonalRamp": [
+          "#1a1f24",
+          "#282f35",
+          "#373f47",
+          "#48515a",
+          "#59636d",
+          "#7d8791",
+          "#a8b1b9",
+          "#d9dee2"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#12161a",
+        "tonalRamp": [
+          "#12161a",
+          "#1e242a",
+          "#2c343c",
+          "#3b444e",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink Two",
+        "canonical": "#4a545e",
+        "tonalRamp": [
+          "#12161a",
+          "#1e242a",
+          "#2c343c",
+          "#3b444e",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink Three",
+        "canonical": "#67717b",
+        "tonalRamp": [
+          "#12161a",
+          "#1e242a",
+          "#2c343c",
+          "#3b444e",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#12161a",
+          "#2c343c",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8",
+          "#f4f6f8",
+          "#ffffff"
+        ]
+      },
+      "ground-2": {
+        "role": "neutral",
+        "displayName": "Ground Two",
+        "canonical": "#f4f6f8",
+        "tonalRamp": [
+          "#12161a",
+          "#2c343c",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8",
+          "#f4f6f8",
+          "#ffffff"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#dde3e8",
+        "tonalRamp": [
+          "#12161a",
+          "#2c343c",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8",
+          "#f0f3f6",
+          "#ffffff"
+        ]
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Rule",
+        "canonical": "#12161a",
+        "tonalRamp": [
+          "#12161a",
+          "#1e242a",
+          "#2c343c",
+          "#3b444e",
+          "#4a545e",
+          "#67717b",
+          "#a3acb5",
+          "#dde3e8"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Focus Green",
+        "canonical": "#0b6b35",
+        "tonalRamp": [
+          "#031a0d",
+          "#052a15",
+          "#07401f",
+          "#09552a",
+          "#0b6b35",
+          "#2d8a55",
+          "#68b287",
+          "#c6e2d2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The page's single display moment. Only ever the heading inside a status field; nothing else on any page uses it."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "The one size. Every listing surface — row roles, rail keys and values, prose, nav items, brand mark. Tabular figures throughout."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase micro-label and key column. Differs from its value by case, weight and colour, never by scale."
+      },
+      "mark": {
+        "displayName": "Status Mark",
+        "purpose": "The word beside a status glyph. Uppercase, 700, never wrapping."
+      },
+      "fine": {
+        "displayName": "Fine",
+        "purpose": "Legal, provenance and the advertisement marker only. Never a listing surface."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "no-transition",
+        "value": "none",
+        "purpose": "No transitions are declared anywhere. State changes (hover, current, disabled) are instant colour and weight swaps. A reduced-motion query clamps any inherited animation to 0.01ms."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-row",
+        "value": "46rem"
+      },
+      {
+        "name": "rail",
+        "value": "64rem"
+      }
+    ],
+    "fonts": [
+      {
+        "family": "Archivo",
+        "hosting": "self-hosted",
+        "files": [
+          "/fonts/archivo-latin.woff2 (34.9KB)",
+          "/fonts/archivo-latin-ext.woff2 (32.7KB)"
+        ],
+        "totalBytes": 67612,
+        "weightRange": "400 700",
+        "display": "swap",
+        "note": "latin-ext is carried specifically because the rupee sign (U+20B9) lives there; salary lines are unreadable without it. Fallback stack ends in Noto Sans Devanagari so a future Hindi layer does not force a redesign."
+      }
+    ],
+    "guards": [
+      {
+        "name": "Contrast Guard",
+        "value": "#67717b",
+        "measuredAgainst": "--ground-2 (#f4f6f8)",
+        "ratio": "4.59:1",
+        "purpose": "Quiet text stops at Ink Three. The binding measurement is 4.59:1 on Ground Two, not the 4.97:1 it reaches on white: Ground Two is the harder ground and the one the category strip and footer actually use, so a floor checked only against white passes values that fail where the label really sits. Most consequential in the masthead, whose two lines are separated from the brand by colour alone."
+      },
+      {
+        "name": "Measured Contrast Floor",
+        "value": "4.5:1",
+        "measuredAgainst": "all seventeen foreground/background pairs in the system",
+        "purpose": "Every foreground/background pair clears 4.5:1, measured across seventeen pairs rather than eyeballed. The reversed type inside the status fields carries the tightest figures: --on-field is 6.63:1 on --live-field and 8.37:1 on --live-field-press; --live-on-2 is 4.93:1 on --live-field; --closed-on-2 is 4.57:1 on --closed. Reversed type is measured against its own ground and quiet ink against --ground-2, never against white."
+      }
+    ],
+    "ceiling": [
+      {
+        "name": "Rule weight as an unspent rank axis",
+        "detail": "--rule-strong is declared and used exactly once (the 2px masthead border) while a single 1px hairline does every other separation job. A graded rule scale is the one thing this world has room for next. Deliberately not built in this run; recorded as headroom, not a defect."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Status Field",
+      "kind": "custom",
+      "refersTo": "status-field",
+      "description": "Full-bleed band naming the page, its live count and the date checked. Carries the page's one display heading.",
+      "html": "<section class=\"ds-field\"><div class=\"ds-field__inner\"><h1 class=\"ds-display\">12 openings you can still apply for</h1><p class=\"ds-field__meta\"><span>Checked Thu 14 Aug</span><span>3 closing this week</span><span>Every listing links to the company's own form</span></p></div></section>",
+      "css": ".ds-field { background: var(--live-field, #0b6b35); color: var(--live-on, #eaf4ee); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.45; font-variant-numeric: tabular-nums; } .ds-field__inner { max-width: 44rem; margin-inline: auto; padding-inline: 1.125rem; padding-block: 1.5rem; } .ds-display { font-size: clamp(1.375rem, 1.05rem + 1.6vw, 1.875rem); line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; text-wrap: balance; color: var(--on-field, #ffffff); margin: 0; } .ds-field__meta { margin: 0.5rem 0 0; color: var(--live-on-2, #cfe3d7); display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }"
+    },
+    {
+      "name": "Status Field (Closed)",
+      "kind": "custom",
+      "refersTo": "status-field-closed",
+      "description": "The lower register of the status field, used on expired listings and the 404.",
+      "html": "<section class=\"ds-field-closed\"><div class=\"ds-field-closed__inner\"><h1 class=\"ds-display-c\">Wipro — Project Engineer</h1><p class=\"ds-field-closed__meta\"><span class=\"ds-mark-c\"><svg viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"6\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M4.8 11.2 11.2 4.8\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\"/></svg>Applications closed</span><span>Closed 2 Aug</span></p></div></section>",
+      "css": ".ds-field-closed { background: var(--closed, #59636d); color: var(--live-on, #eaf4ee); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.45; } .ds-field-closed__inner { max-width: 44rem; margin-inline: auto; padding-inline: 1.125rem; padding-block: 1.5rem; } .ds-display-c { font-size: clamp(1.375rem, 1.05rem + 1.6vw, 1.875rem); line-height: 1.15; letter-spacing: -0.02em; font-weight: 700; text-wrap: balance; color: var(--on-field, #ffffff); margin: 0; } .ds-field-closed__meta { margin: 0.5rem 0 0; color: var(--closed-on-2, #dbdfe3); display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; } .ds-mark-c { display: inline-flex; align-items: center; gap: 0.4em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--closed-on-2, #dbdfe3); } .ds-mark-c svg { width: 0.72em; height: 0.72em; flex: none; }"
+    },
+    {
+      "name": "Status Marks",
+      "kind": "chip",
+      "refersTo": "status-mark",
+      "description": "The three authored status glyphs plus their words. Colour never carries the meaning alone.",
+      "html": "<span class=\"ds-mark ds-mark--open\"><svg viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"6\" fill=\"currentColor\"/></svg>Open</span> <span class=\"ds-mark ds-mark--soon\"><svg viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"6\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M8 4.5V8l2.5 2\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\"/></svg>Closing</span> <span class=\"ds-mark ds-mark--closed\"><svg viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"6\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M4.8 11.2 11.2 4.8\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\"/></svg>Closed</span>",
+      "css": ".ds-mark { display: inline-flex; align-items: center; gap: 0.4em; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; } .ds-mark svg { width: 0.72em; height: 0.72em; flex: none; } .ds-mark--open { color: var(--live, #0b6b35); } .ds-mark--soon { color: var(--soon, #8a4700); } .ds-mark--closed { color: var(--closed, #59636d); }"
+    },
+    {
+      "name": "Listing Row",
+      "kind": "card",
+      "refersTo": "row",
+      "description": "The receipt line. Hairline-separated, never boxed; key-value rail at the one type size.",
+      "html": "<ul class=\"ds-rows\"><li class=\"ds-row\"><div class=\"ds-row__rail\"><span class=\"ds-mark ds-mark--open\"><svg viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"6\" fill=\"currentColor\"/></svg>Open</span><span class=\"ds-row__posted\">12 Aug</span></div><a class=\"ds-row__role\" href=\"#\"><span class=\"ds-row__company\">Honeywell</span> — Software Engineer I</a><dl class=\"ds-facts\"><dt>Batch</dt><dd>2025, 2026</dd><dt>Where</dt><dd>Bengaluru, Hyderabad</dd><dt>Pay</dt><dd>₹8–12 LPA <em>· estimated</em></dd><dt>Closes</dt><dd>in 6 days</dd></dl></li></ul>",
+      "css": ".ds-rows { list-style: none; margin: 0; padding: 0; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.45; font-variant-numeric: tabular-nums; color: var(--ink, #12161a); } .ds-row { border-bottom: 1px solid var(--rule, #dde3e8); padding-block: 1.5rem; } .ds-row:last-child { border-bottom: 0; } .ds-row__rail { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; } .ds-row__posted { color: var(--ink-3, #67717b); white-space: nowrap; } .ds-row__role { display: block; font-weight: 400; color: inherit; text-decoration-color: var(--rule, #dde3e8); text-underline-offset: 0.18em; text-decoration-thickness: 1px; } .ds-row__company { font-weight: 700; } .ds-row__role:hover { text-decoration-color: currentColor; } .ds-facts { margin: 0.75rem 0 0; display: grid; grid-template-columns: minmax(4.5rem, 6.5rem) 1fr; gap: 0.25rem 1rem; } .ds-facts dt { font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3, #67717b); } .ds-facts dd { margin: 0; color: var(--ink, #12161a); } .ds-facts dd em { font-style: normal; color: var(--ink-3, #67717b); }"
+    },
+    {
+      "name": "Apply Action",
+      "kind": "button",
+      "refersTo": "apply",
+      "description": "The success state. Full-width filled green block with an inline external-link glyph.",
+      "html": "<a class=\"ds-apply\" href=\"#\">Apply on Honeywell's site<svg class=\"ds-apply__out\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\"><path d=\"M6 3h7v7\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M13 3 6.5 9.5\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M11 11.5V13H3V5h1.5\" stroke=\"currentColor\" stroke-width=\"2\"/></svg></a>",
+      "css": ".ds-apply { display: flex; width: 100%; align-items: center; justify-content: center; gap: 0.5em; min-height: 3rem; padding: 0 1.5rem; background: var(--live-field, #0b6b35); color: var(--on-field, #ffffff); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; text-decoration: none; border: 1px solid var(--live-field, #0b6b35); border-radius: 0; } .ds-apply:hover { background: var(--live-field-press, #095a2c); border-color: var(--live-field-press, #095a2c); } .ds-apply:focus-visible { outline: 2px solid var(--focus, #0b6b35); outline-offset: 2px; border-radius: 1px; } .ds-apply__out { width: 0.8em; height: 0.8em; flex: none; }"
+    },
+    {
+      "name": "Apply Action (Dead)",
+      "kind": "button",
+      "refersTo": "apply-dead",
+      "description": "Expired listing, or a listing published with no application link. States why rather than hiding.",
+      "html": "<span class=\"ds-apply-dead\" aria-disabled=\"true\">Applications closed</span>",
+      "css": ".ds-apply-dead { display: flex; width: 100%; align-items: center; justify-content: center; gap: 0.5em; min-height: 3rem; padding: 0 1.5rem; background: transparent; color: var(--closed, #59636d); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; text-decoration: none; border: 1px solid var(--rule, #dde3e8); border-radius: 0; cursor: not-allowed; }"
+    },
+    {
+      "name": "Category Strip",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Travels with every page because most sessions land deep. Built from clusters that actually exist. Scrolls with an edge fade below 64rem, wraps above it.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Job categories\"><div class=\"ds-nav__scroll\"><a class=\"ds-nav__item ds-nav__item--home is-current\" href=\"#\">All openings</a><span class=\"ds-nav__group\"><span class=\"ds-nav__label\">Batch</span><a class=\"ds-nav__item\" href=\"#\">2026</a><a class=\"ds-nav__item\" href=\"#\">2025</a></span><span class=\"ds-nav__group\"><span class=\"ds-nav__label\">City</span><a class=\"ds-nav__item\" href=\"#\">Bengaluru</a><a class=\"ds-nav__item\" href=\"#\">Hyderabad</a></span></div></nav>",
+      "css": ".ds-nav { border-bottom: 1px solid var(--rule, #dde3e8); background: var(--ground-2, #f4f6f8); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.45; color: var(--ink, #12161a); } .ds-nav__scroll { max-width: 44rem; margin-inline: auto; padding-inline: 1.125rem; display: flex; align-items: center; gap: 1rem; overflow-x: auto; padding-block: 0.75rem; scrollbar-width: thin; mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent 100%); } .ds-nav__group { display: flex; align-items: center; gap: 0.75rem; white-space: nowrap; } .ds-nav__group + .ds-nav__group { border-left: 1px solid var(--rule, #dde3e8); padding-left: 1rem; } .ds-nav__label { font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3, #67717b); } .ds-nav__item { white-space: nowrap; text-decoration: none; color: inherit; border-bottom: 2px solid transparent; padding-bottom: 1px; } .ds-nav__item:hover { border-bottom-color: var(--ink, #12161a); } .ds-nav__item.is-current { font-weight: 700; border-bottom-color: var(--live, #0b6b35); } .ds-nav__item--home { font-weight: 600; } .ds-nav__item:focus-visible { outline: 2px solid var(--focus, #0b6b35); outline-offset: 2px; border-radius: 1px; } @media (min-width: 64rem) { .ds-nav__scroll { flex-wrap: wrap; row-gap: 0.5rem; overflow-x: visible; mask-image: none; } }"
+    },
+    {
+      "name": "Reserved Ad Slot",
+      "kind": "custom",
+      "refersTo": "ad-slot",
+      "description": "Height reserved at the eventual unit's size before the script exists, so enabling AdSense shifts nothing. Never above the first content block. The marker holds Ink Three: it is small text a reader may need in order to find an ad boundary.",
+      "html": "<aside class=\"ds-ad ds-ad--feed\" aria-label=\"Advertisement\"><span class=\"ds-ad__inner\"></span></aside>",
+      "css": ".ds-ad { display: block; margin-block: 2rem; padding-top: 0.5rem; border-top: 1px solid var(--rule, #dde3e8); overflow: hidden; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-ad::before { content: 'Advertisement'; display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; color: #67717b; } .ds-ad__inner { display: block; width: 100%; margin-inline: auto; } .ds-ad--feed .ds-ad__inner { min-height: 100px; max-width: 336px; } .ds-ad--foot .ds-ad__inner { min-height: 280px; max-width: 336px; } .ds-ad--rail .ds-ad__inner { min-height: 600px; max-width: 300px; } @media (min-width: 46rem) { .ds-ad--feed .ds-ad__inner { min-height: 90px; max-width: 728px; } }"
+    },
+    {
+      "name": "Masthead",
+      "kind": "custom",
+      "refersTo": "masthead",
+      "description": "Three lines under a 2px strong rule: brand, promise of what the site is, promise of what it checks. The two lower lines are separated from the brand by colour alone, which is what the Contrast Guard protects.",
+      "html": "<header class=\"ds-masthead\"><div class=\"ds-masthead__inner\"><a class=\"ds-brand\" href=\"#\">PehlaJob<span class=\"ds-brand__dot\">.</span></a><div class=\"ds-masthead__lines\"><p class=\"ds-masthead__line\">Fresher jobs in India — checked, dated, linked to the real form.</p><p class=\"ds-masthead__promise\">Nothing is published without a human reading it first.</p></div></div></header>",
+      "css": ".ds-masthead { border-bottom: 2px solid var(--rule-strong, #12161a); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.45; color: var(--ink, #12161a); } .ds-masthead__inner { max-width: 44rem; margin-inline: auto; padding-inline: 1.125rem; padding-block: 1rem; } .ds-brand { display: inline-block; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; font-size: 1rem; color: inherit; } .ds-brand__dot { color: var(--live, #0b6b35); } .ds-masthead__lines { margin-top: 0.25rem; } .ds-masthead__line, .ds-masthead__promise { margin: 0; color: var(--ink-3, #67717b); } @media (min-width: 46rem) { .ds-masthead__inner { display: flex; align-items: baseline; gap: 1.5rem; } .ds-masthead__lines { margin-top: 0; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Confirmation Screen",
+    "overview": "The reference object is the transaction confirmation this audience reads a hundred times a month: the outcome states itself first in a field that owns the full width of the viewport, the facts that prove it follow as key-value rails, and one unmissable action closes the page. Nothing is decorated, because a confirmation screen that decorated itself would be suspicious. The whole system is built for a mid-range Android phone held at arm's length in daylight, on mobile data, by someone who wants a yes-or-no answer in twenty seconds and then wants to leave.\n\nIt refuses the vertical's two defaults with equal force. There is no sarkari bordered results table: no cell borders, no boxed grid, no coloured header bands. There is no SaaS job board either: no rounded cards, no shadows, no chips floating on tinted surfaces, no gradients. Separation is done by a single hairline and by whitespace. What remains is white ground, near-black ink, and one committed green that only ever appears at region scale — as a full-bleed field or as a full-width action — never as a decorative tint.\n\nThe most consequential decision is that rank is never carried by size. Every listing surface is set at exactly one type size; hierarchy is produced by weight, case, colour, reversal and rule. Each page gets exactly one display moment, its heading inside the status field, and nothing else on the page is permitted to grow. The system ships zero JavaScript; the single third-party script is AdSense, and only once PUBLIC_ADSENSE_CLIENT is set.",
+    "keyCharacteristics": [
+      "One type size across every listing surface; one display moment per page.",
+      "Status is a drawn glyph plus a word; colour never carries meaning alone.",
+      "Full-bleed colour fields, hairline separation, zero cards and zero shadows.",
+      "Fixed key column so the value edge never moves between page types.",
+      "Ad heights reserved up front; zero layout shift when the script goes live.",
+      "Every foreground/background pair clears 4.5:1 — measured across seventeen pairs, not eyeballed.",
+      "Zero JavaScript ships; Archivo self-hosted as two woff2 subsets (67.6KB total)."
+    ],
+    "rules": [
+      {
+        "name": "The Region-Scale Rule",
+        "body": "Colour commits at region scale or not at all. Green appears as a full-bleed field or a full-width action; it is never a badge, a tint, a card background, or an accent on a word.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mark-Plus-Word Rule",
+        "body": "Colour never carries meaning alone anywhere in the system. Every status renders a drawn SVG glyph plus its word. On a green field the mark is restated explicitly to the reverse colour, because green on green is invisible.",
+        "section": "colors"
+      },
+      {
+        "name": "The Contrast Guard",
+        "body": "Quiet text stops at Ink Three (#67717b), and the binding measurement is 4.59:1 on Ground Two (#f4f6f8) — not the 4.97:1 it reaches on white. Ground Two is the harder ground and the one the category strip and the footer actually use, so a floor checked only against white will pass a value that fails where the label really sits. This matters most in the masthead, whose two lines are separated from the brand by colour alone: lighten the promise line and the trust claim goes with it. This is a floor, not a suggestion.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Size Rule",
+        "body": "Every listing surface is set at one size. Rank comes from weight, case, reversal, colour and rule — never from making something bigger. A key and its value are the same size; a label and its content are the same size. Audit test: if a new element needs a third size to read correctly, the hierarchy is wrong, not the scale.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two-Step Reverse Rule",
+        "body": "Type on a status field has exactly two steps: the mark and the display sit at the bright end (--on-field, --live-on), the meta line one step back (--live-on-2 on green, --closed-on-2 on slate). That gives a reversed field its own internal hierarchy without introducing a second type size — the same device as weight and case elsewhere, applied to a reversed ground. It is the One Size Rule holding under pressure, not being bent. Both back-steps are measured against their own ground rather than white.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Display Moment Rule",
+        "body": "A page gets exactly one display-sized element, and it lives inside the status field. A second display size on a page is a defect, including in the masthead — which is why the promise line is set at body size and ranked by colour instead.",
+        "section": "typography"
+      },
+      {
+        "name": "The Never-Above Rule",
+        "body": "An ad is never placed above the first content block. It interleaves after the first four rows on long lists, sits at the end of content, or lives in the desktop rail. An ad may never be the LCP element or the first thing the visitor meets.",
+        "section": "layout"
+      },
+      {
+        "name": "The Fixed Rail Rule",
+        "body": "The key column is a fixed width, not content-sized. Values must line up across every page type; a rail that resizes to its longest key breaks the scan.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Ground Rule",
+        "body": "Surfaces are flat, always. Depth is a rule, a tint band, or a full-bleed field — never a shadow, never a lift, never a border pretending to be one.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Separation is one 1px hairline. Rows are separated by it and never boxed by it; the last row in a list drops its border rather than closing the box.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do set every listing surface at the one body size (1rem) and rank with weight, case, colour, reversal and rule.",
+      "Do give each page exactly one display-sized element, inside its status field.",
+      "Do ship every status as a drawn glyph plus a word, and restate the mark's colour when it sits on a coloured field.",
+      "Do hold quiet text at or above Ink Three (#67717b) and check it against Ground Two (4.59:1), not white — including the masthead promise line, which is separated from the line above by colour alone.",
+      "Do commit colour at region scale — a full-bleed field or a full-width action.",
+      "Do separate with one 1px hairline and drop it on the last item.",
+      "Do reserve ad heights at the eventual unit size before the script exists, and keep every ad below the first content block.",
+      "Do keep the key column fixed (6.5rem) so values line up across page types.",
+      "Do draw icons as inline SVG on a 16x16 grid at 2px square-capped stroke.",
+      "Do keep the build at zero shipped JavaScript; AdSense is the only third-party script, and only when its env var is set."
+    ],
+    "donts": [
+      "Don't introduce a third type size on a listing surface. Fine type is for legal and provenance only.",
+      "Don't box a row into a card, and don't add border-radius anywhere except the 1px focus ring.",
+      "Don't use a shadow. There are none in the system and depth does not need one.",
+      "Don't let colour carry a meaning on its own, anywhere, for any state.",
+      "Don't place an ad above the first content block, and don't enable Auto Ads or responsive ad heights.",
+      "Don't tint green or use it as a badge, chip or accent fill.",
+      "Don't hide a closed listing. Demote it to Ink Two at weight 400 and keep its URL.",
+      "Don't invent social proof, employer logos, counts or trust badges; none exist to render."
+    ]
+  }
+}
