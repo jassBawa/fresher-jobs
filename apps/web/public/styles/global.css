@@ -59,9 +59,17 @@
 	   meaning on its own. */
 	--live: #0b6b35;
 	--live-field: #0b6b35;
+	--live-field-press: #095a2c;
+	/* Type set on a status field. Two steps: the mark and the display sit at the
+	   bright end, the meta line one step back so the field has an internal
+	   hierarchy without a second size. Both measured against their own ground,
+	   not against white. */
+	--on-field: #ffffff;
 	--live-on: #eaf4ee;
+	--live-on-2: #cfe3d7;
 	--soon: #8a4700;
 	--closed: #59636d;
+	--closed-on-2: #dbdfe3;
 
 	/* One size. Everything on a listing surface is set here. */
 	--fs: 1rem;
@@ -203,12 +211,12 @@ figure {
 }
 
 .field .display {
-	color: #fff;
+	color: var(--on-field);
 }
 
 .field__meta {
 	margin-top: var(--space-2);
-	color: #cfe3d7;
+	color: var(--live-on-2);
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-1) var(--space-4);
@@ -216,7 +224,7 @@ figure {
 
 .field--closed .field__meta {
 	/* 4.57:1 on --closed. The previous #d7dbdf sat at 4.40. */
-	color: #dbdfe3;
+	color: var(--closed-on-2);
 }
 
 /* Inside a status field the mark sits on its own colour, so the reversed value
@@ -227,7 +235,7 @@ figure {
 }
 
 .field--closed .mark {
-	color: #dbdfe3;
+	color: var(--closed-on-2);
 }
 
 /* ------------------------------------------------------------------- marks */
@@ -360,7 +368,7 @@ figure {
 	min-height: 3rem;
 	padding: 0 var(--space-5);
 	background: var(--live-field);
-	color: #fff;
+	color: var(--on-field);
 	font-weight: 700;
 	letter-spacing: 0.02em;
 	text-decoration: none;
@@ -368,8 +376,8 @@ figure {
 }
 
 .apply:hover {
-	background: #095a2c;
-	border-color: #095a2c;
+	background: var(--live-field-press);
+	border-color: var(--live-field-press);
 }
 
 .apply--block {

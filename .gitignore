@@ -12,5 +12,6 @@ build/
 # local run logs
 logs/
 
-# impeccable working files
-.impeccable/
+# impeccable — keep the design record, drop the working files
+.impeccable/*
+!.impeccable/design.json

@@ -92,8 +92,10 @@ const short = (c: Cluster): string => {
 		scrollbar-width: thin;
 		scrollbar-color: var(--rule) transparent;
 		/* Fade the right edge so a clipped item reads as "there is more" rather
-		   than as a word cut in half. */
-		mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent 100%);
+		   than as a word cut in half. A mask reads only the alpha channel, so the
+		   opaque stop is currentColor rather than a literal — there is no colour
+		   decision here to keep in the palette. */
+		mask-image: linear-gradient(to right, currentColor calc(100% - 2rem), transparent 100%);
 	}
 
 	.nav__scroll::-webkit-scrollbar {
