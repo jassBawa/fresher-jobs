@@ -32,22 +32,26 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      # Free-tier providers only, in detection order. Ollama is not an option
+      # here — there is no model server on a runner, and pulling one per run
+      # would cost more minutes than the extraction itself.
       - name: Extract facts from new postings
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MAX_POSTS_PER_RUN: "25"
         run: pnpm --filter @jobs/ingest run fetch
 
+      # If every provider is rate-limited this still writes complete drafts,
+      # tagged generatedBy: template. It does not fail the run.
       - name: Write drafts
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SITE_NAME: ${{ vars.SITE_NAME }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: pnpm --filter @jobs/ingest run draft
 
       - name: Commit new drafts

@@ -338,6 +338,34 @@ compares the types as conditional-type identities instead.
 
 ---
 
+## D19 — No paid model tier at all
+
+**Decision.** Remove the OpenAI and Anthropic adapters. Detection order is now
+Groq → Cerebras → Gemini → OpenRouter, with Ollama available locally. There is no
+metered fallback.
+
+**Why.** D11 already established that a small fast model is the right tool here,
+and kept the frontier providers only as a safety net. The net was worth less than
+it cost:
+
+- **The measured spread is ~30×** — ₹9/month against ₹276 for the same 25
+  postings/day, for JSON extraction plus four short prose fields.
+- **A bigger model writes worse copy for this page.** Longer and more florid is a
+  downgrade when the reader's only question is "can I apply, yes or no".
+- **A fallback that bills is a fallback that fires unnoticed.** Detection is by
+  environment variable, so a stray `OPENAI_API_KEY` in a shell or a runner would
+  silently start charging for work an 8B model already does well.
+
+The failure mode without them is better, not worse: if every free provider is
+rate-limited at once, the run degrades to `generatedBy: template`, which is a
+complete and publishable draft (D12), rather than falling through to something
+metered.
+
+**Kept:** the cost table in [costs.md](./costs.md) still lists the paid options.
+That is the evidence for this decision, and it should stay legible.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |

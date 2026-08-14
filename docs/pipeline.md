@@ -23,7 +23,7 @@ dependencies** — built-ins only.
 | `apps/ingest/src/lib/extract.mjs` | Rule-based pre-extraction: HTML→text, link ranking, batch years |
 | `apps/ingest/src/lib/render.mjs` | Templates and frontmatter assembly. Pure — no clock, no I/O |
 | `apps/ingest/src/lib/dates.mjs` | Free-text deadline → ISO date |
-| `apps/ingest/src/lib/llm.mjs` | Provider-agnostic JSON-mode LLM call. 7 providers, one adapter for most |
+| `apps/ingest/src/lib/llm.mjs` | Provider-agnostic JSON-mode LLM call. 5 providers, all free-tier or local |
 | `apps/ingest/scripts/promote.mjs` | The review gate — flips `status` to published |
 | `apps/ingest/data/state.json` | Post IDs already seen, so reruns are incremental |
 | `packages/schema/src/index.ts` | The fact/draft contracts: types, zod, JSON Schema |
@@ -44,7 +44,7 @@ Run from the repo root.
 | `pnpm run draft:nollm` | **No** — renders complete drafts from templates alone |
 | `pnpm run drafts` | **No** — lists every draft and whether it is live |
 | `pnpm run promote <slug>…` | **No** — publishes one or more drafts |
-| `pnpm run test` | **No** — 86 tests, no runner, no dependencies |
+| `pnpm run test` | **No** — 94 tests, no runner, no dependencies |
 | `pnpm run build` | **No** — builds the static site into `apps/web/dist/` |
 
 ---
@@ -212,9 +212,12 @@ Listing pages that clear the gate also carry schema.org `JobPosting` markup.
 | 2 | **Cerebras** | `llama3.1-8b` | Free tier, fastest |
 | 3 | **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
 | 4 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Free models |
-| — | **Ollama** | `qwen2.5:3b` | Local. Opt in with `LLM_PROVIDER=ollama`. Non-reasoning model — qwen3's thinking blocks break strict JSON |
-| 5 | OpenAI | `gpt-5-nano` | Paid |
-| 6 | Anthropic | `claude-haiku-4-5-20251001` | Paid |
+| — | **Ollama** | `qwen2.5:3b` | Local. Opt in with `LLM_PROVIDER=ollama` |
+
+No paid tier. The OpenAI and Anthropic adapters were removed — see D11 and D19.
+If every free provider is rate-limited at once the run degrades to
+`generatedBy: template`, which is a complete draft, rather than falling through
+to something metered.
 
 Everything except Gemini and Anthropic speaks the OpenAI chat-completions shape,
 so they share one adapter — adding a provider is one line. Gemini uses its native

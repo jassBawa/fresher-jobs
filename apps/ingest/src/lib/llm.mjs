@@ -99,36 +99,18 @@ const P = {
     },
   },
 
-  // ---- paid fallbacks ------------------------------------------------------
-  openai: oai("openai", "https://api.openai.com/v1", "OPENAI_API_KEY", "gpt-5-nano"),
-  anthropic: {
-    name: "anthropic",
-    key: () => process.env.ANTHROPIC_API_KEY,
-    model: () => process.env.LLM_MODEL || "claude-haiku-4-5-20251001",
-    async call(model, key, prompt, maxTokens) {
-      const r = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-api-key": key,
-          "anthropic-version": "2023-06-01",
-        },
-        signal: AbortSignal.timeout(90000),
-        body: JSON.stringify({
-          model,
-          max_tokens: maxTokens,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      if (!r.ok) throw new Error(`anthropic ${r.status}: ${(await r.text()).slice(0, 300)}`);
-      const d = await r.json();
-      return d.content?.map((c) => c.text || "").join("") ?? "";
-    },
-  },
 };
 
 // Order matters: first one with a usable key wins.
-const ORDER = ["groq", "cerebras", "gemini", "openrouter", "openai", "anthropic"];
+//
+// Free tiers and local only. The paid frontier fallbacks were removed: this
+// workload is JSON extraction plus four short prose fields, and the measured
+// spread was ₹9/month against ₹276 for the same 25 postings/day — a 30× swing
+// for output that gets *worse*, since a bigger model writes longer and more
+// florid copy on a page whose only job is "can I apply, yes or no". Keeping
+// them as a fallback meant a stray key in the environment could silently start
+// billing for a job an 8B model already does well. See docs/decisions.md D11.
+const ORDER = ["groq", "cerebras", "gemini", "openrouter"];
 
 let cached = null;
 

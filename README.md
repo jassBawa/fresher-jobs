@@ -26,7 +26,7 @@ fresher-jobs/                pnpm + Turborepo monorepo
 │   ├── src/draft.mjs        turns each facts file into a draft in data/drafts/
 │   ├── src/lib/             llm providers, extraction, templates, date parsing
 │   ├── scripts/promote.mjs  the review gate — flips status to published
-│   ├── test/                86 tests, node:test, no runner
+│   ├── test/                94 tests, node:test, no runner
 │   └── data/                facts/, drafts/, state.json
 ├── apps/web/                static site (@jobs/web) — listings, clusters, sitemap
 ├── packages/schema/         shared types + JSON Schema + zod (@jobs/schema)
@@ -60,7 +60,7 @@ Run from the repo root.
 | `pnpm run drafts` | Lists every draft and whether it is live. **No key needed** |
 | `pnpm run promote <slug>…` | Publishes one or more drafts. Add `draft` to pull one back |
 | `pnpm run build` | Builds the static site into `apps/web/dist/` |
-| `pnpm run test` | 86 tests. No runner, no dependencies |
+| `pnpm run test` | 94 tests. No runner, no dependencies |
 | `pnpm run typecheck` | `tsc` + `astro check` |
 | `pnpm run fetch:dry` | Parses the source and prints what it found. **No API key, writes nothing.** Use it to check the source is reachable |
 | `pnpm run draft:nollm` | Renders drafts from templates alone. **No API key, no cost** |
@@ -90,7 +90,10 @@ Ordered cheapest and fastest first; the first key found wins.
 | **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Genuinely free models |
 | **Ollama** | `qwen2.5:3b` | Local. No key, no cost, no rate limit. Set `LLM_PROVIDER=ollama` |
-| OpenAI / Anthropic | `gpt-5-nano` / `claude-haiku-4-5` | Paid fallbacks |
+
+There is no paid fallback, deliberately. Metered frontier models cost ~30× more
+here for output that is actually worse, and leaving them wired up meant a stray
+key in the environment could quietly start billing.
 
 At 25 postings/day this runs comfortably inside a free tier. A larger model buys
 you nothing here — longer, more florid copy is a downgrade on a page whose only
