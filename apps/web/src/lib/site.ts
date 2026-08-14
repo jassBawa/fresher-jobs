@@ -26,3 +26,15 @@ export async function publishedListings(): Promise<JobEntry[]> {
 export async function liveListings(on: string = today()): Promise<JobEntry[]> {
 	return (await publishedListings()).filter((job) => !isExpired(job.data, on));
 }
+
+/**
+ * Published listings whose deadline has passed.
+ *
+ * These keep their URLs, so they must also keep a way in from inside the site:
+ * a reader who saw a listing yesterday should find out it closed rather than
+ * meet a gap where it was. Shown in a lower register beneath the open rows,
+ * and never counted in the open totals or the sitemap.
+ */
+export async function closedListings(on: string = today()): Promise<JobEntry[]> {
+	return (await publishedListings()).filter((job) => isExpired(job.data, on));
+}

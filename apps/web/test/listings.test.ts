@@ -11,6 +11,7 @@ import {
 	statusOf,
 	closesLabel,
 	shortDay,
+	payLabel,
 } from '../src/lib/listings.ts';
 
 /** A listing that clears the indexing gate, so each test can break one thing.
@@ -162,4 +163,13 @@ test('the date rail is short enough to scan', () => {
 	assert.equal(shortDay('2026-08-14'), '14 Aug');
 	assert.equal(shortDay('2026-01-01'), '1 Jan');
 	assert.equal(shortDay(undefined), '');
+});
+
+test('the page owns the salary hedge, so the source keeps none of its own', () => {
+	// Real values. Left alone these render as "(Expected) · estimated".
+	assert.equal(payLabel('₹ 4 to 7 LPA (Expected)'), '₹4 to 7 LPA');
+	assert.equal(payLabel('₹4 to 6 LPA (Expected)'), '₹4 to 6 LPA');
+	assert.equal(payLabel('10- 20 LPA'), '10–20 LPA');
+	assert.equal(payLabel('Competitive / Best in Industry'), 'Competitive / Best in Industry');
+	assert.equal(payLabel(undefined), '');
 });

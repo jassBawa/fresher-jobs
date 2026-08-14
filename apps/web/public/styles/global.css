@@ -67,6 +67,9 @@
 	--fs-fine: 0.8125rem;
 
 	--measure: 44rem;
+	/* The key column of every key-value rail. Fixed, not content-sized, so the
+	   value edge does not move between the homepage, a cluster and a listing. */
+	--rail: 6.5rem;
 	--gutter: 1.125rem;
 
 	--space-1: 0.25rem;
@@ -210,6 +213,17 @@ figure {
 	color: #d7dbdf;
 }
 
+/* Inside a status field the mark sits on its own colour, so the reversed value
+   has to be stated: `.mark--open{color:var(--live)}` is a direct rule and beats
+   anything the field inherits down. Green on green is invisible. */
+.field .mark {
+	color: var(--live-on);
+}
+
+.field--closed .mark {
+	color: #d7dbdf;
+}
+
 /* ------------------------------------------------------------------- marks */
 
 .mark {
@@ -287,7 +301,7 @@ figure {
 .facts {
 	margin: var(--space-3) 0 0;
 	display: grid;
-	grid-template-columns: max-content 1fr;
+	grid-template-columns: minmax(4.5rem, var(--rail)) 1fr;
 	gap: var(--space-1) var(--space-4);
 }
 
@@ -306,6 +320,28 @@ figure {
 .facts dd em {
 	font-style: normal;
 	color: var(--ink-3);
+}
+
+/* Closed listings stay on the page in a lower register rather than vanishing —
+   a reader who saw it yesterday should find out it closed, not meet a gap. */
+.row--closed .row__company,
+.row--closed .row__role {
+	color: var(--ink-2);
+	font-weight: 400;
+}
+
+.row--closed .facts dd {
+	color: var(--ink-2);
+}
+
+.closed-tail {
+	margin-top: var(--space-6);
+	padding-top: var(--space-4);
+	border-top: 1px solid var(--rule);
+}
+
+.closed-tail__head {
+	margin-bottom: var(--space-2);
 }
 
 /* ----------------------------------------------------------------- actions */
@@ -350,7 +386,22 @@ figure {
 .ad {
 	display: block;
 	margin-block: var(--space-6);
+	padding-top: var(--space-2);
+	border-top: 1px solid var(--rule);
 	overflow: hidden;
+}
+
+/* The marker stays when the script goes live — the label belongs above the
+   unit either way, and a reserved box with nothing in it reads as breakage. */
+.ad::before {
+	content: 'Advertisement';
+	display: block;
+	margin-bottom: var(--space-2);
+	font-weight: 600;
+	font-size: var(--fs-fine);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #9aa4ae;
 }
 
 .ad__inner {
@@ -382,6 +433,29 @@ figure {
 	.ad--foot .ad__inner {
 		min-height: 280px;
 		max-width: 336px;
+	}
+}
+
+/* The desktop margin was carrying nothing. Below this width the rail is not
+   rendered at all rather than stacked into the reading column. */
+.rail {
+	display: none;
+}
+
+@media (min-width: 64rem) {
+	.with-rail {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 300px;
+		gap: var(--space-7);
+		max-width: 60rem;
+	}
+	.rail {
+		display: block;
+	}
+	.rail .ad {
+		position: sticky;
+		top: var(--space-5);
+		margin-block: 0;
 	}
 }
 

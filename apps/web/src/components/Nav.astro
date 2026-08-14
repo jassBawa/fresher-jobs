@@ -1,0 +1,141 @@
+---
+/**
+ * Category strip.
+ *
+ * Most sessions land deep — on a listing or a cluster page, from a search
+ * result or a WhatsApp forward — so the way into the rest of the site has to
+ * travel with every page rather than living on a homepage nobody visits.
+ *
+ * Built from the clusters that actually exist rather than a hardcoded menu, so
+ * it can never point at an empty page. Ordered by how this audience filters:
+ * batch year first (the question a fresher asks before any other), then role,
+ * then city.
+ *
+ * Scrolls horizontally on narrow screens, the same gesture the state strips on
+ * every Indian job board already teach.
+ */
+import { buildClusters, type Cluster } from '../lib/clusters';
+import { liveListings } from '../lib/site';
+
+interface Props {
+	/** Path of the cluster currently being viewed, so it can mark itself. */
+	current?: string;
+}
+
+const { current } = Astro.props;
+
+const clusters = buildClusters((await liveListings()).map((job) => job.data));
+
+const pick = (kind: Cluster['kind'], n: number): Cluster[] =>
+	clusters.filter((c) => c.kind === kind).slice(0, n);
+
+// Batch years read best newest-first; the rest are already ranked by size.
+const batches = clusters
+	.filter((c) => c.kind === 'batch')
+	.sort((a, b) => b.path.localeCompare(a.path))
+	.slice(0, 4);
+
+const groups: { label: string; items: Cluster[] }[] = [
+	{ label: 'Batch', items: batches },
+	{ label: 'Role', items: pick('role', 4) },
+	{ label: 'City', items: pick('city', 4) },
+];
+
+const short = (c: Cluster): string => {
+	if (c.kind === 'batch') return c.path.replace('-batch-jobs', '');
+	if (c.kind === 'city') return c.heading.replace(/^Fresher jobs in /, '');
+	return c.heading.replace(/ jobs for freshers$/, '');
+};
+---
+
+{
+	clusters.length > 0 && (
+		<nav class="nav" aria-label="Job categories">
+			<div class="wrap nav__scroll">
+				<a class:list={['nav__item', 'nav__item--home', !current && 'is-current']} href="/">
+					All openings
+				</a>
+				{groups.map(({ label, items }) =>
+					items.length ? (
+						<span class="nav__group">
+							<span class="nav__label">{label}</span>
+							{items.map((c) => (
+								<a
+									class:list={['nav__item', current === c.path && 'is-current']}
+									href={`/${c.path}/`}
+									aria-current={current === c.path ? 'page' : undefined}
+								>
+									{short(c)}
+								</a>
+							))}
+						</span>
+					) : null
+				)}
+			</div>
+		</nav>
+	)
+}
+
+<style>
+	.nav {
+		border-bottom: 1px solid var(--rule);
+		background: var(--ground-2);
+	}
+
+	.nav__scroll {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		padding-block: var(--space-3);
+		scrollbar-width: thin;
+		scrollbar-color: var(--rule) transparent;
+	}
+
+	.nav__scroll::-webkit-scrollbar {
+		height: 4px;
+	}
+	.nav__scroll::-webkit-scrollbar-thumb {
+		background: var(--rule);
+	}
+
+	.nav__group {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		white-space: nowrap;
+	}
+
+	.nav__group + .nav__group {
+		border-left: 1px solid var(--rule);
+		padding-left: var(--space-4);
+	}
+
+	.nav__label {
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	.nav__item {
+		white-space: nowrap;
+		text-decoration: none;
+		border-bottom: 2px solid transparent;
+		padding-bottom: 1px;
+	}
+
+	.nav__item:hover {
+		border-bottom-color: var(--ink);
+	}
+
+	.nav__item.is-current {
+		font-weight: 700;
+		border-bottom-color: var(--live);
+	}
+
+	.nav__item--home {
+		font-weight: 600;
+	}
+</style>

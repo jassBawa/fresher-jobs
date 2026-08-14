@@ -10,7 +10,7 @@ import Base from '../layouts/Base.astro';
 import JobList from '../components/JobList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { buildClusters, clusterRobots, clusterIsIndexable } from '../lib/clusters';
-import { liveListings } from '../lib/site';
+import { liveListings, closedListings } from '../lib/site';
 import { statusOf, today, shortDay } from '../lib/listings';
 
 export const getStaticPaths = async () => {
@@ -30,9 +30,20 @@ const { cluster, listings } = Astro.props;
 const on = today();
 const closingSoon = listings.filter((fm) => statusOf(fm, on) === 'closing').length;
 const thin = !clusterIsIndexable(cluster);
+
+// Closed listings that belong to this same cluster, in the lower register.
+const closedHere = (await closedListings(on))
+	.map((job) => job.data)
+	.filter((fm) => cluster.slugs.includes(fm.slug))
+	.slice(0, 4);
 ---
 
-<Base title={cluster.title} description={cluster.description} robots={clusterRobots(cluster)}>
+<Base
+	title={cluster.title}
+	description={cluster.description}
+	robots={clusterRobots(cluster)}
+	current={cluster.path}
+>
 	<section class="field">
 		<div class="wrap field__inner">
 			<h1 class="display">{cluster.heading}</h1>
@@ -44,8 +55,18 @@ const thin = !clusterIsIndexable(cluster);
 		</div>
 	</section>
 
-	<div class="wrap">
+	<div class="wrap with-rail">
+		<div>
 		<JobList listings={listings} adAfter={4} />
+
+		{
+			closedHere.length > 0 && (
+				<section class="closed-tail">
+					<h2 class="label closed-tail__head">Recently closed</h2>
+					<JobList listings={closedHere} closed />
+				</section>
+			)
+		}
 
 		<p class="back rule-top">
 			<a href="/">← All openings</a>
@@ -53,6 +74,11 @@ const thin = !clusterIsIndexable(cluster);
 		</p>
 
 		<AdSlot placement="foot" />
+		</div>
+
+		<aside class="rail" aria-label="Advertisement">
+			<AdSlot placement="rail" />
+		</aside>
 	</div>
 </Base>
 

@@ -1,14 +1,19 @@
 ---
+import Nav from '../components/Nav.astro';
+
 interface Props {
 	title: string;
 	description?: string;
 	robots?: string;
+	/** Cluster path currently being viewed, so the nav can mark itself. */
+	current?: string;
 }
 
 const {
 	title,
 	description = 'Fresh openings for freshers and early-career candidates in India. Batch, qualification, location and closing date on every listing.',
 	robots = 'index, follow',
+	current,
 } = Astro.props;
 
 const SITE = Astro.site ?? new URL('http://localhost:4321/');
@@ -76,9 +81,14 @@ const adsClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 				<a class="brand" href="/">
 					PehlaJob<span class="brand__dot">.</span>
 				</a>
-				<p class="masthead__line">Fresher jobs in India — checked, dated, and linked to the real form.</p>
+				<div class="masthead__lines">
+					<p class="masthead__line">Fresher jobs in India — checked, dated, linked to the real form.</p>
+					<p class="masthead__promise">Nothing is published without a human reading it first.</p>
+				</div>
 			</div>
 		</header>
+
+		<Nav current={current} />
 
 		<main id="main">
 			<slot />
@@ -136,9 +146,20 @@ const adsClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 		color: var(--live);
 	}
 
-	.masthead__line {
+	.masthead__lines {
 		margin-top: var(--space-1);
+	}
+
+	.masthead__line {
 		color: var(--ink-3);
+	}
+
+	/* The third line the contract promises, and the trust claim this audience
+	   needs: a job board that says what it checks. Kept to one line at every
+	   width — the masthead is the tax the visitor pays before the listings. */
+	.masthead__promise {
+		color: var(--ink-3);
+		font-size: var(--fs-fine);
 	}
 
 	.foot {
@@ -174,7 +195,7 @@ const adsClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 			align-items: baseline;
 			gap: var(--space-5);
 		}
-		.masthead__line {
+		.masthead__lines {
 			margin-top: 0;
 		}
 	}

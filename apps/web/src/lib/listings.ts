@@ -141,6 +141,25 @@ export function closesLabel(
 	return `Open till ${d} ${month} ${y}`;
 }
 
+/**
+ * Salary with the source's own hedge removed.
+ *
+ * Values arrive as "₹ 4 to 7 LPA (Expected)" and the page adds its own
+ * "· estimated", which read together as "(Expected) · estimated" — the same
+ * caveat twice. The page owns the hedge; the source's parenthetical goes.
+ */
+export function payLabel(salary: string | undefined): string {
+	if (!salary) return '';
+	return salary
+		.replace(/\s*\((?:expected|approx\.?|estimated|tentative)[^)]*\)/gi, '')
+		// The source writes ranges as "10- 20 LPA" and "₹ 4 to 7". Close the gap
+		// around the dash so a range reads as one number, not two.
+		.replace(/(\d)\s*-\s*(\d)/g, '$1–$2')
+		.replace(/₹\s+/g, '₹')
+		.replace(/\s{2,}/g, ' ')
+		.trim();
+}
+
 /** `2026-08-14` → `14 Aug`. Same year is assumed; the rail is for scanning. */
 export function shortDay(iso: string | undefined): string {
 	if (!iso) return '';

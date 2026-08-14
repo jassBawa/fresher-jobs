@@ -11,8 +11,10 @@ import {
 	statusOf,
 	closesLabel,
 	shortDay,
+	payLabel,
 	today,
 } from '../../lib/listings';
+import { slugify, normalizeCity, isPlace, roleFamily } from '../../lib/clusters';
 
 export const getStaticPaths = async () => {
 	const jobs = await getCollection('jobs', ({ data }) => data.status === 'published');
@@ -32,12 +34,23 @@ const status = statusOf(fm, on);
 const canonical = new URL(Astro.url.pathname, Astro.site ?? new URL('http://localhost:4321/'));
 
 // The four facts the whole visit turns on, in the order they are asked.
-const eligibility = [
-	['Batch', fm.batchYears?.length ? fm.batchYears.join(', ') : null],
-	['Where', fm.locations?.length ? fm.locations.join(', ') : null],
-	['Type', fm.jobType],
-	['Pay', fm.salary],
-].filter(([, v]) => v) as [string, string][];
+// Batch and Where link onward: this page is where most sessions land, and a
+// cluster is the nearest way into the rest of the site.
+const batchLinks = (fm.batchYears ?? [])
+	.filter((y) => /^\d{4}$/.test(y))
+	.map((y) => ({ label: y, href: `/${y}-batch-jobs/` }));
+
+const cityLinks = (fm.locations ?? [])
+	.filter(isPlace)
+	.map((raw) => normalizeCity(raw))
+	.filter((c, i, all) => all.indexOf(c) === i)
+	.map((c) => ({ label: c, href: `/jobs-in-${slugify(c)}/` }));
+
+// Locations the clusters cannot represent still have to be stated.
+const plainPlaces = (fm.locations ?? []).filter((l) => !isPlace(l));
+
+const family = roleFamily(fm);
+const companyHref = `/${slugify(fm.company)}-jobs/`;
 ---
 
 <Base title={fm.title} description={fm.description} robots={listingRobots(fm, on)}>
@@ -52,11 +65,9 @@ const eligibility = [
 	<article>
 		<section class:list={['field', expired && 'field--closed']}>
 			<div class="wrap field__inner">
-				<p class="head__status">
-					<StatusMark status={status} label={expired ? 'Applications closed' : undefined} />
-				</p>
 				<h1 class="display">{fm.company} — {fm.role}</h1>
 				<p class="field__meta">
+					<StatusMark status={status} label={expired ? 'Applications closed' : undefined} />
 					<span>{closesLabel(fm, on)}</span>
 					{fm.postedAt && <span>Posted {shortDay(fm.postedAt)}</span>}
 				</p>
@@ -66,25 +77,71 @@ const eligibility = [
 		<div class="wrap">
 			<dl class="facts facts--head">
 				{
-					eligibility.map(([k, v]) => (
+					batchLinks.length > 0 && (
 						<>
-							<dt>{k}</dt>
-							<dd>
-								{v}
-								{k === 'Pay' && <em> · estimated</em>}
+							<dt>Batch</dt>
+							<dd class="links">
+								{batchLinks.map((b) => (
+									<a href={b.href}>{b.label}</a>
+								))}
 							</dd>
 						</>
-					))
+					)
+				}
+				{
+					(cityLinks.length > 0 || plainPlaces.length > 0) && (
+						<>
+							<dt>Where</dt>
+							<dd class="links">
+								{cityLinks.map((c) => (
+									<a href={c.href}>{c.label}</a>
+								))}
+								{plainPlaces.map((l) => (
+									<span>{l}</span>
+								))}
+							</dd>
+						</>
+					)
+				}
+				{
+					fm.jobType && (
+						<>
+							<dt>Type</dt>
+							<dd>{fm.jobType}</dd>
+						</>
+					)
+				}
+				{
+					fm.salary && (
+						<>
+							<dt>Pay</dt>
+							<dd>
+								{payLabel(fm.salary)} <em>· estimated</em>
+							</dd>
+						</>
+					)
 				}
 			</dl>
 
 			{
 				fm.applyUrl && !expired ? (
 					<p class="act">
-						<a class="apply apply--block" href={fm.applyUrl} rel="nofollow sponsored noopener">
+						<a
+							class="apply apply--block"
+							href={fm.applyUrl}
+							target="_blank"
+							rel="nofollow sponsored noopener noreferrer"
+						>
 							Apply on {fm.company}'s site
+							<svg class="apply__out" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+								<path d="M6 3h7v7" stroke="currentColor" stroke-width="2" />
+								<path d="M13 3 6.5 9.5" stroke="currentColor" stroke-width="2" />
+								<path d="M11 11.5V13H3V5h1.5" stroke="currentColor" stroke-width="2" />
+							</svg>
 						</a>
-						<span class="fine act__note">Opens the employer's own application form.</span>
+						<span class="fine act__note">
+							Opens {fm.company}'s own application form in a new tab.
+						</span>
 					</p>
 				) : expired ? (
 					<p class="act">
@@ -111,13 +168,23 @@ const eligibility = [
 				<Content />
 			</div>
 
+			<nav class="more rule-top" aria-label="More like this">
+				<h2 class="label more__head">More like this</h2>
+				<p class="more__links">
+					{family && <a href={`/${family.slug}-jobs/`}>{family.label} jobs</a>}
+					<a href={companyHref}>All {fm.company} openings</a>
+					{cityLinks.map((c) => <a href={c.href}>Jobs in {c.label}</a>)}
+					{batchLinks.map((b) => <a href={b.href}>{b.label} batch</a>)}
+				</p>
+			</nav>
+
 			<AdSlot placement="foot" />
 
 			{
 				fm.sourceRef && (
 					<p class="fine src">
 						Facts compiled from a public announcement.{' '}
-						<a href={fm.sourceRef} rel="nofollow noopener">
+						<a href={fm.sourceRef} target="_blank" rel="nofollow noopener noreferrer">
 							Where we found it
 						</a>
 						.
@@ -129,9 +196,42 @@ const eligibility = [
 </Base>
 
 <style>
-	.head__status {
-		margin-bottom: var(--space-2);
-		color: #fff;
+	/* Values that are also routes. Underlined so they read as links inside a
+	   rail whose other values are plain text. */
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1) var(--space-3);
+	}
+
+	.apply__out {
+		width: 0.8em;
+		height: 0.8em;
+		flex: none;
+	}
+
+	.more {
+		margin-top: var(--space-6);
+		padding-top: var(--space-4);
+	}
+
+	.more__head {
+		margin-bottom: var(--space-3);
+	}
+
+	.more__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-4);
+	}
+
+	.more__links a {
+		text-decoration: none;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.more__links a:hover {
+		border-bottom-color: var(--ink);
 	}
 
 	.facts--head {

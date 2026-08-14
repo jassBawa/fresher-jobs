@@ -13,16 +13,23 @@
 import type { DraftFrontmatter } from '@jobs/schema';
 import StatusMark from './StatusMark.astro';
 import AdSlot from './AdSlot.astro';
-import { statusOf, closesLabel, shortDay, today } from '../lib/listings';
+import { statusOf, closesLabel, shortDay, payLabel, today } from '../lib/listings';
 
 interface Props {
 	listings: DraftFrontmatter[];
 	empty?: string;
 	/** Interleave a reserved ad slot after this many rows. 0 disables. */
 	adAfter?: number;
+	/** Render in the lower register used for listings that have closed. */
+	closed?: boolean;
 }
 
-const { listings, empty = 'Nothing open here right now.', adAfter = 0 } = Astro.props;
+const {
+	listings,
+	empty = 'Nothing open here right now.',
+	adAfter = 0,
+	closed = false,
+} = Astro.props;
 const on = today();
 
 const cap = (arr: string[] | undefined, n: number): string => {
@@ -40,7 +47,7 @@ const cap = (arr: string[] | undefined, n: number): string => {
 				const status = statusOf(fm, on);
 				return (
 					<>
-						<li class="row">
+						<li class:list={['row', closed && 'row--closed']}>
 							<div class="row__rail">
 								<StatusMark status={status} />
 								<span class="row__posted">{shortDay(fm.postedAt ?? fm.createdAt.slice(0, 10))}</span>
@@ -67,7 +74,7 @@ const cap = (arr: string[] | undefined, n: number): string => {
 									<>
 										<dt>Pay</dt>
 										<dd>
-											{fm.salary} <em>· estimated</em>
+											{payLabel(fm.salary)} <em>· estimated</em>
 										</dd>
 									</>
 								)}

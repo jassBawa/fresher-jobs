@@ -3,13 +3,16 @@ import Base from '../layouts/Base.astro';
 import JobList from '../components/JobList.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { buildClusters, type Cluster, type ClusterKind } from '../lib/clusters';
-import { liveListings } from '../lib/site';
+import { liveListings, closedListings } from '../lib/site';
 import { statusOf, today, shortDay } from '../lib/listings';
 
 const on = today();
 const jobs = await liveListings(on);
 const listings = jobs.map((job) => job.data);
 const clusters = buildClusters(listings);
+// Kept visible in a lower register rather than vanishing — a reader who saw a
+// listing yesterday should learn it closed, not meet a gap where it was.
+const closed = (await closedListings(on)).slice(0, 6).map((job) => job.data);
 
 const closingSoon = listings.filter((fm) => statusOf(fm, on) === 'closing').length;
 
@@ -37,8 +40,18 @@ const group = (kind: ClusterKind): Cluster[] => clusters.filter((c) => c.kind ==
 		</div>
 	</section>
 
-	<div class="wrap">
+	<div class="wrap with-rail">
+		<div>
 		<JobList listings={listings} empty="No openings published yet. Check back soon." adAfter={4} />
+
+		{
+			closed.length > 0 && (
+				<section class="closed-tail">
+					<h2 class="label closed-tail__head">Recently closed</h2>
+					<JobList listings={closed} closed />
+				</section>
+			)
+		}
 
 		{
 			clusters.length > 0 && (
@@ -64,6 +77,11 @@ const group = (kind: ClusterKind): Cluster[] => clusters.filter((c) => c.kind ==
 		}
 
 		<AdSlot placement="foot" />
+		</div>
+
+		<aside class="rail" aria-label="Advertisement">
+			<AdSlot placement="rail" />
+		</aside>
 	</div>
 </Base>
 
