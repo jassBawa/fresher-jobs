@@ -8,6 +8,7 @@ import {
   rankApplyUrls,
   batchYearsIn,
   preExtract,
+  chooseApplyUrl,
 } from "../src/lib/extract.mjs";
 
 const SOURCE = "https://freshersdunia.in";
@@ -130,4 +131,30 @@ test("preExtract survives an empty post", () => {
 test("preExtract caps the text it holds in memory", () => {
   const post = { title: { rendered: "x" }, content: { rendered: "<p>" + "a ".repeat(9000) + "</p>" } };
   assert.ok(preExtract(post, { sourceBase: SOURCE }).text.length <= 6000);
+});
+
+test("rejects a bare homepage the model offered as the apply link", () => {
+  // Both of these were real: the model answered with the company front page.
+  assert.equal(chooseApplyUrl("https://www.harman.com/", null), null);
+  assert.equal(chooseApplyUrl("https://www.corporate.carrier.com", null), null);
+});
+
+test("falls back to the best ranked candidate when the model picks badly", () => {
+  const ranked = "https://careers.acme.com/job/42";
+  assert.equal(chooseApplyUrl("https://acme.com/", ranked), ranked);
+});
+
+test("keeps the model's pick when it looks like a real requisition", () => {
+  const good = "https://careers.medpace.com/jobs/11927";
+  assert.equal(chooseApplyUrl(good, null), good);
+});
+
+test("cleans tracking off the model's pick", () => {
+  const picked = chooseApplyUrl("https://careers.acme.com/jobs/1?utm_source=x&id=7", null);
+  assert.match(picked, /id=7/);
+  assert.doesNotMatch(picked, /utm_source/);
+});
+
+test("returns null when there is nothing usable at all", () => {
+  assert.equal(chooseApplyUrl(null, null), null);
 });

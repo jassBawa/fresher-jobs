@@ -10,7 +10,7 @@
 
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { askJSON, providerBanner } from "./lib/llm.mjs";
-import { preExtract } from "./lib/extract.mjs";
+import { preExtract, chooseApplyUrl } from "./lib/extract.mjs";
 import { parseApplyByDate } from "./lib/dates.mjs";
 
 const SOURCE = process.env.SOURCE_BASE || "https://freshersdunia.in";
@@ -155,7 +155,7 @@ async function main() {
         // something like "ASAP" instead of naming a date. The site retires
         // those on a freshness horizon rather than a deadline.
         applyByDate: parseApplyByDate(facts.lastDateToApply),
-        applyUrl: facts.applyUrl ?? pre.bestApplyUrl,
+        applyUrl: chooseApplyUrl(facts.applyUrl, pre.bestApplyUrl),
         skills: facts.skills ?? [],
         requirements: facts.requirements ?? [],
         responsibilities: facts.responsibilities ?? [],

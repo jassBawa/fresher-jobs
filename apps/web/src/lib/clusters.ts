@@ -89,15 +89,26 @@ export const INDIAN_STATES: ReadonlySet<string> = new Set([
 
 const titleCase = (s: string): string => s.replace(/\b[a-z]/g, (c) => c.toUpperCase());
 
-/** Resolve a location string to one canonical display name. */
+/**
+ * Reduce a location string to one canonical city name.
+ *
+ * Postings write the whole address into a single entry — "Hyderabad,
+ * Karnataka", "Navi Mumbai, India", "Bangalore, Karnataka, India" — which
+ * without trimming becomes a cluster slug like `hyderabad-karnataka` and an
+ * addressLocality no postal system recognises. The leading segment is the city;
+ * the rest is administrative tail. (That first example is also simply wrong —
+ * Hyderabad is in Telangana — which is another reason not to keep the tail.)
+ */
+const clean = (raw: string): string =>
+	(raw.split(',')[0] ?? '').toLowerCase().replace(/\s+/g, ' ').trim();
+
 export function normalizeCity(raw: string): string {
-	const key = raw.toLowerCase().replace(/\s+/g, ' ').trim();
+	const key = clean(raw);
 	return CITY_ALIASES[key] ?? titleCase(key);
 }
 
 /** True when a location names a state rather than a city. */
-export const isState = (raw: string): boolean =>
-	INDIAN_STATES.has(raw.toLowerCase().replace(/\s+/g, ' ').trim());
+export const isState = (raw: string): boolean => INDIAN_STATES.has(clean(raw));
 
 /**
  * Role families. A raw job title is too sparse to cluster on — "Graduate

@@ -1,6 +1,6 @@
 ---
 title: "Harman - Software Engineering Intern"
-description: "Harman is hiring full-time Software Engineering Intern positions for B.E/B-Tech, M.E/M-Tech, or BCA/MCA students in Bangalore, India. ₹3 – 5 LPA (Expected). Apply now."
+description: "Harman is hiring full-time Software Engineering Intern positions for B.E/B-Tech, M.E/M-Tech, or BCA/MCA graduates in Bangalore, India. ₹3 – 5 LPA (Expected). Apply now."
 slug: "harman-software-engineering-intern"
 status: draft
 company: "Harman"
@@ -9,15 +9,14 @@ jobType: "full-time"
 batchYears: ["2024", "2025", "2026"]
 locations: ["Bangalore, India"]
 salary: "₹3 – 5 LPA (Expected)"
-applyUrl: "https://www.harman.com/"
 skills: ["C", "C++", "Java", "Android", "Embedded Systems"]
 generatedBy: "llm+template"
-createdAt: "2026-08-12T18:02:34.519Z"
+createdAt: "2026-08-13T11:34:36.081Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/harman-off-campus-internship-2026/"
 ---
 
-For fresh graduates looking to gain experience in software development on the Android platform and embedded systems. Basic understanding of software development lifecycle required.
+For students graduating in 2024, 2025, or 2026 with a focus on software engineering and related fields. This role offers hands-on experience developing Android applications using C, C++, Java, and embedded systems.
 
 | | |
 |---|---|
@@ -36,7 +35,7 @@ For fresh graduates looking to gain experience in software development on the An
 
 ## About the Role
 
-You will learn and develop software using C, C++, Java or other selected programming languages on the Android platform, gain understanding of Android fundamentals and embedded systems concepts, assist in software testing, support release management, and work collaboratively with the engineering team.
+You will learn to develop software using C, C++, Java, or other selected programming languages on the Android platform, gain understanding of Android fundamentals and embedded systems concepts, assist in testing with debuggers, emulators, and simulators, support release management, and work collaboratively with a team while continuously improving technical knowledge.
 
 ## What You Need
 
@@ -58,9 +57,3 @@ You will learn and develop software using C, C++, Java or other selected program
 - Assist in software testing using debuggers, emulators, and simulators
 - Support software release management and quality assurance processes
 - Work collaboratively with the engineering team while continuously improving technical knowledge and adapting to evolving automotive technologies
-
-## How to Apply
-
-Applications are submitted on Harman's official careers page.
-
-[Apply for Software Engineering Intern at Harman](https://www.harman.com/)

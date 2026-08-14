@@ -88,6 +88,25 @@ export function rankApplyUrls(html = "", sourceBase) {
     .sort((a, b) => scoreApplyUrl(b) - scoreApplyUrl(a));
 }
 
+/**
+ * Settle on an apply URL, given the model's pick and the ranked candidates.
+ *
+ * The model is allowed to choose, but not to choose badly: asked for the
+ * official application link it sometimes answers with the company's front page,
+ * which is how https://www.harman.com/ and https://www.corporate.carrier.com
+ * ended up as the apply links for two real listings. A reader clicking those
+ * lands nowhere near the requisition.
+ *
+ * So the pick is held to the same scorer as everything else, and a URL that
+ * cannot clear zero is dropped in favour of the best ranked candidate — or
+ * nothing. No link is better than a link that wastes the reader's time, and a
+ * listing without one is already excluded from the index.
+ */
+export function chooseApplyUrl(modelChoice, bestApplyUrl) {
+  if (modelChoice && scoreApplyUrl(modelChoice) > 0) return cleanUrl(modelChoice);
+  return bestApplyUrl ?? null;
+}
+
 /** Batch years mentioned anywhere in the posting, deduped and sorted. */
 export const batchYearsIn = (text = "") =>
   [...new Set(text.match(/\b20(1[89]|2[0-9])\b/g) || [])].sort();

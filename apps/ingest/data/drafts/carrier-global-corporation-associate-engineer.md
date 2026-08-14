@@ -1,6 +1,6 @@
 ---
-title: "Carrier Global Corporation Associate Engineer 2026"
-description: "Carrier Global Corporation is hiring for Associate Engineer in Bangalore, Karnataka, India. Open to 2026 batch."
+title: "Carrier Global Corporation - Associate Engineer"
+description: "Full-time job available for freshers in Bangalore, India. Entry level position with competitive salary."
 slug: "carrier-global-corporation-associate-engineer"
 status: draft
 company: "Carrier Global Corporation"
@@ -10,15 +10,14 @@ batchYears: ["2026"]
 locations: ["Bangalore, Karnataka, India"]
 salary: "Competitive / Best in Industry"
 lastDateToApply: "ASAP"
-applyUrl: "https://www.corporate.carrier.com"
 skills: ["BMS platforms", "HVAC systems", "Automation controls", "Networking and control protocols", "AI-driven tools", "Data analytics", "Microsoft Excel"]
-generatedBy: "template"
-createdAt: "2026-08-12T17:42:13.579Z"
+generatedBy: "llm+template"
+createdAt: "2026-08-13T11:34:33.700Z"
 postedAt: "2026-08-12"
 sourceRef: "https://freshersdunia.in/carrier-global-off-campus-recruitment-2026/"
 ---
 
-Carrier Global Corporation is hiring for the role of Associate Engineer in Bangalore, Karnataka, India. The opening is open to 2026 batch.
+For fresh Electrical, Mechanical or Instrumentation Engineering graduates looking to start their career as an Associate Engineer at Carrier Global Corporation in Bangalore. Responsibilities include monitoring and operating BMS systems, analyzing system alerts, and ensuring proper functioning of various systems.
 
 | | |
 |---|---|
@@ -37,6 +36,10 @@ Carrier Global Corporation is hiring for the role of Associate Engineer in Banga
 **Batch:** 2026 graduates  
 **Qualification:** Diploma, Bachelor's Degree, Master Degree  
 **Experience:** Entry Level / Freshers
+
+## About the Role
+
+You will monitor and operate the Building Management System (BMS), analyze system alerts, alarms, and trends, and ensure proper functioning of HVAC, electrical, lighting, and fire systems.
 
 ## What You Need
 
@@ -60,8 +63,4 @@ Carrier Global Corporation is hiring for the role of Associate Engineer in Banga
 
 ## How to Apply
 
-Applications are submitted on Carrier Global Corporation's official careers page.
-
 **Last date to apply:** ASAP
-
-[Apply for Associate Engineer at Carrier Global Corporation](https://www.corporate.carrier.com)

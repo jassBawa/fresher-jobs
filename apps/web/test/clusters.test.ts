@@ -196,3 +196,22 @@ test('a thin cluster is noindex but still followed', () => {
 	assert.equal(clusterRobots(cluster(['a', 'b'])), 'noindex, follow');
 	assert.equal(clusterRobots(cluster(['a', 'b', 'c'])), 'index, follow');
 });
+
+test('a location string is reduced to its city', () => {
+	// Postings write the whole address into one entry.
+	assert.equal(normalizeCity('Hyderabad, Karnataka'), 'Hyderabad');
+	assert.equal(normalizeCity('Navi Mumbai, India'), 'Navi Mumbai');
+	assert.equal(normalizeCity('Bangalore, Karnataka, India'), 'Bengaluru');
+});
+
+test('a state is still recognised when it carries a tail', () => {
+	assert.equal(isState('Maharashtra, India'), true);
+});
+
+test('addresses and bare city names land in the same cluster', () => {
+	const clusters = buildClusters([
+		listing({ slug: 'a', locations: ['Bangalore, Karnataka, India'] }),
+		listing({ slug: 'b', locations: ['Bengaluru'] }),
+	]);
+	assert.equal(mustFind(clusters, 'jobs-in-bengaluru').slugs.length, 2);
+});
