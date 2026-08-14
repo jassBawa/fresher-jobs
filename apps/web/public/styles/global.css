@@ -455,7 +455,9 @@ figure {
 	.rail .ad {
 		position: sticky;
 		top: var(--space-5);
-		margin-block: 0;
+		/* Matches the first row's top padding so the rail's hairline starts level
+		   with the first listing, never above it. */
+		margin-block: var(--space-5) 0;
 	}
 }
 

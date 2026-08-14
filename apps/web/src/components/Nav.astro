@@ -91,6 +91,9 @@ const short = (c: Cluster): string => {
 		padding-block: var(--space-3);
 		scrollbar-width: thin;
 		scrollbar-color: var(--rule) transparent;
+		/* Fade the right edge so a clipped item reads as "there is more" rather
+		   than as a word cut in half. */
+		mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent 100%);
 	}
 
 	.nav__scroll::-webkit-scrollbar {
@@ -137,5 +140,16 @@ const short = (c: Cluster): string => {
 
 	.nav__item--home {
 		font-weight: 600;
+	}
+
+	/* Desktop has the room, so nothing scrolls and nothing is clipped: the strip
+	   wraps and the fade comes off. */
+	@media (min-width: 64rem) {
+		.nav__scroll {
+			flex-wrap: wrap;
+			row-gap: var(--space-2);
+			overflow-x: visible;
+			mask-image: none;
+		}
 	}
 </style>
