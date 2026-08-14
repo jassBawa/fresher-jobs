@@ -87,7 +87,7 @@ Ordered cheapest and fastest first; the first key found wins.
 |---|---|---|
 | **Groq** | `llama-3.1-8b-instant` | Free tier, ~500 tok/s. Best default. |
 | **Cerebras** | `llama3.1-8b` | Free tier, fastest available |
-| **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
+| **Gemini** | `gemini-flash-lite-latest` | Free tier, strict JSON mode |
 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Genuinely free models |
 | **Ollama** | `qwen2.5:3b` | Local. No key, no cost, no rate limit. `LLM_PROVIDER=ollama` |
 

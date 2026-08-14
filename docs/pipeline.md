@@ -212,7 +212,7 @@ Listing pages that clear the gate also carry schema.org `JobPosting` markup.
 |---|---|---|---|
 | 1 | **Groq** | `llama-3.1-8b-instant` | Free tier, ~500 tok/s |
 | 2 | **Cerebras** | `llama3.1-8b` | Free tier, fastest |
-| 3 | **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
+| 3 | **Gemini** | `gemini-flash-lite-latest` | Free tier, strict JSON mode |
 | 4 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Free models |
 | — | **Ollama** | `qwen2.5:3b` | Local. Opt in with `LLM_PROVIDER=ollama` |
 

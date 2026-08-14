@@ -74,7 +74,10 @@ const P = {
   gemini: {
     name: "gemini",
     key: () => process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY,
-    model: () => process.env.LLM_MODEL || "gemini-2.5-flash-lite",
+    // An alias, not a pinned version. gemini-2.5-flash-lite was the default
+    // here until Google closed it to new keys, and a pinned version that
+    // retires fails with a 404 that reads like a bad credential.
+    model: () => process.env.LLM_MODEL || "gemini-flash-lite-latest",
     async call(model, key, prompt, maxTokens) {
       const r = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,

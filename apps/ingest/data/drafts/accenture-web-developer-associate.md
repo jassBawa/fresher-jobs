@@ -1,8 +1,8 @@
 ---
-title: "Accenture Web Developer Associate"
-description: "Accenture seeks Web Developer Associates for fresh graduates in Mumbai. Qualifications: B.E/B-Tech, M.E/M-Tech, BCA/MCA or related fields. Experience required: 0-2 years."
+title: "Accenture Web Developer Associate Job"
+description: "Accenture is hiring Web Developer Associates in Mumbai. Open for 0 to 2 years experience and graduates from 2022 to 2026 batches."
 slug: "accenture-web-developer-associate"
-status: draft
+status: published
 company: "Accenture"
 role: "Web Developer Associate"
 jobType: "full-time"
@@ -11,12 +11,12 @@ locations: ["Mumbai"]
 applyUrl: "https://www.accenture.com/in-en/careers/jobdetails?id=AIOC-S01654266_en&title=Web+Developer+Associate"
 skills: ["HTML", "CSS", "JavaScript", "web applications & HTTP requests", "databases & server-side development", "CMS platforms", "digital marketing technology", "responsive design & UI/UX"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:15.528Z"
+createdAt: "2026-08-14T08:59:07.838Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/accenture-recruitment-2026-hiring/"
 ---
 
-Fresh graduates with a background in computer science or related fields are welcome to apply. We seek individuals who can develop and maintain web-based applications using HTML, CSS, JavaScript, and other technologies.
+This job is for graduates from the 2022 to 2026 batches with zero to two years of experience. You will develop and maintain web-based applications at Accenture in Mumbai.
 
 | | |
 |---|---|
@@ -36,7 +36,7 @@ Fresh graduates with a background in computer science or related fields are welc
 
 ## About the Role
 
-Develop and maintain web-based applications, work on HTML, CSS, JavaScript & web technologies, build responsive and cross-browser compatible UI, support marketing operations, manage CMS platforms & templates, analyze and solve technical issues, collaborate with internal teams.
+You will develop and maintain web-based applications using HTML, CSS, and JavaScript. Your role involves building responsive user interfaces, managing CMS platforms, and supporting digital marketing operations. You will also analyze technical issues, write server-side code, and collaborate with internal teams to execute campaigns successfully.
 
 ## What You Need
 
