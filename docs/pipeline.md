@@ -1,15 +1,16 @@
 # Pipeline
 
-How the current code works. This is the only thing built so far — there is no
-site, no database and no hosting yet.
+How the current code works, end to end: ingest, review gate, static site.
+Nothing is hosted yet — the build produces a `dist/` and stops there.
 
 ```
-freshersdunia WP API ──► apps/ingest/src/fetch.mjs ──► apps/ingest/data/facts/*.json ──► apps/ingest/src/draft.mjs ──► apps/ingest/data/drafts/*.md
-                        facts only,                            template + prose          status: draft
-                        prose discarded
+freshersdunia WP API ──► fetch.mjs ──► data/facts/*.json ──► draft.mjs ──► data/drafts/*.md ──► promote ──► apps/web ──► dist/
+                        facts only,                        template + prose   status: draft     human      Astro build
+                        prose discarded                                                          review
 ```
 
-Node 20+. **Zero npm dependencies** — built-ins only.
+Node 22+ (the ingest app alone runs on 20+). The ingest app has **zero npm
+dependencies** — built-ins only.
 
 ---
 
@@ -19,11 +20,20 @@ Node 20+. **Zero npm dependencies** — built-ins only.
 |---|---|
 | `apps/ingest/src/fetch.mjs` | Reads postings, extracts structured facts, writes `apps/ingest/data/facts/*.json` |
 | `apps/ingest/src/draft.mjs` | Renders `apps/ingest/data/drafts/*.md` from facts — templates plus a small LLM call |
+| `apps/ingest/src/lib/extract.mjs` | Rule-based pre-extraction: HTML→text, link ranking, batch years |
+| `apps/ingest/src/lib/render.mjs` | Templates and frontmatter assembly. Pure — no clock, no I/O |
+| `apps/ingest/src/lib/dates.mjs` | Free-text deadline → ISO date |
 | `apps/ingest/src/lib/llm.mjs` | Provider-agnostic JSON-mode LLM call. 7 providers, one adapter for most |
+| `apps/ingest/scripts/promote.mjs` | The review gate — flips `status` to published |
 | `apps/ingest/data/state.json` | Post IDs already seen, so reruns are incremental |
+| `packages/schema/src/index.ts` | The fact/draft contracts: types, zod, JSON Schema |
+| `apps/web/src/lib/listings.ts` | Expiry horizon and the D5 indexing gate |
+| `apps/web/src/lib/clusters.ts` | Cluster pages — the indexable surface |
 | `.github/workflows/ingest.yml` | Daily cron at 07:00 IST, commits new drafts |
 
 ## Commands
+
+Run from the repo root.
 
 | Command | Needs a key? |
 |---|---|
@@ -32,6 +42,10 @@ Node 20+. **Zero npm dependencies** — built-ins only.
 | `pnpm run ingest` | Yes |
 | `pnpm run fetch:dry` | **No** — parses the source and prints findings, writes nothing |
 | `pnpm run draft:nollm` | **No** — renders complete drafts from templates alone |
+| `pnpm run drafts` | **No** — lists every draft and whether it is live |
+| `pnpm run promote <slug>…` | **No** — publishes one or more drafts |
+| `pnpm run test` | **No** — 86 tests, no runner, no dependencies |
+| `pnpm run build` | **No** — builds the static site into `apps/web/dist/` |
 
 ---
 
@@ -120,14 +134,71 @@ batchYears: ["2024", "2025", "2026"]
 locations: ["Bengaluru", "Pune"]
 salary: "3.5 LPA"
 lastDateToApply: "31 August 2026"
+applyByDate: "2026-08-31"
 applyUrl: "https://careers.wipro.com/job/Graduate-Engineer-Trainee/190712-en_US"
 skills: ["Java", "SQL", "Data Structures"]
 generatedBy: "llm+template"
+createdAt: "2026-08-12T18:02:36.377Z"
+postedAt: "2026-08-11"
 sourceRef: "https://freshersdunia.in/…"
 ---
 ```
 
 **Everything writes as `status: draft`. Nothing self-publishes.**
+
+`lastDateToApply` is whatever the source said; `applyByDate` is that parsed into
+a real date, and is absent far more often than not — see the freshness horizon
+below. `postedAt` is when the employer announced it, which is what drives both
+expiry and JSON-LD `datePosted`.
+
+---
+
+## Stage 3 — the site
+
+`apps/web` is an Astro static build that reads `apps/ingest/data/drafts/*.md` as
+a content collection, validated against the shared zod schema, filtered to
+`status: published`.
+
+### What gets shown
+
+A listing drops off the site when it expires: on its stated deadline if it has
+one, otherwise **60 days after `postedAt`**. The horizon is the load-bearing
+rule, not the fallback — of the first 8 postings ingested, **zero** stated a
+parseable deadline; four said nothing and four said "ASAP" or "Rolling Basis".
+Without it, dead apply links would accumulate forever.
+
+Expired pages keep their URL rather than 404 — inbound links should land
+somewhere useful — but they lose the apply button, drop out of every listing and
+the sitemap, and say applications have closed.
+
+### What gets indexed
+
+Implementing D5. Individual listings default to `noindex, follow`; one earns
+`index, follow` only with a live apply link, model-written prose, and at least
+three of salary, batch, location, skills or deadline.
+
+The indexable surface is the cluster pages, generated from one rest route:
+
+| Shape | Example |
+|---|---|
+| Role family | `/software-engineer-jobs/` |
+| City | `/jobs-in-bengaluru/` |
+| Role in city | `/software-engineer-jobs-in-bengaluru/` |
+| Company | `/wipro-limited-jobs/` |
+| Batch year | `/2026-batch-jobs/` |
+
+Under 2 listings a cluster gets no page at all; under 3 it gets a page for
+navigation but stays `noindex`. Raw job titles are collapsed into role families
+first — "Graduate Engineer Trainee", "Associate Engineer" and "SDE I" are one
+intent written three ways. City aliases are merged for the same reason
+(Bangalore/Bengaluru was producing two thin pages).
+
+The sitemap lists exactly the pages that are `index, follow` — advertising a URL
+and then serving it `noindex` sends two contradictory signals.
+
+Listing pages that clear the gate also carry schema.org `JobPosting` markup.
+`baseSalary` is deliberately omitted: the source's figures are estimates marked
+"(Expected)", and publishing a guess as structured data is a penalty risk.
 
 ---
 
@@ -149,8 +220,16 @@ Everything except Gemini and Anthropic speaks the OpenAI chat-completions shape,
 so they share one adapter — adding a provider is one line. Gemini uses its native
 API because strict JSON mode is more reliable there.
 
-**Response parsing is defensive**: strips code fences, strips `<think>` blocks
-(small models emit them), finds the first `{`/`[`, retries once on malformed JSON.
+**Response parsing is defensive**: strips reasoning blocks, strips code fences,
+finds the first `{`/`[`, retries once on malformed JSON, and waits out 429s using
+the provider's `Retry-After`.
+
+The reasoning-block strip was broken until August — the opening tag in the
+pattern had been mangled into a literal `" thinking"`, so a real `<think>` block
+was never removed, and any brace inside the model's scratchpad broke the parse.
+That is what the qwen3 warning above was about. Fixed, and covered by tests; a
+block left unterminated by the token cap now raises rather than being parsed out
+of half a thought.
 
 ---
 
@@ -164,8 +243,13 @@ All optional except a key. See `apps/ingest/.env.example`.
 | `LLM_PROVIDER` | auto | Force a provider |
 | `LLM_MODEL` | per provider | Override the model |
 | `MAX_POSTS_PER_RUN` | `15` | Throttle per run |
-| `SITE_NAME` | `Your Jobs Site` | Used in the drafting prompt |
+| `INGEST_DELAY_MS` | `1500` | Minimum gap between model calls |
 | `SOURCE_BASE` | `https://freshersdunia.in` | **Any WordPress site with an open REST API** |
+| `SITE` | — | Canonical origin for the web build. **Required in CI** |
+
+`SITE_NAME` used to be listed here as "used in the drafting prompt". It never
+was — the binding was read from the environment and then never interpolated into
+anything. Removed rather than documented.
 
 ---
 
@@ -181,7 +265,16 @@ All optional except a key. See `apps/ingest/.env.example`.
 4. **No dedupe across runs** beyond post ID. Two sources covering the same job
    would produce two drafts. See the dedupe cascade in
    [data-sources.md](./data-sources.md#7-deduplication).
-5. **No publish step.** Drafts sit on disk.
+5. **Expiry is a guess for most listings.** The 60-day horizon is a judgement
+   call, not a fact about any particular opening. A posting filled in a week
+   stays up for eight; one open for six months disappears at two. The real fix
+   is checking `applyUrl` for a live requisition — not built.
+6. **`locations` mixes cities and states.** The source writes "Maharashtra"
+   where it means Pune. Structured data handles it (states go to
+   `addressRegion`) but a `/jobs-in-maharashtra/` cluster is still weaker than a
+   city page.
+7. **Nothing is hosted.** The build produces `apps/web/dist/`; deploy.yml is
+   written but the Cloudflare project, secrets and domain do not exist yet.
 
 ---
 
@@ -189,11 +282,10 @@ All optional except a key. See `apps/ingest/.env.example`.
 
 Ordered by how much they'd matter:
 
-- Publish target (WordPress REST, or a static site)
+- Hosting: the Cloudflare Pages project, its secrets, and a domain (open D2)
+- Verification pass against the official apply page — would fix both limitation
+  2 and limitation 5
 - Telegram broadcast — free, fully automatable, zero policy risk
-- Verification pass against the official apply page
-- Expiry handling (`validThrough`, 410 for dead listings)
-- Cluster/aggregate pages — the actual SEO surface, see
-  [product-strategy.md](./product-strategy.md#31-the-single-most-important-design-decision)
+- Hindi content layer, the actual wedge (D4)
 - Additional sources (Workday, Keka, Greenhouse — all verified, see
   [data-sources.md](./data-sources.md))

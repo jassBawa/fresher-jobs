@@ -25,5 +25,16 @@ labelled as estimates. Anything that could not be verified says so.
 
 ## Current build status
 
-Only Phase 1 exists: a two-stage ingest that reads postings, extracts facts, and
-writes draft posts. No site, no database, no hosting. See [pipeline.md](./pipeline.md).
+The ingest pipeline and the site both exist; nothing is hosted.
+
+- **Ingest** — two stages, reads postings, extracts facts, writes drafts. Real
+  data flowing: 8 listings from freshersdunia's WordPress API.
+- **Review gate** — everything lands `status: draft`; `pnpm run promote` is the
+  only way anything goes live.
+- **Site** — Astro static build with the D5 indexing policy implemented:
+  listings mostly `noindex`, cluster pages as the indexable surface, expiry,
+  and `JobPosting` structured data.
+- **Not built** — hosting. `deploy.yml` targets Cloudflare Pages but the
+  project, secrets and domain do not exist. Domain is still open decision D2.
+
+No database, and none needed at this volume. See [pipeline.md](./pipeline.md).

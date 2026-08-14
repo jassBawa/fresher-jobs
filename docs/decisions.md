@@ -226,6 +226,118 @@ dependencies — built-ins only.
 
 ---
 
+## D14 — Expiry is a freshness horizon, not a deadline
+
+**Decision.** A listing ends on its stated deadline where one exists, and
+otherwise **60 days after it was posted**.
+
+**Why.** The deadline field was expected to do this work. It cannot: of the first
+8 postings ingested, **zero** stated a parseable date. Four said nothing at all
+and four said "ASAP" or "Rolling Basis (Apply ASAP)". So the parser was built —
+`applyByDate`, conservative, returns null on anything ambiguous — but it is the
+precise case, not the general one.
+
+Without a horizon nothing would ever retire, and an aggregator whose apply links
+are dead is worse than no aggregator. Sixty days is a judgement call about when
+an Indian fresher requisition has typically been filled; it is written down here
+because it is a guess and should be revisited against real data.
+
+Expired listings keep their URL rather than 404 — inbound links and bookmarks
+should land somewhere useful — but lose the apply button, the structured data
+and their place in every index surface.
+
+**Rejected:** deleting expired drafts (breaks links, loses the record);
+410 Gone (a static host can't, and it discards accumulated authority).
+
+---
+
+## D15 — Which listings get indexed, and what they feed
+
+**Decision.** Individual listings default to `noindex, follow`. One earns
+`index, follow` only by having a live apply link, model-written prose, and at
+least three of salary, batch, location, skills or deadline. The indexable surface
+is cluster pages: role family, city, role-in-city, company, batch year.
+
+**Why.** This is D5 made executable. D5 said "noindex 60–80% of listings" and
+"cluster pages are the indexable surface" but named no rule for either. A policy
+with no predicate is not a policy.
+
+Measured on the 8 listings ingested: 4 of 8 listings and 6 of 10 clusters index.
+That is 50% noindex against D5's 60–80% target — the ratio should drift toward it
+as volume grows, since template-only drafts and postings without an apply link
+accumulate. Worth re-measuring at 100 listings rather than tuning the gate now.
+
+Two thresholds on clusters, because a thin cluster page is the exact thing D5
+exists to prevent: under 2 listings no page is generated, under 3 the page exists
+for navigation but stays out of the index.
+
+Raw job titles proved unusable as cluster keys — "Graduate Engineer Trainee",
+"Associate Engineer" and "SDE I" are one intent written three ways, and exact
+matching yields clusters of one. Titles map to role families instead.
+
+`follow` throughout, never `nofollow`: the apply links and the cluster pages
+still need crawling.
+
+**Also found:** city aliases split clusters. The first build produced
+`/jobs-in-bangalore` and `/jobs-in-bengaluru` side by side, each too thin to
+index, where merged they clear the bar. Aliases are normalized.
+
+---
+
+## D16 — JobPosting markup, minus the salary
+
+**Decision.** Emit schema.org `JobPosting` on indexable listings. Omit
+`baseSalary` and `directApply`.
+
+**Why.** The salary figures are the source's estimates, labelled "(Expected)" —
+"₹4 to 6 LPA (Expected)" is not the employer's number. Publishing a guess as
+structured salary data is the sort of mismatch Google penalizes, and it is a
+promise to the reader that cannot be kept. The figure stays on the visible page,
+labelled as expected.
+
+`directApply` states whether the application can be completed at the URL in the
+markup. Ours hands off to the employer's ATS, so either answer is a guess about
+someone else's flow, and a wrong one costs rich-result eligibility.
+
+Markup is emitted only where it can do something — a `noindex` page cannot
+produce a rich result, and Google asks that filled postings lose their markup.
+
+---
+
+## D17 — Tests, on node:test, with no runner
+
+**Decision.** 86 tests using Node's built-in test runner. No vitest, no jest.
+
+**Why.** The ingest app's zero-dependency rule is worth keeping, and the built-in
+runner is now good enough that a framework buys nothing here. Web logic is
+written as pure functions over plain frontmatter so it tests without booting
+Astro, and runs straight off the `.ts` sources via Node 22's type stripping.
+
+Two real bugs surfaced in the writing, which is the argument for having done it:
+the social-link filter matched on service names and so let `wa.me` and `t.me`
+through into apply-URL candidates, and the schema's TypeScript interface had
+silently drifted from its zod schema.
+
+---
+
+## D18 — Contracts assert their own agreement
+
+**Decision.** The hand-written types and the zod schemas in `@jobs/schema` carry
+a compile-time assertion that they are identical.
+
+**Why.** They are two views of one contract, maintained by hand, and they had
+already drifted: the draft frontmatter schema reused a nullable `jobType` meant
+for facts records, so every consumer typed against the interface failed to
+compile against the content collection. `astro build` never noticed, because it
+does not typecheck.
+
+The first version of the check used mutual assignability and was too weak — an
+optional property added to one side only is assignable in both directions, which
+is precisely the likeliest drift. Verified by adding one; it passed. The check
+compares the types as conditional-type identities instead.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |
@@ -233,5 +345,7 @@ dependencies — built-ins only.
 | 1 | **Read apna.co's ToS** — robots permits crawling, silent on republishing | Using apna as a source |
 | 2 | Domain A name and niche | Everything downstream |
 | 3 | City + vertical for the Phase 0 employer sales test | Phase 0 |
-| 4 | Publish target — WordPress REST, static site, or Telegram first | Publish step |
+| 4 | ~~Publish target~~ — **resolved**: static site (Astro), built and working | — |
 | 5 | **Government notification sources** — public-domain under Section 52(1)(q), safest and richest content available, never researched | Phase 3 content |
+| 6 | Is 60 days the right freshness horizon? Set by judgement in D14, never measured | Listing accuracy |
+| 7 | Cloudflare Pages project, secrets and domain — the only thing between the build and a live site | Launch |
