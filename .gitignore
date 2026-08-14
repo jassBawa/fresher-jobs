@@ -12,6 +12,8 @@ build/
 # local run logs
 logs/
 
-# impeccable — keep the design record, drop the working files
-.impeccable/*
-!.impeccable/design.json
+# impeccable — keep the design record, drop the working files.
+# Globbed: a pattern containing a slash is anchored to this file's directory,
+# so ".impeccable/*" would only ever have matched one at the repo root.
+**/.impeccable/*
+!**/.impeccable/design.json

@@ -17,6 +17,11 @@
     "draft:nollm": "pnpm --filter @jobs/ingest run draft:nollm",
     "promote": "pnpm --filter @jobs/ingest run promote",
     "drafts": "pnpm --filter @jobs/ingest run promote --list",
+    "db:up": "docker compose up -d && docker compose ps",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @jobs/db run db:migrate",
+    "db:import": "pnpm --filter @jobs/db run import",
+    "verify:apply": "pnpm --filter @jobs/db run verify:apply",
     "daily": "./scripts/daily.sh"
   },
   "devDependencies": {

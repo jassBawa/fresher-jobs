@@ -1,0 +1,40 @@
+{
+  "name": "@jobs/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Postgres schema and client for the jobs platform.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "lint": "echo \"no lint configured\"",
+    "test": "node --test \"test/*.test.ts\"",
+    "import": "node dist/import-markdown.js",
+    "verify:apply": "node dist/verify-apply.js"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.7",
+    "postgres": "^3.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "drizzle-kit": "^0.31.6",
+    "typescript": "^5.7.2"
+  }
+}
