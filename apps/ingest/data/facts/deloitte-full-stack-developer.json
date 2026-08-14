@@ -1,0 +1,59 @@
+{
+  "company": "Deloitte",
+  "role": "Full Stack Developer",
+  "jobType": "full-time",
+  "batchYears": [
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+  ],
+  "qualifications": [
+    "Bachelor's Degree Or Master Degree or Related Field"
+  ],
+  "experienceRequired": "0–2 years of experience in software implementation, application support, or web application development",
+  "salary": null,
+  "locations": [
+    "Bengaluru",
+    "Karnataka"
+  ],
+  "lastDateToApply": null,
+  "applyByDate": null,
+  "applyUrl": "https://southasiacareers.deloitte.com/job/Bengaluru-Enabling-Areas-DEC-Executive-Full-stack-Development-Bengaluru/58386144/",
+  "skills": [
+    "Python",
+    "JavaScript/TypeScript",
+    "SQL",
+    "React.js",
+    "Node.js",
+    "REST APIs",
+    "Git",
+    "CI/CD pipelines"
+  ],
+  "requirements": [
+    "Basic understanding of data structures, algorithms, and problem-solving skills",
+    "Working knowledge of Python, JavaScript/TypeScript, and SQL",
+    "Ability to understand client requirements and translate them into product configurations, workflows, and implementation solutions",
+    "Hands-on exposure to web technologies such as React.js, Node.js, or FastAPI is a plus",
+    "Familiarity with REST APIs, data integrations, and working with RDBMS/NoSQL databases",
+    "Experience or exposure to deploying or configuring applications on cloud platforms such as AWS, Azure, or GCP",
+    "Ability to troubleshoot implementation issues, support deployments, and assist in client onboarding and integrations",
+    "Understanding of security and data protection best practices",
+    "Experience with unit testing frameworks such as Jest, Mocha, or PyTest is a plus",
+    "Comfortable working in Agile environments, collaborating with cross-functional teams"
+  ],
+  "responsibilities": [
+    "Work on software implementation, application support, and basic web application development for client-facing systems",
+    "Understand client business requirements and translate them into product configurations, workflows, and technical implementation solutions",
+    "Develop, customize, and support features using Python, JavaScript/TypeScript, and SQL",
+    "Work with web technologies such as React.js, Node.js, or FastAPI to support modern web applications (exposure preferred)",
+    "Integrate systems using REST APIs and manage data flow across RDBMS and NoSQL databases",
+    "Assist in deploying, configuring, and supporting applications on cloud platforms such as AWS, Azure, or GCP",
+    "Troubleshoot implementation and production issues, ensuring timely resolution and minimal impact to clients",
+    "Support client onboarding, training, and system integrations in a client-facing technical role",
+    "Follow security and data protection best practices while handling application data and configurations"
+  ],
+  "discoveredVia": "https://freshersdunia.in/deloitte-full-stack-developer-recruitment-2026/",
+  "discoveredAt": "2026-08-13T06:18:38",
+  "extractedAt": "2026-08-14T03:46:39.381Z"
+}

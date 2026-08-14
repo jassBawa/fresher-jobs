@@ -6,6 +6,7 @@ import {
 	slugify,
 	normalizeCity,
 	isState,
+	isPlace,
 	roleFamily,
 	buildClusters,
 	clusterIsIndexable,
@@ -214,4 +215,25 @@ test('addresses and bare city names land in the same cluster', () => {
 		listing({ slug: 'b', locations: ['Bengaluru'] }),
 	]);
 	assert.equal(mustFind(clusters, 'jobs-in-bengaluru').slugs.length, 2);
+});
+
+test('"PAN India" and friends are not places', () => {
+	// Real value from the source. Untreated it built /jobs-in-pan-india/ and
+	// claimed a city of that name in the structured data.
+	for (const raw of ['PAN India', 'pan india', 'All India', 'Remote', 'Work From Home', 'Multiple Locations']) {
+		assert.equal(isPlace(raw), false, raw);
+	}
+	for (const raw of ['Bengaluru', 'Pune', 'Maharashtra', 'Navi Mumbai, India']) {
+		assert.equal(isPlace(raw), true, raw);
+	}
+});
+
+test('a non-place builds no city cluster', () => {
+	const clusters = buildClusters([
+		listing({ slug: 'a', locations: ['PAN India'] }),
+		listing({ slug: 'b', locations: ['PAN India'] }),
+		listing({ slug: 'c', locations: ['PAN India', 'Pune'] }),
+	]);
+	assert.equal(find(clusters, 'jobs-in-pan-india'), undefined);
+	assert.equal(clusters.filter((c) => c.kind === 'city').length, 0);
 });

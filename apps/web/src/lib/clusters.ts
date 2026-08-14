@@ -111,6 +111,27 @@ export function normalizeCity(raw: string): string {
 export const isState = (raw: string): boolean => INDIAN_STATES.has(clean(raw));
 
 /**
+ * Values that appear in `locations` but name no place at all.
+ *
+ * "PAN India" is the common one — Indian postings use it to mean nationwide —
+ * and untreated it produced a `/jobs-in-pan-india/` cluster sitting alongside
+ * real cities, plus `addressLocality: "Pan India"` in the structured data,
+ * which is a claim about a city that does not exist.
+ */
+const NON_PLACES: ReadonlySet<string> = new Set([
+	'pan india', 'all india', 'across india', 'india', 'anywhere in india',
+	'remote', 'work from home', 'wfh', 'anywhere', 'hybrid', 'onsite',
+	'multiple locations', 'various locations', 'multiple cities', 'across india locations',
+	'not specified', 'na', 'n/a', 'tbd',
+]);
+
+/** True when a location names somewhere real enough to build a page about. */
+export const isPlace = (raw: string): boolean => {
+	const key = clean(raw);
+	return key !== '' && !NON_PLACES.has(key);
+};
+
+/**
  * Role families. A raw job title is too sparse to cluster on — "Graduate
  * Engineer Trainee", "Associate Engineer" and "SDE I" are one intent expressed
  * three ways, and grouping by exact string would yield clusters of one.
@@ -179,6 +200,7 @@ export function buildClusters(listings: Listing[]): Cluster[] {
 		}
 
 		for (const rawCity of cities) {
+			if (!isPlace(rawCity)) continue; // "PAN India" is not a city
 			const cityName = normalizeCity(rawCity);
 			const citySlug = slugify(cityName);
 			if (!citySlug) continue;

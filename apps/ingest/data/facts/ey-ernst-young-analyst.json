@@ -1,0 +1,53 @@
+{
+  "company": "EY (Ernst & Young)",
+  "role": "Analyst",
+  "jobType": "internship",
+  "batchYears": [
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+  ],
+  "qualifications": [
+    "B.E/B.Tech",
+    "M.E/M.Tech",
+    "B.Sc",
+    "M.Sc",
+    "BCA",
+    "MCA"
+  ],
+  "experienceRequired": null,
+  "salary": null,
+  "locations": [
+    "Pune",
+    "Chennai",
+    "Bengaluru"
+  ],
+  "lastDateToApply": null,
+  "applyByDate": null,
+  "applyUrl": "https://careers.ey.com/ey/job/Pune-Analyst-TAX-National-TAX-Indirect-Tax-Core-Pune-MH-411001/1415532233/",
+  "skills": [
+    "Programming knowledge (Java / Python / C++ or any OOP language)",
+    "Understanding of software development concepts",
+    "Analytical and problem-solving skills",
+    "Quick learning ability",
+    "Basic knowledge of SAP (preferred)",
+    "Good communication skills",
+    "Preferred Skills: Knowledge of SAP applications and enterprise systems, Strong presentation and communication skills, Ability to work in teams and client-facing roles, Flexibility to travel and relocate, Problem-solving and consulting mindset"
+  ],
+  "requirements": [
+    "Full-time Graduate or Postgraduate (CS / IT / ECE or related field)",
+    "No prior experience required (Freshers eligible)"
+  ],
+  "responsibilities": [
+    "Assist in application development based on technical specifications",
+    "Support design, build, and testing of SAP applications",
+    "Work closely with senior consultants and managers",
+    "Participate in client engagements and project delivery",
+    "Understand business requirements and provide solutions",
+    "Maintain process documentation and reports"
+  ],
+  "discoveredVia": "https://freshersdunia.in/ey-off-campus-2026-hiring/",
+  "discoveredAt": "2026-08-10T07:23:14",
+  "extractedAt": "2026-08-14T03:46:56.750Z"
+}

@@ -1,0 +1,44 @@
+{
+  "company": "American Express",
+  "role": "Apprentice",
+  "jobType": "full-time",
+  "batchYears": [
+    "2024",
+    "2025",
+    "2026"
+  ],
+  "qualifications": [
+    "B.E/B.Tech / ME/M.Tech / MBA / BBA / BCA / B.Com / BA & more"
+  ],
+  "experienceRequired": null,
+  "salary": "₹ 4 to 7 LPA (Expected)",
+  "locations": [
+    "PAN India"
+  ],
+  "lastDateToApply": "ASAP",
+  "applyByDate": null,
+  "applyUrl": "https://careers.americanexpress.com/en/sites/CX_1/job/26009311/?intlink=us-amex-career-en-us-search&location=India&locationId=300000000228786&locationLevel=country&mode=location",
+  "skills": [
+    "SQL",
+    "Data Warehousing concepts",
+    "Automation tools/techniques (RPA, ETL tools)",
+    "Machine Learning",
+    "Data Visualization tools (Power BI, Tableau)",
+    "MS-Office (Excel, PowerPoint, Word)"
+  ],
+  "requirements": [
+    "Hands-on experience on SQL and familiarity with Data Warehousing concepts",
+    "Familiarity with Software Development Lifecycle (SDLC)",
+    "Knowledge of banking products and regulatory reporting exposure"
+  ],
+  "responsibilities": [
+    "Support Product Owners and Data Architects in regulatory reporting automation design and implementation phases",
+    "Analyze large datasets to identify trends, anomalies, and potential issues related to regulatory reporting",
+    "Create and maintain comprehensive documentation for automated reporting processes",
+    "Identify opportunities to optimize and enhance existing reporting processes and workflows through automation",
+    "Support data quality checks on documents, ensuring they are complete and follow templates"
+  ],
+  "discoveredVia": "https://freshersdunia.in/american-express-off-campus-2026-apprentice/",
+  "discoveredAt": "2026-08-13T06:01:35",
+  "extractedAt": "2026-08-14T03:46:45.146Z"
+}
