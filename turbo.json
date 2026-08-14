@@ -4,7 +4,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      // Turborepo 2 runs tasks in strict env mode: anything not declared here is
+      // stripped before the task sees it. SITE was being filtered out, so the
+      // site would have built against the fallback origin no matter what CI
+      // passed in. Declaring it also makes it part of the cache key, which is
+      // correct — the origin is baked into every canonical tag and the sitemap.
+      "env": ["SITE", "CI"]
     },
     "typecheck": {
       "dependsOn": ["^build"]
