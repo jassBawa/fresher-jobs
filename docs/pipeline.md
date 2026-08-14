@@ -29,7 +29,7 @@ dependencies** — built-ins only.
 | `packages/schema/src/index.ts` | The fact/draft contracts: types, zod, JSON Schema |
 | `apps/web/src/lib/listings.ts` | Expiry horizon and the D5 indexing gate |
 | `apps/web/src/lib/clusters.ts` | Cluster pages — the indexable surface |
-| `.github/workflows/ingest.yml` | Daily cron at 07:00 IST, commits new drafts |
+| `scripts/daily.sh` | The scheduled run — fetch, draft, log. cron or launchd |
 
 ## Commands
 
@@ -46,6 +46,8 @@ Run from the repo root.
 | `pnpm run promote <slug>…` | **No** — publishes one or more drafts |
 | `pnpm run test` | **No** — 94 tests, no runner, no dependencies |
 | `pnpm run build` | **No** — builds the static site into `apps/web/dist/` |
+| `pnpm run check` | **No** — build + typecheck + test, all at once |
+| `pnpm run daily` | Yes — the scheduled run, for cron or launchd |
 
 ---
 
@@ -214,10 +216,10 @@ Listing pages that clear the gate also carry schema.org `JobPosting` markup.
 | 4 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Free models |
 | — | **Ollama** | `qwen2.5:3b` | Local. Opt in with `LLM_PROVIDER=ollama` |
 
-No paid tier. The OpenAI and Anthropic adapters were removed — see D11 and D19.
-If every free provider is rate-limited at once the run degrades to
-`generatedBy: template`, which is a complete draft, rather than falling through
-to something metered.
+No paid tier. The OpenAI and Anthropic adapters were removed (D11, D19) and a
+local coding-agent CLI was measured and rejected (D21). If every provider is
+unavailable the run degrades to `generatedBy: template`, which is a complete
+draft, rather than falling through to something metered.
 
 Everything except Gemini and Anthropic speaks the OpenAI chat-completions shape,
 so they share one adapter — adding a provider is one line. Gemini uses its native
@@ -276,8 +278,9 @@ anything. Removed rather than documented.
    where it means Pune. Structured data handles it (states go to
    `addressRegion`) but a `/jobs-in-maharashtra/` cluster is still weaker than a
    city page.
-7. **Nothing is hosted.** The build produces `apps/web/dist/`; deploy.yml is
-   written but the Cloudflare project, secrets and domain do not exist yet.
+7. **Nothing is hosted, and nothing is automated.** The build produces
+   `apps/web/dist/` and stops. Scheduling is a local cron or launchd job, so
+   the machine has to be on — there is no hosted runner behind it.
 
 ---
 
@@ -285,7 +288,7 @@ anything. Removed rather than documented.
 
 Ordered by how much they'd matter:
 
-- Hosting: the Cloudflare Pages project, its secrets, and a domain (open D2)
+- Hosting: somewhere to put `dist/`, and a domain (open D2)
 - Verification pass against the official apply page — would fix both limitation
   2 and limitation 5
 - Telegram broadcast — free, fully automatable, zero policy risk

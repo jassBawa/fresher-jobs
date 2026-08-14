@@ -206,7 +206,7 @@ Deciding factor: **Cloudflare charges zero egress, and static asset requests are
 | DB | Neon Launch | No base fee; **disable scale-to-zero** before live traffic |
 | Search | **Postgres FTS + pg_trgm** | Good to ~100–200k listings. Precompute facet counts nightly. |
 | Storage | Cloudflare R2 | Zero egress; hosts IG carousel JPEGs |
-| Ingest | GitHub Actions | 2,000 min/mo free private |
+| Ingest | **Local cron / launchd** | Free. Revised in D20 — was GitHub Actions |
 | Analytics | Cloudflare Web Analytics | Free, no cookie banner, best CWV |
 
 **⚠️ Vercel Hobby bans AdSense by name.** Fair Use Guidelines (updated 2026-07-29) list *"the inclusion of advertisements, including but not limited to online advertising platforms like Google AdSense"* as prohibited commercial use. Pro ($20/mo) is the floor there, and 500k pages revalidating daily = **~$66/mo in ISR writes alone** at Mumbai rates.

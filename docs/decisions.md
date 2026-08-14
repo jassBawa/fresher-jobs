@@ -366,6 +366,65 @@ That is the evidence for this decision, and it should stay legible.
 
 ---
 
+## D20 — Everything runs locally; no CI, no hosted cron
+
+**Decision.** Delete all three GitHub Actions workflows. The repo holds code, and
+nothing else happens there. Ingest runs on a local cron or launchd job via
+`scripts/daily.sh`; `pnpm run check` does locally what CI did remotely.
+
+**Why.** User call. The automation was solving problems this project does not
+have yet: there is one contributor, one machine, no reviewers to gate, and no
+deploy target. Against that, the hosted setup carried real friction — three
+workflows to keep green, secrets to mirror into a second place, a red X on
+every push from a deploy job that could not possibly succeed, and a
+2,000-minutes-per-month budget to think about on a private repo.
+
+Running locally also removes the whole class of bug that dominated the first
+day of this repo being on GitHub: two consecutive CI failures caused purely by
+Turborepo's strict env mode stripping `SITE`, neither reproducible with a plain
+local build.
+
+**What is given up, honestly:** the machine has to be awake for the daily run.
+launchd is preferred over cron for exactly this — it runs a missed job when the
+machine next wakes, where cron skips the day silently. And nothing now verifies
+a push from a clean checkout, so `pnpm run check` before committing is a habit
+rather than a gate.
+
+**Reversible.** The workflows were deleted, not disabled; they are in the history
+if a second contributor or a real deploy target ever makes them worth having.
+
+---
+
+## D21 — A local coding-agent CLI is not a cheap model
+
+**Decision.** Do not use the Claude Code CLI (or any coding agent) as the
+extraction model. Considered, built, measured, removed.
+
+**Why.** It looks free — the binary is installed, signed in, and needs no API
+key — and that intuition is wrong by two orders of magnitude. Measured on this
+exact workload:
+
+| Provider | Per call | 25 postings/day |
+|---|---|---|
+| Groq `llama-3.1-8b-instant` | ~₹0.01 | **~₹9/month** |
+| Claude Code `--model haiku` | $0.012 | ~$18/month |
+| Claude Code `--model opus` | $0.159 | ~$240/month |
+
+The cause is structural, not a tuning problem: the CLI rebuilds a
+multi-thousand-token system prompt on every invocation (~5k on haiku, ~15k on
+opus), and this workload is two short calls per posting. It is paying agent
+prices for a parser. On a subscription it is not billed per call, but it draws
+down the same usage limits real coding work needs.
+
+**Rejected with it:** a generic `AGENT_CMD` escape hatch for piping prompts to
+any local CLI. Neat, and one more code path to keep working for no benefit once
+the cost argument killed the main use case.
+
+**Kept from the exercise:** nothing in `llm.mjs`. The measurements are the
+deliverable, and they are above.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |
@@ -376,4 +435,4 @@ That is the evidence for this decision, and it should stay legible.
 | 4 | ~~Publish target~~ — **resolved**: static site (Astro), built and working | — |
 | 5 | **Government notification sources** — public-domain under Section 52(1)(q), safest and richest content available, never researched | Phase 3 content |
 | 6 | Is 60 days the right freshness horizon? Set by judgement in D14, never measured | Listing accuracy |
-| 7 | Cloudflare Pages project, secrets and domain — the only thing between the build and a live site | Launch |
+| 7 | Somewhere to put `apps/web/dist/`, and a domain — the only thing between the build and a live site | Launch |

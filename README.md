@@ -89,11 +89,12 @@ Ordered cheapest and fastest first; the first key found wins.
 | **Cerebras** | `llama3.1-8b` | Free tier, fastest available |
 | **Gemini** | `gemini-2.5-flash-lite` | Free tier, strict JSON mode |
 | **OpenRouter** | `llama-3.3-70b-instruct:free` | Genuinely free models |
-| **Ollama** | `qwen2.5:3b` | Local. No key, no cost, no rate limit. Set `LLM_PROVIDER=ollama` |
+| **Ollama** | `qwen2.5:3b` | Local. No key, no cost, no rate limit. `LLM_PROVIDER=ollama` |
 
-There is no paid fallback, deliberately. Metered frontier models cost ~30× more
-here for output that is actually worse, and leaving them wired up meant a stray
-key in the environment could quietly start billing.
+There is no paid tier at all. Metered frontier models cost ~30× more here for
+output that is actually worse, and leaving them wired up meant a stray key in
+the environment could quietly start billing. Driving a local coding-agent CLI
+was measured too and came out worse still — see [D19 and D21](./docs/decisions.md).
 
 At 25 postings/day this runs comfortably inside a free tier. A larger model buys
 you nothing here — longer, more florid copy is a downgrade on a page whose only
@@ -170,34 +171,65 @@ All optional except a key, all in `apps/ingest/.env`:
 `apps/ingest/data/state.json` tracks which posts have been seen, so reruns are
 incremental and cheap.
 
-## Running on a schedule
+## Running it on a schedule
 
-`.github/workflows/ingest.yml` runs daily at 07:00 IST and commits new drafts
-back to the repo. Add your API key under **Settings → Secrets and variables →
-Actions**. Drafts still need promoting by hand.
+Everything runs on your machine. There is no CI, no hosted cron and no
+automation on GitHub — the repo is there to hold the code, nothing more.
 
-To run locally instead:
+`pnpm run daily` is the scheduled entry point: it fetches, drafts, logs to
+`logs/`, and prunes logs older than a fortnight. Nothing publishes itself.
+
+**launchd (macOS, preferred)** — runs a missed job when the machine next wakes,
+where cron just skips it:
+
+```bash
+sed -i '' "s|__REPO__|$PWD|g" scripts/com.fresherjobs.ingest.plist
+cp scripts/com.fresherjobs.ingest.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.fresherjobs.ingest.plist
+launchctl start com.fresherjobs.ingest     # run it now to check
+```
+
+**cron**, if you prefer:
 
 ```
-30 1 * * *  cd /path/to/fresher-jobs && pnpm run ingest
+0 7 * * *  /path/to/fresher-jobs/scripts/daily.sh
 ```
 
-## Deployment
+Either way the job runs with a near-empty PATH, which is the usual reason a
+scheduled task works by hand and silently does nothing overnight.
+`scripts/daily.sh` sets PATH up front and fails loudly if `pnpm` is still
+missing.
 
-**Not deployed yet.** `.github/workflows/deploy.yml` targets Cloudflare Pages and
-is written, but the project, its secrets and the domain don't exist. To finish it:
+## Checking your work
 
-| Kind | Name | Purpose |
-|---|---|---|
-| Secret | `CF_API_TOKEN` | Cloudflare Pages deploy token |
-| Secret | `CF_ACCOUNT_ID` | Cloudflare account |
-| Secret | `GROQ_API_KEY` | For the ingest cron |
-| Variable | `CF_PAGES_PROJECT` | Pages project name |
-| Variable | `SITE_URL` | Canonical origin. Without it the build fails by design |
+`pnpm run check` runs build, typecheck and tests together — what a CI pipeline
+would have run, on your machine, before you commit.
 
-Cloudflare rather than Vercel for a specific reason — Vercel's Hobby tier bans
-AdSense by name, and metered egress taxes exactly what an ad-supported SEO site
-has most of. See [D6](./docs/decisions.md).
+## Publishing the site
+
+The build writes a plain static directory to `apps/web/dist/` — no server, no
+runtime, no platform assumed:
+
+```bash
+SITE=https://your-domain.example pnpm run build
+```
+
+`SITE` is the canonical origin. Every canonical tag, the sitemap and robots.txt
+derive from it, so the build refuses to run without it under `CI=1` rather than
+silently shipping the wrong domain. Locally it falls back to
+`http://localhost:4321`.
+
+From there `dist/` can be dropped anywhere that serves files — Cloudflare Pages,
+Netlify, a VPS, `python3 -m http.server` for a look. Cloudflare remains the
+recommendation on cost grounds (zero egress, free unlimited static requests;
+Vercel's Hobby tier bans AdSense by name) — see [D6](./docs/decisions.md) — but
+nothing in the repo is wired to it, and no deploy runs automatically.
+
+Preview the built site locally:
+
+```bash
+pnpm --filter @jobs/web run preview
+```
 
 ## Adding sources later
 

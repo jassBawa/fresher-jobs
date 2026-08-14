@@ -163,8 +163,9 @@ thousand postings a day. The real costs are **hosting once you serve traffic**, 
 6. **Oracle Always Free was halved** (now 2 OCPU / 12 GB Arm) and **reclaims
    instances idle below 20% for 7 days**. Free, not dependable.
 7. **Fly.io charges $0.12/GB for India** — 6× its US rate.
-8. **GitHub Actions private-repo minutes are tight** — 2,000/mo free; a 60-minute
-   nightly job burns 1,800. Use a public repo or budget $0.006/min.
+8. ~~**GitHub Actions private-repo minutes are tight**~~ — 2,000/mo free; a
+   60-minute nightly job burns 1,800. **No longer applies (D20):** ingest runs
+   as a local cron/launchd job, so it costs nothing and needs no budget.
 9. **AdSense Auto Ads wreck CLS.** Manual slots with reserved `min-height` only,
    and never above the LCP element.
 

@@ -8,6 +8,7 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
+    "check": "turbo run build typecheck test",
     "test": "turbo run test",
     "ingest": "pnpm --filter @jobs/ingest run ingest",
     "fetch": "pnpm --filter @jobs/ingest run fetch",
@@ -15,7 +16,8 @@
     "fetch:dry": "pnpm --filter @jobs/ingest run fetch:dry",
     "draft:nollm": "pnpm --filter @jobs/ingest run draft:nollm",
     "promote": "pnpm --filter @jobs/ingest run promote",
-    "drafts": "pnpm --filter @jobs/ingest run promote --list"
+    "drafts": "pnpm --filter @jobs/ingest run promote --list",
+    "daily": "./scripts/daily.sh"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

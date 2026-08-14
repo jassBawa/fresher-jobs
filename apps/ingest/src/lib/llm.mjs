@@ -1,14 +1,13 @@
 // Provider-agnostic JSON-mode LLM call. No SDK, no dependencies.
 //
 // Almost everything here speaks the OpenAI chat-completions shape, so they share
-// one adapter and differ only by base URL, key and model. Ordered cheapest-and-
-// fastest first: a local model costs nothing, Groq and Cerebras are free-tier and
-// very fast, and the big paid providers sit at the bottom as a fallback.
+// one adapter and differ only by base URL, key and model. Free tiers and local
+// models only — there is no metered provider left to fall through to (D19).
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Wraps providers (Groq, Cerebras, Gemini, OpenAI, OpenRouter) comfortably inside
-// their free tiers. The real ceiling on free plans is requests/min and
+// Keeps Groq, Cerebras, Gemini and OpenRouter comfortably inside their free
+// tiers. The real ceiling on free plans is requests/min and
 // tokens/min (Groq: llama-3.1-8b-instant = 30 RPM / 6,000 TPM), which 429s when
 // exceeded. We enforce a minimum gap between calls and, on a 429, honor the
 // Retry-After header so a burst degrades into a slow crawl instead of failing.
@@ -98,18 +97,14 @@ const P = {
       return d.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ?? "";
     },
   },
-
 };
 
-// Order matters: first one with a usable key wins.
+// Order matters: the first provider with a usable key wins. Ollama is opt-in
+// via LLM_PROVIDER because it needs a model server running locally.
 //
-// Free tiers and local only. The paid frontier fallbacks were removed: this
-// workload is JSON extraction plus four short prose fields, and the measured
-// spread was ₹9/month against ₹276 for the same 25 postings/day — a 30× swing
-// for output that gets *worse*, since a bigger model writes longer and more
-// florid copy on a page whose only job is "can I apply, yes or no". Keeping
-// them as a fallback meant a stray key in the environment could silently start
-// billing for a job an 8B model already does well. See docs/decisions.md D11.
+// The paid providers were removed outright (D11, D19), and driving a local
+// coding-agent CLI was measured and rejected on the same grounds (D21) — at
+// $0.012 a call it cost more than the whole month on Groq.
 const ORDER = ["groq", "cerebras", "gemini", "openrouter"];
 
 let cached = null;
@@ -130,10 +125,11 @@ export function activeProvider() {
   if (!found) {
     throw new Error(
       "No LLM configured. Cheapest options:\n" +
-        "    • Groq      — free tier, very fast:  GROQ_API_KEY=…      (console.groq.com)\n" +
-        "    • Cerebras  — free tier, fastest:    CEREBRAS_API_KEY=…  (cloud.cerebras.ai)\n" +
-        "    • Gemini    — free tier:             GEMINI_API_KEY=…    (aistudio.google.com)\n" +
-        "    • Local     — no key, no cost:       LLM_PROVIDER=ollama (ollama serve)\n" +
+        "    • Groq        — free tier, very fast:  GROQ_API_KEY=…      (console.groq.com)\n" +
+        "    • Cerebras    — free tier, fastest:    CEREBRAS_API_KEY=…  (cloud.cerebras.ai)\n" +
+        "    • Gemini      — free tier:             GEMINI_API_KEY=…    (aistudio.google.com)\n" +
+        "    • OpenRouter  — free models:           OPENROUTER_API_KEY=…(openrouter.ai)\n" +
+        "    • Ollama      — local, no key, free:   LLM_PROVIDER=ollama (ollama serve)\n" +
         "  See .env.example."
     );
   }

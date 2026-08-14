@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd job for the daily ingest. Preferred over cron on macOS: if the machine
+  is asleep at the scheduled time, launchd runs the job when it next wakes,
+  where cron simply skips it.
+
+  Install:
+    sed -i '' "s|__REPO__|$PWD|g" scripts/com.fresherjobs.ingest.plist
+    cp scripts/com.fresherjobs.ingest.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.fresherjobs.ingest.plist
+
+  Run it now:      launchctl start com.fresherjobs.ingest
+  Stop scheduling: launchctl unload ~/Library/LaunchAgents/com.fresherjobs.ingest.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fresherjobs.ingest</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO__/scripts/daily.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>__REPO__</string>
+
+    <!-- 07:00 local, daily. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>7</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- Catch up on a missed run rather than skipping the day. -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>__REPO__/logs/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>__REPO__/logs/launchd.err.log</string>
+</dict>
+</plist>
