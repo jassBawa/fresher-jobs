@@ -1,16 +1,20 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["tsconfig.base.json"],
+  // Turborepo 2 runs tasks in strict env mode: anything not declared is stripped
+  // before the task sees it. Declared globally rather than per task because
+  // every command that loads astro.config needs them — `build` and `typecheck`
+  // both do, and fixing only the first left CI red a second time. Anything added
+  // later that touches the config gets this for free.
+  //
+  // SITE belongs in the cache key regardless: the origin is baked into every
+  // canonical tag and the sitemap, so a build with a different SITE really is a
+  // different build.
+  "globalEnv": ["SITE", "CI"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"],
-      // Turborepo 2 runs tasks in strict env mode: anything not declared here is
-      // stripped before the task sees it. SITE was being filtered out, so the
-      // site would have built against the fallback origin no matter what CI
-      // passed in. Declaring it also makes it part of the cache key, which is
-      // correct — the origin is baked into every canonical tag and the sitemap.
-      "env": ["SITE", "CI"]
+      "outputs": ["dist/**"]
     },
     "typecheck": {
       "dependsOn": ["^build"]
