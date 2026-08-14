@@ -44,7 +44,12 @@
 	   contrast ink. A dark UI is the wrong instrument for this use scene. */
 	--ink: #12161a;
 	--ink-2: #4a545e;
-	--ink-3: #6b757f;
+	/* Muted ink. Darkened from #6b757f, which cleared 4.5:1 on white but only
+	   managed 4.33:1 on --ground-2 — and --ground-2 is where it does most of its
+	   work, in the category strip and the footer. Now 4.97 on white, 4.59 on the
+	   grey. This is also the floor for the masthead promise line, which is
+	   separated from the tagline by colour alone. */
+	--ink-3: #67717b;
 	--ground: #ffffff;
 	--ground-2: #f4f6f8;
 	--rule: #dde3e8;
@@ -210,7 +215,8 @@ figure {
 }
 
 .field--closed .field__meta {
-	color: #d7dbdf;
+	/* 4.57:1 on --closed. The previous #d7dbdf sat at 4.40. */
+	color: #dbdfe3;
 }
 
 /* Inside a status field the mark sits on its own colour, so the reversed value
@@ -221,7 +227,7 @@ figure {
 }
 
 .field--closed .mark {
-	color: #d7dbdf;
+	color: #dbdfe3;
 }
 
 /* ------------------------------------------------------------------- marks */
@@ -401,7 +407,9 @@ figure {
 	font-size: var(--fs-fine);
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	color: #9aa4ae;
+	/* The marker is quiet but it is still text a reader may need to identify as
+	   an ad boundary, so it holds 4.5:1 rather than fading toward the rule. */
+	color: var(--ink-3);
 }
 
 .ad__inner {
