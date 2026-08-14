@@ -1,19 +1,17 @@
 ---
 /**
- * Every cluster page, from one route.
- *
- * These are the pages meant to rank (D5): "software engineer jobs in bengaluru",
- * "wipro jobs", "2026 batch jobs". Individual listings mostly sit behind
- * noindex and feed these.
+ * Every cluster page, from one route — the indexable surface (D5, D15).
  *
  * Route priority puts the static pages and /jobs/[slug] ahead of this rest
- * parameter, and getStaticPaths only emits the cluster paths, so nothing here
+ * parameter, and getStaticPaths only emits cluster paths, so nothing here
  * shadows an existing route.
  */
 import Base from '../layouts/Base.astro';
 import JobList from '../components/JobList.astro';
+import AdSlot from '../components/AdSlot.astro';
 import { buildClusters, clusterRobots, clusterIsIndexable } from '../lib/clusters';
 import { liveListings } from '../lib/site';
+import { statusOf, today, shortDay } from '../lib/listings';
 
 export const getStaticPaths = async () => {
 	const jobs = await liveListings();
@@ -29,26 +27,47 @@ export const getStaticPaths = async () => {
 };
 
 const { cluster, listings } = Astro.props;
+const on = today();
+const closingSoon = listings.filter((fm) => statusOf(fm, on) === 'closing').length;
+const thin = !clusterIsIndexable(cluster);
 ---
 
 <Base title={cluster.title} description={cluster.description} robots={clusterRobots(cluster)}>
-	<h1>{cluster.heading}</h1>
-	<p class="count">
-		{listings.length} open {listings.length === 1 ? 'position' : 'positions'}
-		{!clusterIsIndexable(cluster) && <span class="thin"> · too few to list in search yet</span>}
-	</p>
+	<section class="field">
+		<div class="wrap field__inner">
+			<h1 class="display">{cluster.heading}</h1>
+			<p class="field__meta">
+				<span>{listings.length} open now</span>
+				{closingSoon > 0 && <span>{closingSoon} closing this week</span>}
+				<span>Checked {shortDay(on)}</span>
+			</p>
+		</div>
+	</section>
 
-	<JobList listings={listings} />
+	<div class="wrap">
+		<JobList listings={listings} adAfter={4} />
 
-	<p><a href="/">← All fresher jobs</a></p>
+		<p class="back rule-top">
+			<a href="/">← All openings</a>
+			{thin && <span class="fine"> · too few here to list in search yet</span>}
+		</p>
+
+		<AdSlot placement="foot" />
+	</div>
 </Base>
 
 <style>
-	.count {
-		color: #78716c;
-		font-size: 0.9rem;
+	.back {
+		margin-top: var(--space-6);
+		padding-top: var(--space-4);
 	}
-	.thin {
-		font-style: italic;
+
+	.back a {
+		text-decoration: none;
+		font-weight: 600;
+	}
+
+	.back a:hover {
+		text-decoration: underline;
 	}
 </style>

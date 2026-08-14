@@ -1,12 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import JobList from '../components/JobList.astro';
+import AdSlot from '../components/AdSlot.astro';
 import { buildClusters, type Cluster, type ClusterKind } from '../lib/clusters';
 import { liveListings } from '../lib/site';
+import { statusOf, today, shortDay } from '../lib/listings';
 
-const jobs = await liveListings();
+const on = today();
+const jobs = await liveListings(on);
 const listings = jobs.map((job) => job.data);
 const clusters = buildClusters(listings);
+
+const closingSoon = listings.filter((fm) => statusOf(fm, on) === 'closing').length;
 
 const GROUPS: ReadonlyArray<{ kind: ClusterKind; label: string }> = [
 	{ kind: 'role', label: 'By role' },
@@ -18,63 +23,62 @@ const GROUPS: ReadonlyArray<{ kind: ClusterKind; label: string }> = [
 const group = (kind: ClusterKind): Cluster[] => clusters.filter((c) => c.kind === kind);
 ---
 
-<Base title="Fresher Jobs — Latest Off Campus & Walk-in Jobs in India">
-	<h1>Latest fresher jobs in India</h1>
+<Base title="Fresher Jobs in India — Off Campus Drives, Batch-wise | PehlaJob">
+	<section class="field">
+		<div class="wrap field__inner">
+			<h1 class="display">
+				{listings.length} openings you can still apply for
+			</h1>
+			<p class="field__meta">
+				<span>Checked {shortDay(on)}</span>
+				{closingSoon > 0 && <span>{closingSoon} closing this week</span>}
+				<span>Every listing links to the company's own form</span>
+			</p>
+		</div>
+	</section>
 
-	<JobList
-		listings={listings}
-		empty="No published openings yet. Check back soon."
-	/>
+	<div class="wrap">
+		<JobList listings={listings} empty="No openings published yet. Check back soon." adAfter={4} />
 
-	{
-		clusters.length > 0 && (
-			<nav class="browse">
-				<h2>Browse</h2>
-				{GROUPS.map(({ kind, label }) =>
-					group(kind).length ? (
-						<div class="facet">
-							<h3>{label}</h3>
-							<ul>
-								{group(kind).map((c) => (
-									<li>
-										<a href={`/${c.path}/`}>{c.heading}</a> <span>{c.slugs.length}</span>
-									</li>
-								))}
-							</ul>
-						</div>
-					) : null
-				)}
-			</nav>
-		)
-	}
+		{
+			clusters.length > 0 && (
+				<nav class="browse rule-top" aria-label="Browse openings">
+					<h2 class="label browse__title">Browse</h2>
+					{GROUPS.map(({ kind, label }) =>
+						group(kind).length ? (
+							<div class="facet">
+								<h3 class="facet__head">{label}</h3>
+								<ul class="facet__list">
+									{group(kind).map((c) => (
+										<li>
+											<a href={`/${c.path}/`}>{c.heading}</a>{' '}
+											<span class="facet__count">{c.slugs.length}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						) : null
+					)}
+				</nav>
+			)
+		}
+
+		<AdSlot placement="foot" />
+	</div>
 </Base>
 
 <style>
 	.browse {
-		border-top: 1px solid #e7e5e4;
-		margin-top: 2rem;
-		padding-top: 1rem;
+		margin-top: var(--space-6);
+		padding-top: var(--space-5);
 	}
-	.browse h2 {
-		font-size: 1rem;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		color: #78716c;
+
+	.browse__title {
+		margin-bottom: var(--space-4);
 	}
-	.facet h3 {
-		font-size: 0.9rem;
-		margin-bottom: 0.25rem;
-	}
-	.facet ul {
-		list-style: none;
-		padding: 0;
-		margin: 0 0 1rem;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem 1rem;
-	}
-	.facet span {
-		color: #a8a29e;
-		font-size: 0.8rem;
+
+	.facet__head {
+		font-size: var(--fs);
+		font-weight: 700;
 	}
 </style>

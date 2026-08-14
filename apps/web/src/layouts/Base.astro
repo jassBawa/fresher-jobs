@@ -2,21 +2,26 @@
 interface Props {
 	title: string;
 	description?: string;
-	robots?: string; // e.g. "noindex, follow" — set per page
+	robots?: string;
 }
 
 const {
 	title,
-	description = 'Fresh job openings for freshers and early-career candidates in India.',
+	description = 'Fresh openings for freshers and early-career candidates in India. Batch, qualification, location and closing date on every listing.',
 	robots = 'index, follow',
 } = Astro.props;
 
-const SITE = Astro.site ?? new URL('/');
+const SITE = Astro.site ?? new URL('http://localhost:4321/');
 const canonical = new URL(Astro.url.pathname, SITE);
+
+// The only third-party script this site will ever load, and only once AdSense
+// is approved and PUBLIC_ADSENSE_CLIENT is set. Until then the page ships zero
+// JavaScript, which is the point on a mid-range phone over mobile data.
+const adsClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,54 +30,152 @@ const canonical = new URL(Astro.url.pathname, SITE);
 		<meta name="robots" content={robots} />
 		<link rel="canonical" href={canonical} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="theme-color" content="#0b6b35" />
+		<link
+			rel="preload"
+			href="/fonts/archivo-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
 		<link rel="stylesheet" href="/styles/global.css" />
+		{
+			adsClient && (
+				<script
+					async
+					src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsClient}`}
+					crossorigin="anonymous"
+				/>
+			)
+		}
 		<slot name="head" />
-		<style>
-			body {
-				font-family: system-ui, -apple-system, sans-serif;
-				margin: 0;
-				color: #1c1917;
-				line-height: 1.6;
-			}
-			.site-header {
-				border-bottom: 1px solid #e7e5e4;
-				padding: 1rem 1.25rem;
-			}
-			.site-header a {
-				text-decoration: none;
-				color: inherit;
-				font-weight: 600;
-			}
-			.site-header .brand {
-				font-size: 1.1rem;
-			}
-			.wrap {
-				max-width: 720px;
-				margin: 0 auto;
-				padding: 0 1.25rem;
-			}
-			.site-footer {
-				border-top: 1px solid #e7e5e4;
-				margin-top: 3rem;
-				padding: 1.25rem;
-				font-size: 0.85rem;
-				color: #78716c;
-			}
-		</style>
 	</head>
 	<body>
-		<header class="site-header">
-			<div class="wrap">
-				<a class="brand" href="/">Fresher Jobs</a>
+		<!--
+		THESIS: A job listing read as the confirmation screen this audience already
+		reads a hundred times a month — outcome first, the facts that prove it
+		second, one action last. It refuses the vertical's two defaults equally:
+		the sarkari bordered results table, and the SaaS job board of rounded cards.
+		OWN-WORLD: White ground, near-black ink, one committed green owning full-width
+		status fields. Archivo, self-hosted. Rows separated by hairlines, never boxed
+		into cards. Key-value rails at one type size; rank by weight, case, reversal
+		and rule. Status is a drawn mark plus a word, never colour alone.
+		STORY: The visitor lands deep from a search or a WhatsApp forward, learns in
+		one glance whether it is open and whether their batch qualifies, and leaves
+		through the apply link — which is the success state, not a bounce.
+		FIRST VIEWPORT: Three-line masthead; a full-bleed green status field naming
+		the page, its live count and the date checked; then listing rows as receipt
+		lines. The reserved ad slot sits below the first rows, never above them.
+		FORM: Confirmation Screen, candidate 5 of 7, seed d785fe22.
+		FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+		-->
+		<a class="skip" href="#main">Skip to listings</a>
+
+		<header class="masthead">
+			<div class="wrap masthead__inner">
+				<a class="brand" href="/">
+					PehlaJob<span class="brand__dot">.</span>
+				</a>
+				<p class="masthead__line">Fresher jobs in India — checked, dated, and linked to the real form.</p>
 			</div>
 		</header>
-		<main class="wrap">
+
+		<main id="main">
 			<slot />
 		</main>
-		<footer class="site-footer">
+
+		<footer class="foot">
 			<div class="wrap">
-				Fresher Jobs · fresh openings for freshers in India
+				<nav class="foot__nav" aria-label="Browse">
+					<a href="/">All openings</a>
+					<a href="/2026-batch-jobs/">2026 batch</a>
+					<a href="/software-engineer-jobs/">Software engineer</a>
+					<a href="/jobs-in-bengaluru/">Bengaluru</a>
+				</nav>
+				<p class="fine">
+					Listings are compiled from public announcements and rewritten from the facts. Salary
+					figures are estimates unless the employer states otherwise. Always apply on the
+					company's own careers page — we never ask for a fee.
+				</p>
 			</div>
 		</footer>
 	</body>
 </html>
+
+<style>
+	.skip {
+		position: absolute;
+		left: -9999px;
+		top: 0;
+		background: var(--ink);
+		color: #fff;
+		padding: var(--space-3) var(--space-4);
+		z-index: 10;
+	}
+	.skip:focus {
+		left: 0;
+	}
+
+	.masthead {
+		border-bottom: 2px solid var(--rule-strong);
+	}
+
+	.masthead__inner {
+		padding-block: var(--space-4);
+	}
+
+	.brand {
+		display: inline-block;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		text-decoration: none;
+		font-size: var(--fs);
+	}
+
+	.brand__dot {
+		color: var(--live);
+	}
+
+	.masthead__line {
+		margin-top: var(--space-1);
+		color: var(--ink-3);
+	}
+
+	.foot {
+		border-top: 1px solid var(--rule);
+		margin-top: var(--space-7);
+		padding-block: var(--space-5) var(--space-7);
+		background: var(--ground-2);
+	}
+
+	.foot__nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-5);
+		margin-bottom: var(--space-4);
+	}
+
+	.foot__nav a {
+		text-decoration: none;
+		border-bottom: 1px solid var(--rule);
+	}
+
+	.foot__nav a:hover {
+		border-bottom-color: var(--ink);
+	}
+
+	.foot .fine {
+		max-width: 42rem;
+	}
+
+	@media (min-width: 46rem) {
+		.masthead__inner {
+			display: flex;
+			align-items: baseline;
+			gap: var(--space-5);
+		}
+		.masthead__line {
+			margin-top: 0;
+		}
+	}
+</style>

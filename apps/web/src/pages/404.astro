@@ -1,8 +1,44 @@
 ---
 import Base from '../layouts/Base.astro';
+import JobList from '../components/JobList.astro';
+import { liveListings } from '../lib/site';
+import { today, shortDay } from '../lib/listings';
+
+// A dead end is where a visitor is most likely to leave, so this page does the
+// one useful thing it can: show what is actually open right now.
+const on = today();
+const recent = (await liveListings(on)).slice(0, 5).map((job) => job.data);
 ---
 
-<Base title="Page not found" robots="noindex, follow">
-	<h1>404</h1>
-	<p>That page doesn't exist. <a href="/">Back to the homepage</a>.</p>
+<Base title="Page not found — PehlaJob" robots="noindex, follow">
+	<section class="field field--closed">
+		<div class="wrap field__inner">
+			<h1 class="display">That page isn't here</h1>
+			<p class="field__meta">
+				<span>The listing may have closed, or the link may be wrong.</span>
+			</p>
+		</div>
+	</section>
+
+	<div class="wrap">
+		<h2 class="label recent">Open right now · checked {shortDay(on)}</h2>
+		<JobList listings={recent} empty="Nothing is published yet." />
+		<p class="back rule-top"><a href="/">← All openings</a></p>
+	</div>
 </Base>
+
+<style>
+	.recent {
+		margin-top: var(--space-5);
+	}
+
+	.back {
+		margin-top: var(--space-6);
+		padding-top: var(--space-4);
+	}
+
+	.back a {
+		text-decoration: none;
+		font-weight: 600;
+	}
+</style>

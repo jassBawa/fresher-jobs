@@ -1,64 +1,100 @@
 ---
+/**
+ * Listings as receipt lines.
+ *
+ * Every row answers the eligibility question in the order the reader asks it:
+ * is it still open, who is hiring, for what, and am I allowed to apply. The
+ * key-value rail is set at the one type size the whole listing surface shares —
+ * labels differ from values by case, weight and colour, never by scale.
+ *
+ * An ad slot is interleaved after the first few rows on long lists, never
+ * before them.
+ */
 import type { DraftFrontmatter } from '@jobs/schema';
+import StatusMark from './StatusMark.astro';
+import AdSlot from './AdSlot.astro';
+import { statusOf, closesLabel, shortDay, today } from '../lib/listings';
 
 interface Props {
 	listings: DraftFrontmatter[];
 	empty?: string;
+	/** Interleave a reserved ad slot after this many rows. 0 disables. */
+	adAfter?: number;
 }
 
-const { listings, empty = 'No openings here right now.' } = Astro.props;
+const { listings, empty = 'Nothing open here right now.', adAfter = 0 } = Astro.props;
+const on = today();
 
-/** The one line that decides whether the reader clicks: who it is open to. */
-const eligibility = (fm: DraftFrontmatter): string =>
-	[
-		fm.batchYears?.length ? `${fm.batchYears.join(', ')} batch` : '',
-		fm.locations?.length ? fm.locations.slice(0, 3).join(', ') : '',
-		fm.salary ?? '',
-	]
-		.filter(Boolean)
-		.join(' · ');
+const cap = (arr: string[] | undefined, n: number): string => {
+	if (!arr?.length) return '';
+	return arr.length > n ? `${arr.slice(0, n).join(', ')} +${arr.length - n}` : arr.join(', ');
+};
 ---
 
 {
 	listings.length === 0 ? (
-		<p>{empty}</p>
+		<p class="empty">{empty}</p>
 	) : (
-		<ul class="jobs">
-			{listings.map((fm) => (
-				<li>
-					<a href={`/jobs/${fm.slug}/`}>{fm.title}</a>
-					<p class="meta">{eligibility(fm)}</p>
-					<p class="summary">{fm.description}</p>
-				</li>
-			))}
+		<ul class="rows">
+			{listings.map((fm, i) => {
+				const status = statusOf(fm, on);
+				return (
+					<>
+						<li class="row">
+							<div class="row__rail">
+								<StatusMark status={status} />
+								<span class="row__posted">{shortDay(fm.postedAt ?? fm.createdAt.slice(0, 10))}</span>
+							</div>
+
+							<a class="row__role" href={`/jobs/${fm.slug}/`}>
+								<span class="row__company">{fm.company}</span> — {fm.role}
+							</a>
+
+							<dl class="facts">
+								{fm.batchYears?.length && (
+									<>
+										<dt>Batch</dt>
+										<dd>{fm.batchYears.join(', ')}</dd>
+									</>
+								)}
+								{fm.locations?.length && (
+									<>
+										<dt>Where</dt>
+										<dd>{cap(fm.locations, 3)}</dd>
+									</>
+								)}
+								{fm.salary && (
+									<>
+										<dt>Pay</dt>
+										<dd>
+											{fm.salary} <em>· estimated</em>
+										</dd>
+									</>
+								)}
+								<dt>Closes</dt>
+								<dd>{closesLabel(fm, on)}</dd>
+							</dl>
+						</li>
+						{adAfter > 0 && i === adAfter - 1 && listings.length > adAfter + 1 && (
+							<li class="row row--ad">
+								<AdSlot placement="feed" />
+							</li>
+						)}
+					</>
+				);
+			})}
 		</ul>
 	)
 }
 
 <style>
-	.jobs {
-		list-style: none;
-		padding: 0;
-		margin: 1.5rem 0;
+	.empty {
+		padding-block: var(--space-6);
+		color: var(--ink-2);
 	}
-	.jobs li {
-		border-bottom: 1px solid #e7e5e4;
-		padding: 1rem 0;
-	}
-	.jobs li:last-child {
+
+	.row--ad {
 		border-bottom: 0;
-	}
-	.jobs a {
-		font-weight: 600;
-		color: #1c1917;
-	}
-	.meta {
-		margin: 0.25rem 0 0;
-		font-size: 0.85rem;
-		color: #78716c;
-	}
-	.summary {
-		margin: 0.35rem 0 0;
-		font-size: 0.95rem;
+		padding-block: 0;
 	}
 </style>

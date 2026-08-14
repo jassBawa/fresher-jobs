@@ -2,7 +2,17 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import JobPostingSchema from '../../components/JobPostingSchema.astro';
-import { isExpired, isIndexable, listingRobots, expiresOn, today } from '../../lib/listings';
+import StatusMark from '../../components/StatusMark.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import {
+	isExpired,
+	isIndexable,
+	listingRobots,
+	statusOf,
+	closesLabel,
+	shortDay,
+	today,
+} from '../../lib/listings';
 
 export const getStaticPaths = async () => {
 	const jobs = await getCollection('jobs', ({ data }) => data.status === 'published');
@@ -16,12 +26,18 @@ const { job } = Astro.props;
 const { Content } = await render(job);
 const fm = job.data;
 
-// Expired listings keep their page — inbound links and bookmarks should not
-// 404 — but they drop out of every index surface and say so at the top.
 const on = today();
 const expired = isExpired(fm, on);
-const closedOn = expiresOn(fm);
-const canonical = new URL(Astro.url.pathname, Astro.site ?? new URL('/'));
+const status = statusOf(fm, on);
+const canonical = new URL(Astro.url.pathname, Astro.site ?? new URL('http://localhost:4321/'));
+
+// The four facts the whole visit turns on, in the order they are asked.
+const eligibility = [
+	['Batch', fm.batchYears?.length ? fm.batchYears.join(', ') : null],
+	['Where', fm.locations?.length ? fm.locations.join(', ') : null],
+	['Type', fm.jobType],
+	['Pay', fm.salary],
+].filter(([, v]) => v) as [string, string][];
 ---
 
 <Base title={fm.title} description={fm.description} robots={listingRobots(fm, on)}>
@@ -34,46 +50,132 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? new URL('/'));
 	}
 
 	<article>
-		{
-			expired && (
-				<p class="closed">
-					<strong>Applications closed.</strong> This opening is no longer accepting
-					applications{closedOn ? ` as of ${closedOn}` : ''}. It is kept here for reference —
-					see <a href="/">current openings</a>.
+		<section class:list={['field', expired && 'field--closed']}>
+			<div class="wrap field__inner">
+				<p class="head__status">
+					<StatusMark status={status} label={expired ? 'Applications closed' : undefined} />
 				</p>
-			)
-		}
+				<h1 class="display">{fm.company} — {fm.role}</h1>
+				<p class="field__meta">
+					<span>{closesLabel(fm, on)}</span>
+					{fm.postedAt && <span>Posted {shortDay(fm.postedAt)}</span>}
+				</p>
+			</div>
+		</section>
 
-		<h1>{fm.title}</h1>
-		<p>
-			<strong>{fm.company}</strong> · {fm.role}
-			{fm.locations?.length ? ` · ${fm.locations.join(', ')}` : ''}
-		</p>
-		{fm.salary && <p>
-			<strong>Salary:</strong> {fm.salary}
-		</p>}
-		{fm.lastDateToApply && <p>
-			<strong>Last date:</strong> {fm.lastDateToApply}
-		</p>}
-		{fm.applyUrl && !expired && (
-			<p>
-				<a href={fm.applyUrl} rel="nofollow sponsored">
-					Apply now
-				</a>
-			</p>
-		)}
+		<div class="wrap">
+			<dl class="facts facts--head">
+				{
+					eligibility.map(([k, v]) => (
+						<>
+							<dt>{k}</dt>
+							<dd>
+								{v}
+								{k === 'Pay' && <em> · estimated</em>}
+							</dd>
+						</>
+					))
+				}
+			</dl>
 
-		<Content />
+			{
+				fm.applyUrl && !expired ? (
+					<p class="act">
+						<a class="apply apply--block" href={fm.applyUrl} rel="nofollow sponsored noopener">
+							Apply on {fm.company}'s site
+						</a>
+						<span class="fine act__note">Opens the employer's own application form.</span>
+					</p>
+				) : expired ? (
+					<p class="act">
+						<span class="apply apply--block apply--dead" aria-disabled="true">
+							Applications closed
+						</span>
+						<span class="fine act__note">
+							Kept for reference. <a href="/">See what is open now</a>.
+						</span>
+					</p>
+				) : (
+					<p class="act">
+						<span class="apply apply--block apply--dead" aria-disabled="true">
+							No application link published
+						</span>
+						<span class="fine act__note">
+							The source gave no direct form. Search {fm.company}'s careers page for this role.
+						</span>
+					</p>
+				)
+			}
+
+			<div class="prose prose--listing">
+				<Content />
+			</div>
+
+			<AdSlot placement="foot" />
+
+			{
+				fm.sourceRef && (
+					<p class="fine src">
+						Facts compiled from a public announcement.{' '}
+						<a href={fm.sourceRef} rel="nofollow noopener">
+							Where we found it
+						</a>
+						.
+					</p>
+				)
+			}
+		</div>
 	</article>
 </Base>
 
 <style>
-	.closed {
-		border: 1px solid #e7e5e4;
-		border-left: 3px solid #a8a29e;
-		background: #fafaf9;
-		padding: 0.75rem 1rem;
-		border-radius: 4px;
-		font-size: 0.95rem;
+	.head__status {
+		margin-bottom: var(--space-2);
+		color: #fff;
+	}
+
+	.facts--head {
+		margin-top: var(--space-5);
+		padding-bottom: var(--space-5);
+		border-bottom: 1px solid var(--rule);
+	}
+
+	/* The draft's own quick-facts table opens the markdown body, and the rail
+	   above already states the same four facts directly under the status field.
+	   Showing both reads as a page that could not decide. The table stays in the
+	   markdown — the file is meant to stay portable to any other publisher — and
+	   nothing is lost from the page, because Qualification and Experience appear
+	   again under "Who Can Apply" a few lines further down. */
+	.prose--listing :global(table:first-of-type) {
+		display: none;
+	}
+
+	.act {
+		margin-top: var(--space-5);
+		display: grid;
+		gap: var(--space-2);
+	}
+
+	.act__note {
+		text-align: center;
+	}
+
+	.src {
+		margin-top: var(--space-5);
+		padding-top: var(--space-4);
+		border-top: 1px solid var(--rule);
+	}
+
+	@media (min-width: 46rem) {
+		.act {
+			justify-items: start;
+		}
+		.act .apply--block {
+			width: auto;
+			min-width: 22rem;
+		}
+		.act__note {
+			text-align: left;
+		}
 	}
 </style>

@@ -1,7 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { DraftFrontmatter } from '@jobs/schema';
-import { expiresOn, isExpired, isIndexable, listingRobots, STALE_AFTER_DAYS } from '../src/lib/listings.ts';
+import {
+	expiresOn,
+	isExpired,
+	isIndexable,
+	listingRobots,
+	STALE_AFTER_DAYS,
+	daysLeft,
+	statusOf,
+	closesLabel,
+	shortDay,
+} from '../src/lib/listings.ts';
 
 /** A listing that clears the indexing gate, so each test can break one thing.
  *  Typed against the real contract so the fixtures cannot drift from it. */
@@ -105,4 +115,51 @@ test('a stated deadline also counts as a signal', () => {
 test('a listing kept out of the index is still followed', () => {
 	// The apply link and the cluster pages must stay crawlable.
 	assert.equal(listingRobots(listing({ generatedBy: 'template' }), '2026-08-13'), 'noindex, follow');
+});
+
+// ------------------------------------------------------- presentation helpers
+
+test('days left counts from the effective end date', () => {
+	assert.equal(daysLeft({ applyByDate: '2026-08-20' }, '2026-08-14'), 6);
+	assert.equal(daysLeft({ applyByDate: '2026-08-14' }, '2026-08-14'), 0);
+	assert.equal(daysLeft({ applyByDate: '2026-08-10' }, '2026-08-14'), -4);
+	assert.equal(daysLeft({}, '2026-08-14'), null, 'undateable listings have no count');
+});
+
+test('status splits into apply-now, apply-today and do-not-bother', () => {
+	assert.equal(statusOf({ applyByDate: '2026-09-30' }, '2026-08-14'), 'open');
+	assert.equal(statusOf({ applyByDate: '2026-08-21' }, '2026-08-14'), 'closing', 'exactly a week out');
+	assert.equal(statusOf({ applyByDate: '2026-08-22' }, '2026-08-14'), 'open', 'a day past the window');
+	assert.equal(statusOf({ applyByDate: '2026-08-14' }, '2026-08-14'), 'closing', 'the last day still counts');
+	assert.equal(statusOf({ applyByDate: '2026-08-13' }, '2026-08-14'), 'closed');
+});
+
+test('an undateable listing reads as open, never as closed', () => {
+	// Hiding a listing we merely failed to date is the worse error.
+	assert.equal(statusOf({}, '2026-08-14'), 'open');
+});
+
+test('the deadline is phrased in the reader terms, not as arithmetic', () => {
+	assert.equal(closesLabel({ applyByDate: '2026-08-14' }, '2026-08-14'), 'Closes today');
+	assert.equal(closesLabel({ applyByDate: '2026-08-15' }, '2026-08-14'), 'Closes tomorrow');
+	assert.equal(closesLabel({ applyByDate: '2026-08-20' }, '2026-08-14'), '6 days left');
+	assert.equal(closesLabel({ applyByDate: '2026-08-10' }, '2026-08-14'), 'Closed');
+});
+
+test('beyond a month the countdown stops meaning anything and names the date', () => {
+	assert.equal(closesLabel({ applyByDate: '2026-12-31' }, '2026-08-14'), 'Open till 31 Dec 2026');
+});
+
+test('with no deadline at all the source phrasing is shown rather than invented', () => {
+	assert.equal(
+		closesLabel({ lastDateToApply: 'Rolling Basis (Apply ASAP)' }, '2026-08-14'),
+		'Rolling Basis (Apply ASAP)'
+	);
+	assert.equal(closesLabel({}, '2026-08-14'), 'No deadline stated');
+});
+
+test('the date rail is short enough to scan', () => {
+	assert.equal(shortDay('2026-08-14'), '14 Aug');
+	assert.equal(shortDay('2026-01-01'), '1 Jan');
+	assert.equal(shortDay(undefined), '');
 });

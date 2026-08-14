@@ -1,0 +1,65 @@
+---
+/**
+ * A reserved advertising slot.
+ *
+ * AdSense is not approved yet, so nothing renders inside this — but the height
+ * is reserved *now*, at the size the eventual unit will occupy. Adding the
+ * script later fills space that already exists, so Cumulative Layout Shift
+ * stays at zero. Retrofitting the reservation afterwards is how a site ends up
+ * with content that jumps under the reader's thumb mid-sentence.
+ *
+ * Two rules this component exists to enforce:
+ *   - never above the first content block, so an ad can never be the LCP
+ *     element or the first thing the visitor meets;
+ *   - manual units only. Auto Ads decide placement at runtime, which is
+ *     precisely the layout instability being designed out here.
+ *
+ * To go live, set these and rebuild — no markup changes:
+ *   PUBLIC_ADSENSE_CLIENT     ca-pub-XXXXXXXXXXXXXXXX
+ *   PUBLIC_ADSENSE_SLOT_FEED  the in-feed unit id
+ *   PUBLIC_ADSENSE_SLOT_FOOT  the end-of-content unit id
+ *   PUBLIC_ADSENSE_SLOT_RAIL  the desktop rail unit id
+ *
+ * Reserved sizes are fixed rather than responsive on purpose:
+ * data-full-width-responsive lets Google pick a height at runtime, which
+ * reintroduces the shift this component exists to prevent.
+ */
+interface Props {
+	placement: 'feed' | 'foot' | 'rail';
+	/** Overrides the env-configured unit for this placement. */
+	unit?: string;
+}
+
+const { placement, unit } = Astro.props;
+
+const UNIT_ENV: Record<Props['placement'], string | undefined> = {
+	feed: import.meta.env.PUBLIC_ADSENSE_SLOT_FEED,
+	foot: import.meta.env.PUBLIC_ADSENSE_SLOT_FOOT,
+	rail: import.meta.env.PUBLIC_ADSENSE_SLOT_RAIL,
+};
+
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const slot = unit ?? UNIT_ENV[placement];
+const live = Boolean(client && slot);
+---
+
+<aside class:list={['ad', `ad--${placement}`]} aria-label="Advertisement" data-slot={placement}>
+	{
+		live ? (
+			<Fragment>
+				<ins
+					class="adsbygoogle ad__inner"
+					style="display:block"
+					data-ad-client={client}
+					data-ad-slot={slot}
+					data-full-width-responsive="false"
+				/>
+				<script is:inline>
+					(window.adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
+			</Fragment>
+		) : (
+			<span class="ad__inner" />
+		)
+	}
+</aside>

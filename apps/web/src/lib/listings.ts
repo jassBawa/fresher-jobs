@@ -89,3 +89,64 @@ export function isIndexable(fm: DraftFrontmatter, on: string): boolean {
  *  apply link and the cluster pages should still be crawled. */
 export const listingRobots = (fm: DraftFrontmatter, on: string): string =>
 	isIndexable(fm, on) ? 'index, follow' : 'noindex, follow';
+
+// --------------------------------------------------------------- presentation
+
+export type ListingStatus = 'open' | 'closing' | 'closed';
+
+/** Whole days from `on` until the listing stops accepting applications.
+ *  Null when it cannot be dated at all. */
+export function daysLeft(
+	fm: Pick<DraftFrontmatter, 'applyByDate' | 'postedAt'>,
+	on: string
+): number | null {
+	const end = expiresOn(fm);
+	if (!end) return null;
+	const ms = Date.parse(`${end}T00:00:00Z`) - Date.parse(`${on}T00:00:00Z`);
+	return Math.round(ms / 86_400_000);
+}
+
+/**
+ * Three states, because that is what the reader is deciding between: apply now,
+ * apply today, or do not bother. "Closing" is a week, which is roughly the
+ * window in which a fresher can still assemble a CV and a cover note.
+ */
+export function statusOf(
+	fm: Pick<DraftFrontmatter, 'applyByDate' | 'postedAt'>,
+	on: string
+): ListingStatus {
+	const left = daysLeft(fm, on);
+	if (left === null) return 'open';
+	if (left < 0) return 'closed';
+	return left <= 7 ? 'closing' : 'open';
+}
+
+/** The deadline in the reader's terms. A date alone makes them do arithmetic. */
+export function closesLabel(
+	fm: Pick<DraftFrontmatter, 'applyByDate' | 'postedAt' | 'lastDateToApply'>,
+	on: string
+): string {
+	const left = daysLeft(fm, on);
+	if (left === null) return fm.lastDateToApply ?? 'No deadline stated';
+	if (left < 0) return 'Closed';
+	if (left === 0) return 'Closes today';
+	if (left === 1) return 'Closes tomorrow';
+	if (left <= 30) return `${left} days left`;
+	// Beyond a month the count stops meaning anything; name the date instead.
+	const end = expiresOn(fm)!;
+	const [y, m, d] = end.split('-').map(Number);
+	const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][
+		(m ?? 1) - 1
+	];
+	return `Open till ${d} ${month} ${y}`;
+}
+
+/** `2026-08-14` → `14 Aug`. Same year is assumed; the rail is for scanning. */
+export function shortDay(iso: string | undefined): string {
+	if (!iso) return '';
+	const [, m, d] = iso.split('-').map(Number);
+	const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][
+		(m ?? 1) - 1
+	];
+	return `${d} ${month}`;
+}

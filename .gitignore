@@ -11,3 +11,6 @@ build/
 
 # local run logs
 logs/
+
+# impeccable working files
+.impeccable/
