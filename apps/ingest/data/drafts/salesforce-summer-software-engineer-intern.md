@@ -13,7 +13,7 @@ lastDateToApply: "ASAP"
 applyUrl: "https://salesforce.wd12.myworkdayjobs.com/External_Career_Site/job/India---Bangalore/Summer-2027-Intern---Software-Engineer_JR337715"
 skills: ["Java", "C++", "Python", "Object-Oriented Design", "Data Structures", "Algorithm Development", "Complexity Analysis", "HTML", "CSS", "JavaScript", "React", "Angular", "Vue.js", "SQL", "Relational Database Concepts"]
 generatedBy: "template"
-createdAt: "2026-08-12T17:45:03.816Z"
+createdAt: "2026-08-14T11:53:34.587Z"
 postedAt: "2026-08-11"
 sourceRef: "https://freshersdunia.in/salesforce-off-campus-internship-2026/"
 ---

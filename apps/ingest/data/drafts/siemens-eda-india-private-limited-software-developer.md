@@ -13,7 +13,7 @@ lastDateToApply: "ASAP (Apply Quickly)"
 applyUrl: "https://jobs.siemens.com/en_US/externaljobs/JobDetail/517650?sourceType=PREMIUM_POST_SITE"
 skills: ["C/C++ programming", "Design patterns", "Data structures", "UNIX/Linux platforms"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:28.540Z"
+createdAt: "2026-08-14T11:53:34.589Z"
 postedAt: "2026-08-13"
 sourceRef: "https://freshersdunia.in/siemens-recruitment-2026/"
 ---

@@ -12,7 +12,7 @@ salary: "₹7.1 LPA (Expected)"
 lastDateToApply: "ASAP"
 applyUrl: "https://ibqbjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Honeywell/job/149843/?keyword=Intern+%2528Bachelor%2527s%2529"
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:26.395Z"
+createdAt: "2026-08-14T11:53:34.585Z"
 postedAt: "2026-08-13"
 sourceRef: "https://freshersdunia.in/honeywell-internship-2026-hiring-intern/"
 ---

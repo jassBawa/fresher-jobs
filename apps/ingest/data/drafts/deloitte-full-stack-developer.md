@@ -11,7 +11,7 @@ locations: ["Bengaluru", "Karnataka"]
 applyUrl: "https://southasiacareers.deloitte.com/job/Bengaluru-Enabling-Areas-DEC-Executive-Full-stack-Development-Bengaluru/58386144/"
 skills: ["Python", "JavaScript/TypeScript", "SQL", "React.js", "Node.js", "REST APIs", "Git", "CI/CD pipelines"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:19.088Z"
+createdAt: "2026-08-14T11:53:34.577Z"
 postedAt: "2026-08-13"
 sourceRef: "https://freshersdunia.in/deloitte-full-stack-developer-recruitment-2026/"
 ---

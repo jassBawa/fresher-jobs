@@ -15,7 +15,11 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
-  apps/ingest: {}
+  apps/ingest:
+    dependencies:
+      '@jobs/db':
+        specifier: workspace:*
+        version: link:../../packages/db
 
   apps/web:
     dependencies:

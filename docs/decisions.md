@@ -425,6 +425,80 @@ deliverable, and they are above.
 
 ---
 
+## D22 — Postgres becomes the source of truth; markdown becomes a projection
+
+**Decision.** The pipeline reads and writes a Postgres database. Local
+development runs it in Docker; production is Neon, per D6. The markdown files
+still exist, but they are now exported *from* the database rather than being the
+database.
+
+**Why.** User call, and the thing that forced it was D23 below: verifying apply
+links needs state that a directory of files cannot hold — when each link was
+last checked, what the verdict was, where it redirected to. "Re-check every
+listing older than a week" is a query, not a directory scan.
+
+The rest follows from that. Deduplicating one job across two sources, expiring by
+date, counting a cluster without reading every file — all of it is a `WHERE`
+clause and none of it is reasonable against markdown at the 75,000-listing scale
+in [product-strategy.md](./product-strategy.md).
+
+**What it cost.** The ingest app's zero-dependency rule, which was real and worth
+something. It now depends on `@jobs/db`, and through it on drizzle and a
+Postgres driver. Stated plainly rather than quietly dropped.
+
+**What was kept.** The export. A directory of markdown with YAML frontmatter
+moves to WordPress, Next.js or anything else; a Postgres table does not. The
+export means the data is never trapped in this schema, and it is what keeps the
+current site working while it is still reading files.
+
+**Also kept:** the review gate. `promote` flips a column instead of a line in a
+file, and nothing publishes itself.
+
+---
+
+## D23 — A posting that cannot be parsed is discarded, not published
+
+**Decision.** Stage one verifies the apply link before stage two spends a model
+call on prose. A posting is discarded when it has no usable apply link, when the
+link is dead, or when the link goes to a different job. Discards are rows with a
+stated reason, not deletions.
+
+**Why.** Nothing checked this before. The apply URL was chosen by a model from
+the candidate links on a source page, scored by a heuristic, and published — and
+a spot check of the sixteen live listings found one, Wipro's Associate Analyst,
+pointing at a requisition that no longer resolved. It had been live on the site
+the whole time. An aggregator whose apply links are dead is worse than no
+aggregator, because it costs the reader the click to find out.
+
+Verification runs on a schedule too, not just at ingest. A requisition that was
+live when drafted goes dead without telling anyone, and re-checking is the only
+thing that would ever notice. A listing whose link fails a later check is retired
+from published automatically.
+
+**The classifier is deliberately reluctant to say "dead."** The two errors cost
+differently: marking a live job dead takes an opportunity away from someone who
+could have applied, while leaving a dead one up wastes a click. Only an explicit
+signal — a 4xx, a redirect to a site root, or a title saying the posting is gone
+— will do it.
+
+**`needs_browser` is a verdict, not a failure.** Most Indian ATS platforms
+(Oracle CX, Workday, SuccessFactors) render the posting client-side, so a plain
+fetch sees an empty shell. Four of the fourteen live links are in this state.
+Calling them dead would retire real jobs; calling them live would be a guess.
+They are kept and honestly marked unverified.
+
+**A regression worth recording:** the first version of this check looked for "no
+longer available" anywhere in the body, and reported two *live* requisitions —
+Amazon's and Wipro's — as gone, because that phrasing lives in cookie banners and
+related-jobs rails. Only the `<title>` is trusted now.
+
+**Known limit.** The HCLTech link goes to a campus-hiring landing page rather
+than a requisition and still passes at 80%, because such a page genuinely does
+say "graduate", "engineer" and "trainee". Catching it needs a rendering pass,
+which is the same thing `needs_browser` is waiting on.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |

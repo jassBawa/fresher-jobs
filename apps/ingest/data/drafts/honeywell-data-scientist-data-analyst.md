@@ -12,7 +12,7 @@ lastDateToApply: "ASAP"
 applyUrl: "https://ibqbjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Honeywell/job/154260/?keyword=Data+Analysis&mode=location"
 skills: ["Python / R", "Machine Learning & Statistical Modeling", "Data Analysis and Visualization", "Strong problem-solving ability", "Knowledge of algorithms and data structures", "Experience in real-world data science projects", "Strong collaboration and communication skills", "Strategic thinking ability", "Ability to work in cross-functional teams"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:24.524Z"
+createdAt: "2026-08-14T11:53:34.583Z"
 postedAt: "2026-08-12"
 sourceRef: "https://freshersdunia.in/honeywell-off-campus-2026-hiring/"
 ---

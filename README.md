@@ -8,13 +8,13 @@ builds a static site from the ones a human approves.
 > If you're wondering *why* something is built this way, it's in
 > [docs/decisions.md](./docs/decisions.md).
 
-No database. The ingest app has zero npm dependencies; the site is Astro and
-nothing else.
+Postgres holds the listings; the markdown files are exported from it so the data
+is never trapped in one schema.
 
 ```
-source posts ──► fetch.mjs ──► data/facts/*.json ──► draft.mjs ──► data/drafts/*.md ──► promote ──► apps/web ──► dist/
-                (facts only)                        (original prose)  status: draft     human       Astro build
-                                                                                        review
+source posts ──► fetch.mjs ──────────────────► draft.mjs ──► promote ──► export ──► apps/web ──► dist/
+                 facts only · link verified    prose from    human      markdown    Astro build
+                 unparseable ones discarded    the facts     review     projection
 ```
 
 ## Structure
@@ -22,13 +22,14 @@ source posts ──► fetch.mjs ──► data/facts/*.json ──► draft.mjs
 ```
 fresher-jobs/                pnpm + Turborepo monorepo
 ├── apps/ingest/             the ingest pipeline (@jobs/ingest)
-│   ├── src/fetch.mjs        pulls facts from the source, writes data/facts/
+│   ├── src/fetch.mjs        pulls facts, verifies the apply link, writes to Postgres
 │   ├── src/draft.mjs        turns each facts file into a draft in data/drafts/
 │   ├── src/lib/             llm providers, extraction, templates, date parsing
 │   ├── scripts/promote.mjs  the review gate — flips status to published
 │   ├── test/                94 tests, node:test, no runner
-│   └── data/                facts/, drafts/, state.json
+│   └── data/drafts/         markdown exported from the database
 ├── apps/web/                static site (@jobs/web) — listings, clusters, sitemap
+├── packages/db/             Postgres schema, migrations, link verification (@jobs/db)
 ├── packages/schema/         shared types + JSON Schema + zod (@jobs/schema)
 ├── docs/                    research, strategy, decisions
 └── package.json             root scripts
@@ -38,12 +39,18 @@ fresher-jobs/                pnpm + Turborepo monorepo
 
 ```bash
 pnpm install                                    # root only
+docker compose up -d                            # Postgres on :5432
+pnpm run db:migrate                             # create the schema
 cp apps/ingest/.env.example apps/ingest/.env    # add one API key
-pnpm run ingest                                 # fetch + draft
-pnpm run drafts                                 # see what came back
+pnpm run ingest                                 # fetch + verify + draft + export
+pnpm run drafts                                 # see what came back, and what was discarded
 pnpm run promote <slug>                         # publish the good ones
 pnpm run build                                  # build the site
 ```
+
+Postgres runs in Docker locally and Neon in production; `DATABASE_URL` is the
+only difference. `pnpm run db:up` and `pnpm run db:down` wrap the compose
+commands.
 
 Node 22+ (the ingest app alone runs on 20+). Only the monorepo root needs
 `pnpm install` — `apps/ingest/` has no npm dependencies of its own.
@@ -54,13 +61,15 @@ Run from the repo root.
 
 | Command | What it does |
 |---|---|
-| `pnpm run fetch` | Reads new postings, extracts structured facts to `apps/ingest/data/facts/` |
+| `pnpm run fetch` | Reads new postings, extracts facts, verifies the apply link, discards what it cannot parse |
 | `pnpm run draft` | Turns each facts file into an original post in `apps/ingest/data/drafts/` |
 | `pnpm run ingest` | Both, in order |
 | `pnpm run drafts` | Lists every draft and whether it is live. **No key needed** |
 | `pnpm run promote <slug>…` | Publishes one or more drafts. Add `draft` to pull one back |
 | `pnpm run build` | Builds the static site into `apps/web/dist/` |
-| `pnpm run test` | 94 tests. No runner, no dependencies |
+| `pnpm run verify:apply` | Re-checks every apply link and retires the ones that have died |
+| `pnpm run db:up` / `db:down` | Start or stop local Postgres |
+| `pnpm run test` | 119 tests |
 | `pnpm run typecheck` | `tsc` + `astro check` |
 | `pnpm run fetch:dry` | Parses the source and prints what it found. **No API key, writes nothing.** Use it to check the source is reachable |
 | `pnpm run draft:nollm` | Renders drafts from templates alone. **No API key, no cost** |
@@ -112,9 +121,8 @@ signal**, not as content:
 
 - `fetch.mjs` holds the source article in memory only long enough to pull
   structured fields out of it. **The prose is never written to disk.**
-- `data/facts/*.json` contains only facts — company, role, batch years,
-  qualifications, salary, deadline, apply URL — plus a `discoveredVia` link as
-  provenance.
+- the database stores only facts — company, role, batch years, qualifications,
+  salary, deadline, apply URL — plus a `source_ref` link as provenance.
 - `draft.mjs` never sees the source text. It only reads the facts file, so the
   prose it writes is generated from structured data rather than rewritten from
   anyone's article. A test asserts that a field the renderer doesn't know about
@@ -128,6 +136,29 @@ that line without slowing anything down.
 **Everything is written as `status: draft`.** Nothing publishes itself.
 `pnpm run promote <slug>` is the only thing that flips a listing live, and the
 site only renders `status: published`.
+
+## Postings that get discarded
+
+A listing has to be something a reader can act on. Stage one verifies the apply
+link *before* stage two spends a model call on prose, and discards the posting
+when:
+
+- there is no usable apply link — a company homepage is not one;
+- the link is dead (a 4xx, a redirect to a site root, or a page titled "no
+  longer available");
+- the link goes to a different job than the listing describes.
+
+Discards are rows with a stated reason, not deletions, so "why did this one not
+make it" stays answerable. `pnpm run drafts` shows them.
+
+Verification also runs again on a schedule. A requisition that was live when
+drafted goes dead without telling anyone, and a listing whose link later fails
+is retired from published automatically — that is how Wipro's Associate Analyst
+came down.
+
+**`needs_browser` is not a failure.** Most Indian ATS platforms render the
+posting client-side, so a plain fetch sees an empty shell. Those listings are
+kept and honestly marked unverified rather than guessed either way.
 
 ## The site
 
@@ -168,8 +199,9 @@ All optional except a key, all in `apps/ingest/.env`:
 | `SOURCE_BASE` | `https://freshersdunia.in` | Any WordPress site with an open REST API |
 | `SITE` | — | Canonical origin for the site build. **Required in CI** — the build fails rather than shipping the wrong domain |
 
-`apps/ingest/data/state.json` tracks which posts have been seen, so reruns are
-incremental and cheap.
+The `seen_posts` table tracks which posts have been read, so reruns are
+incremental and cheap. It is keyed by source as well as id, so a second source
+cannot collide with the first one's numbering.
 
 ## Running it on a schedule
 

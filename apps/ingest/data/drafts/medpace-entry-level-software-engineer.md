@@ -12,7 +12,7 @@ salary: "₹ 6 to 11 LPA"
 applyUrl: "https://careers.medpace.com/jobs/11927?lang=en-us&iis=Job%20Board&iisn=LinkedIn"
 skills: ["C#", "Angular", "Webservices", "GraphQL", "Git", "relational databases", "Entity Framework", "Azure DevOps"]
 generatedBy: "template"
-createdAt: "2026-08-12T17:45:03.815Z"
+createdAt: "2026-08-14T11:53:34.586Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/medpace-off-campus-drive-2026/"
 ---

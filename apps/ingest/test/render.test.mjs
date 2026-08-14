@@ -37,6 +37,7 @@ const draft = (over = {}) =>
     usedLLM: over.usedLLM ?? true,
     createdAt: over.createdAt ?? "2026-08-12T18:02:36.377Z",
     postedAt: over.postedAt ?? "2026-08-11",
+    status: over.status ?? "draft",
   });
 
 // ------------------------------------------------------------------ helpers
@@ -161,4 +162,21 @@ test("provenance is recorded as a citation", () => {
 
 test("output is deterministic for the same inputs", () => {
   assert.equal(draft(), draft());
+});
+
+test("the exported status is whatever the row says, not always draft", () => {
+  // The database is the source of truth now; the file is a projection of it.
+  assert.match(draft({ status: "published" }), /^status: published$/m);
+  assert.match(draft(), /^status: draft$/m);
+});
+
+test("provenance survives under either field name", () => {
+  // Facts records called it discoveredVia; the database column is source_ref.
+  const viaDb = buildDraft({
+    facts: { ...FACTS, discoveredVia: undefined, sourceRef: "https://example.com/post" },
+    prose: PROSE, slug: "x", usedLLM: true,
+    createdAt: "2026-08-12T18:02:36.377Z", postedAt: "2026-08-11",
+  });
+  assert.match(viaDb, /^sourceRef: "https:\/\/example\.com\/post"$/m);
+  assert.match(draft(), /^sourceRef: "https:\/\/freshersdunia\.in\/wipro-2026\/"$/m);
 });

@@ -11,7 +11,7 @@ locations: ["Hyderabad, Karnataka"]
 applyUrl: "https://usijobs.deloitte.com/en_US/careersUSI/JobDetail/USI-EH27-ES-MF-L25-Associate-Secondary-research-Hyderabad/354615"
 skills: ["Database Expertise", "Survey Platforms (Confirmit, Qualtrics)", "Data Tools (Tableau, Microsoft Power BI, Qlik Sense, R, Python)", "MS Office (PowerPoint, Excel, Word, Outlook)"]
 generatedBy: "llm+template"
-createdAt: "2026-08-12T18:02:32.364Z"
+createdAt: "2026-08-14T11:53:34.576Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/deloitte-recruitment-2026/"
 ---

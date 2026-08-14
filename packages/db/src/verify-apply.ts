@@ -141,6 +141,10 @@ export function classifyApplyPage(input: {
 	};
 }
 
+/** Verdicts that mean the link proved itself wrong, rather than merely refusing
+ *  to prove itself right. `needs_browser` and `unreachable` are not in here. */
+export const REJECTING: ReadonlySet<string> = new Set(['dead', 'role_mismatch']);
+
 /** Fetch a URL and classify what came back. */
 export async function checkApplyUrl(
 	url: string,
@@ -185,6 +189,8 @@ export async function verifyApplyLinks({
 		needs_browser: 0,
 	};
 
+	const retired: string[] = [];
+
 	try {
 		const due = await db
 			.select()
@@ -203,6 +209,13 @@ export async function verifyApplyLinks({
 		for (const job of due) {
 			const result = await checkApplyUrl(job.applyUrl!, job.role, job.company);
 			tally[result.verdict]++;
+
+			// A link that proves itself wrong retires the listing, even one already
+			// live. A requisition that was fine when drafted goes dead without
+			// telling anyone, and this is the only thing that would ever notice —
+			// which is the whole reason to re-check rather than check once.
+			const retire = REJECTING.has(result.verdict) && job.status !== 'rejected';
+
 			await db
 				.update(jobs)
 				.set({
@@ -210,14 +223,27 @@ export async function verifyApplyLinks({
 					applyCheckedAt: sql`now()`,
 					applyFinalUrl: result.finalUrl,
 					applyNote: result.note,
+					...(retire
+						? {
+								status: 'rejected' as const,
+								rejectedReason: `apply link ${result.verdict}: ${result.note}`,
+							}
+						: {}),
 					updatedAt: sql`now()`,
 				})
 				.where(eq(jobs.id, job.id));
 
+			if (retire) retired.push(`${job.slug} (was ${job.status})`);
+
 			const mark = result.verdict === 'live' ? '✓' : result.verdict === 'needs_browser' ? '?' : '✗';
 			console.log(
-				`  ${mark} ${result.verdict.padEnd(14)} ${(job.company + ' · ' + job.role).slice(0, 44).padEnd(46)} ${result.note}`
+				`  ${mark} ${result.verdict.padEnd(14)} ${(job.company + ' · ' + job.role).slice(0, 44).padEnd(46)} ${result.note}` +
+					(retire ? '  → discarded' : '')
 			);
+		}
+
+		if (retired.length) {
+			console.log(`\n  retired ${retired.length}: ${retired.join(', ')}`);
 		}
 		return tally;
 	} finally {

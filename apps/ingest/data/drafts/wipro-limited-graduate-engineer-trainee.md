@@ -11,7 +11,7 @@ locations: ["Bengaluru", "Hyderabad", "Mumbai", "Chennai"]
 salary: "₹4 to 6 LPA (Expected)"
 applyUrl: "https://careers.wipro.com/job/Graduate-Engineer-Trainee/190712-en_US"
 generatedBy: "llm+template"
-createdAt: "2026-08-12T18:02:36.377Z"
+createdAt: "2026-08-14T11:53:34.591Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/wipro-off-campus-hiring-2026-3/"
 ---

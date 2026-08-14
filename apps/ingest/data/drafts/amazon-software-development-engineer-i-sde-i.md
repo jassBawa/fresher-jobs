@@ -13,7 +13,7 @@ lastDateToApply: "Rolling Basis (Apply ASAP)"
 applyUrl: "https://www.amazon.jobs/en/jobs/10454435/software-dev-engineer-i-amazon-university-talent-acquisition"
 skills: ["C/C++", "Python", "Java", "Perl", "object-oriented design (OOP)", "algorithm design", "data structures", "problem-solving", "complexity analysis (Big-O)"]
 generatedBy: "llm+template"
-createdAt: "2026-08-12T17:42:13.158Z"
+createdAt: "2026-08-14T11:53:34.571Z"
 postedAt: "2026-08-12"
 sourceRef: "https://freshersdunia.in/amazon-university-talent-acquisition-2026-hiring/"
 ---

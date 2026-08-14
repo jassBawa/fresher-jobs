@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Fetch job postings, extract facts, draft original posts. Zero npm dependencies.",
+  "description": "Fetch job postings, extract and verify facts, draft original prose into Postgres.",
   "scripts": {
-    "ingest": "node --env-file-if-exists=.env src/fetch.mjs && node --env-file-if-exists=.env src/draft.mjs",
+    "ingest": "node --env-file-if-exists=.env src/fetch.mjs && node --env-file-if-exists=.env src/draft.mjs && node --env-file-if-exists=.env scripts/export-markdown.mjs",
     "fetch": "node --env-file-if-exists=.env src/fetch.mjs",
     "draft": "node --env-file-if-exists=.env src/draft.mjs",
     "fetch:dry": "node --env-file-if-exists=.env src/fetch.mjs --dry",
@@ -13,9 +13,13 @@
     "promote": "node scripts/promote.mjs",
     "typecheck": "echo \"no types — .mjs scripts\"",
     "lint": "echo \"no lint configured\"",
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\"",
+    "export": "node --env-file-if-exists=.env scripts/export-markdown.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@jobs/db": "workspace:*"
   }
 }

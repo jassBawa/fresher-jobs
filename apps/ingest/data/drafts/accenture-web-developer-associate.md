@@ -11,7 +11,7 @@ locations: ["Mumbai"]
 applyUrl: "https://www.accenture.com/in-en/careers/jobdetails?id=AIOC-S01654266_en&title=Web+Developer+Associate"
 skills: ["HTML", "CSS", "JavaScript", "web applications & HTTP requests", "databases & server-side development", "CMS platforms", "digital marketing technology", "responsive design & UI/UX"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T08:59:07.838Z"
+createdAt: "2026-08-14T11:53:34.566Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/accenture-recruitment-2026-hiring/"
 ---

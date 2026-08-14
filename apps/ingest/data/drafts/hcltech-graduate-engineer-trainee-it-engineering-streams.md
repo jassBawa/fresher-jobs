@@ -12,7 +12,7 @@ salary: "₹ 4.1 LPA (Expected)"
 lastDateToApply: "ASAP"
 applyUrl: "https://www.hcltech.com/careers/campus-hiring"
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:22.931Z"
+createdAt: "2026-08-14T11:53:34.582Z"
 postedAt: "2026-08-13"
 sourceRef: "https://freshersdunia.in/hcltech-mega-off-campus-drive-2026/"
 ---

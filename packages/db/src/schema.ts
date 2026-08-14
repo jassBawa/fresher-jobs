@@ -28,7 +28,15 @@ import {
 	primaryKey,
 } from 'drizzle-orm/pg-core';
 
-export const jobStatus = pgEnum('job_status', ['draft', 'published']);
+/**
+ * `rejected` is a discard that leaves a record.
+ *
+ * A posting we cannot parse into something a reader could act on does not reach
+ * the site — but deleting it outright means never being able to answer "why did
+ * this one not make it", and the same posting would look new again if the seen
+ * list were ever rebuilt. It is kept, invisible, with a reason.
+ */
+export const jobStatus = pgEnum('job_status', ['draft', 'published', 'rejected']);
 export const jobType = pgEnum('job_type', ['full-time', 'internship', 'contract', 'trainee']);
 export const generatedBy = pgEnum('generated_by', ['llm+template', 'template']);
 
@@ -79,11 +87,14 @@ export const jobs = pgTable(
 		responsibilities: text('responsibilities').array().notNull().default([]),
 
 		// ---- prose, generated from the facts -----------------------------------
-		title: text('title').notNull(),
-		description: text('description').notNull(),
-		summary: text('summary').notNull(),
+		// Nullable because facts land first: stage one extracts and verifies, and
+		// only a posting that survives that is worth spending model tokens on.
+		title: text('title'),
+		description: text('description'),
+		summary: text('summary'),
 		about: text('about'),
-		generatedBy: generatedBy('generated_by').notNull(),
+		generatedBy: generatedBy('generated_by'),
+		draftedAt: timestamp('drafted_at', { withTimezone: true }),
 
 		// ---- apply link verification -------------------------------------------
 		applyCheck: applyCheck('apply_check').notNull().default('unchecked'),
@@ -96,6 +107,8 @@ export const jobs = pgTable(
 		/** A citation, not content. */
 		sourceRef: text('source_ref'),
 		postedAt: date('posted_at'),
+		/** Why a rejected posting was discarded. Null for everything else. */
+		rejectedReason: text('rejected_reason'),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 	},

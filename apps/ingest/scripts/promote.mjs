@@ -1,128 +1,124 @@
-// Promote drafts to published (or pull them back) by flipping frontmatter
-// `status`. This is the review-before-ship gate: drafts land `status: draft`, a
-// human runs this, and the site only surfaces `status: published`.
+// The review gate.
+//
+// Listings land as `draft` and only a human moves them to `published`. Nothing
+// in the pipeline publishes itself, which is the one rule the whole ingest is
+// built around.
 //
 // Usage:
-//   node scripts/promote.mjs --list                 show every draft and its status
-//   node scripts/promote.mjs <slug> [<slug>...]     publish one or more
-//   node scripts/promote.mjs <slug> draft           pull one back
-//   node scripts/promote.mjs <slug>... --to draft   same, for several
+//   pnpm run drafts                       what is drafted, live, and discarded
+//   pnpm run promote <slug> [<slug>...]   publish
+//   pnpm run promote <slug> draft         pull one back
+//   pnpm run promote <slug> --to draft    same, for several
 //
-// Only the `status` line is rewritten; nothing else in the file is touched.
+// Rejected listings cannot be promoted by accident: the pipeline discarded them
+// for a stated reason, and overriding that takes --force, which says so out loud.
 
-import { readFile, writeFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { writeFile } from "node:fs/promises";
+import { connect, eq, inArray, jobs, sql } from "@jobs/db";
+import { buildDraft } from "../src/lib/render.mjs";
 
-const DRAFTS_DIR = join(process.cwd(), "data", "drafts");
+const DRAFTS_DIR = "data/drafts";
 const STATUSES = ["draft", "published"];
-
 const argv = process.argv.slice(2);
 
 function usage(message) {
   if (message) console.error(`\n  ✗ ${message}`);
   console.error(`
-  usage: node scripts/promote.mjs --list
-         node scripts/promote.mjs <slug> [<slug>...] [--to draft|published]
+  usage: pnpm run drafts
+         pnpm run promote <slug> [<slug>...] [--to draft|published] [--force]
 `);
   process.exit(1);
 }
 
-/** Read every draft's slug and current status. */
-async function readAll() {
-  let files;
-  try {
-    files = (await readdir(DRAFTS_DIR)).filter((f) => f.endsWith(".md"));
-  } catch {
-    usage(`no drafts directory at ${DRAFTS_DIR} — run "pnpm run ingest" first`);
-  }
-
-  return Promise.all(
-    files.sort().map(async (file) => {
-      const doc = await readFile(join(DRAFTS_DIR, file), "utf8");
-      return {
-        slug: file.replace(/\.md$/, ""),
-        status: doc.match(/^status:\s*(draft|published)/m)?.[1] ?? "?",
-        title: doc.match(/^title:\s*"?(.*?)"?$/m)?.[1] ?? "",
-      };
-    })
-  );
+/** Keep the markdown projection in step with the row that just changed. */
+async function writeProjection(job) {
+  const doc = buildDraft({
+    facts: job,
+    prose: {
+      title: job.title ?? `${job.company} ${job.role}`,
+      meta: job.description ?? "",
+      summary: job.summary ?? "",
+      about: job.about ?? "",
+    },
+    slug: job.slug,
+    usedLLM: job.generatedBy === "llm+template",
+    createdAt: (job.createdAt ?? new Date()).toISOString(),
+    postedAt: job.postedAt ?? null,
+    status: job.status,
+  });
+  await writeFile(`${DRAFTS_DIR}/${job.slug}.md`, doc);
 }
 
-if (argv.includes("--list") || argv.includes("-l")) {
-  const all = await readAll();
-  const published = all.filter((d) => d.status === "published").length;
-  console.log();
-  for (const { slug, status, title } of all) {
-    const mark = status === "published" ? "●" : "○";
-    console.log(`  ${mark} ${status.padEnd(9)} ${slug}`);
-    if (title) console.log(`              ${title.slice(0, 70)}`);
+const { sql: client, db } = connect();
+
+try {
+  if (argv.includes("--list") || argv.includes("-l")) {
+    const rows = await db.select().from(jobs).orderBy(jobs.status, jobs.slug);
+    console.log();
+    for (const j of rows) {
+      const mark = j.status === "published" ? "●" : j.status === "rejected" ? "✗" : "○";
+      const check = j.applyCheck === "unchecked" ? "" : `  [link ${j.applyCheck}]`;
+      console.log(`  ${mark} ${j.status.padEnd(9)} ${j.slug}${check}`);
+      if (j.title) console.log(`              ${j.title.slice(0, 70)}`);
+      if (j.rejectedReason) console.log(`              discarded: ${j.rejectedReason.slice(0, 70)}`);
+    }
+    const n = (s) => rows.filter((r) => r.status === s).length;
+    console.log(
+      `\n  ${n("published")} published · ${n("draft")} draft · ${n("rejected")} discarded · ${rows.length} total\n`
+    );
+    process.exit(0);
   }
-  console.log(`\n  ${published} published · ${all.length - published} draft · ${all.length} total\n`);
-  process.exit(0);
+
+  let toStatus = "published";
+  let force = false;
+  const slugs = [];
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === "--to") toStatus = argv[++i];
+    else if (arg.startsWith("--to=")) toStatus = arg.slice(5);
+    else if (arg === "--force") force = true;
+    else slugs.push(arg.replace(/\.md$/, ""));
+  }
+  if (slugs.length > 1 && STATUSES.includes(slugs.at(-1))) toStatus = slugs.pop();
+
+  if (!slugs.length) usage("no slug given");
+  if (!STATUSES.includes(toStatus)) usage(`invalid status "${toStatus}" — must be draft or published`);
+
+  const found = await db.select().from(jobs).where(inArray(jobs.slug, slugs));
+  const bySlug = new Map(found.map((j) => [j.slug, j]));
+
+  let changed = 0;
+  let failed = 0;
+
+  for (const slug of slugs) {
+    const job = bySlug.get(slug);
+    if (!job) {
+      console.error(`  ✗ ${slug} — not in the database`);
+      failed++;
+      continue;
+    }
+    if (job.status === "rejected" && !force) {
+      console.error(`  ✗ ${slug} — discarded (${job.rejectedReason}). Use --force to publish anyway.`);
+      failed++;
+      continue;
+    }
+    if (job.status === toStatus) {
+      console.log(`  · ${slug} — already ${toStatus}`);
+      continue;
+    }
+
+    await db
+      .update(jobs)
+      .set({ status: toStatus, updatedAt: sql`now()` })
+      .where(eq(jobs.id, job.id));
+    await writeProjection({ ...job, status: toStatus });
+
+    console.log(`  ✓ ${slug} → ${toStatus}`);
+    changed++;
+  }
+
+  console.log(`\n  ${changed} changed${failed ? ` · ${failed} failed` : ""} — rebuild the site to see it.\n`);
+  process.exitCode = failed ? 1 : 0;
+} finally {
+  await client.end();
 }
-
-// --to published | --to=published, else a trailing bare status (legacy form).
-let toStatus = "published";
-const args = [];
-for (let i = 0; i < argv.length; i++) {
-  const arg = argv[i];
-  if (arg === "--to") {
-    toStatus = argv[++i];
-  } else if (arg.startsWith("--to=")) {
-    toStatus = arg.slice(5);
-  } else {
-    args.push(arg);
-  }
-}
-if (args.length > 1 && STATUSES.includes(args.at(-1))) toStatus = args.pop();
-
-if (!args.length) usage("no slug given");
-if (!STATUSES.includes(toStatus)) usage(`invalid status "${toStatus}" — must be draft or published`);
-
-let changed = 0;
-let failed = 0;
-
-for (const raw of args) {
-  const slug = raw.replace(/\.md$/, "");
-  const target = join(DRAFTS_DIR, `${slug}.md`);
-
-  let doc;
-  try {
-    doc = await readFile(target, "utf8");
-  } catch {
-    console.error(`  ✗ ${slug} — no draft at data/drafts/${slug}.md`);
-    failed++;
-    continue;
-  }
-
-  const block = doc.match(/^---\n([\s\S]*?)\n---/);
-  if (!block) {
-    console.error(`  ✗ ${slug} — no frontmatter`);
-    failed++;
-    continue;
-  }
-
-  const current = block[1].match(/^status:\s*(draft|published)/m)?.[1];
-  if (!current) {
-    console.error(`  ✗ ${slug} — no status field in frontmatter`);
-    failed++;
-    continue;
-  }
-
-  if (current === toStatus) {
-    console.log(`  · ${slug} — already ${toStatus}`);
-    continue;
-  }
-
-  // Rewrite inside the frontmatter block only, so a "status:" line occurring in
-  // the body cannot be hit.
-  const nextBlock = block[1].replace(/^status:\s*(draft|published)/m, `status: ${toStatus}`);
-  await writeFile(target, doc.replace(block[1], nextBlock));
-  console.log(`  ✓ ${slug} → ${toStatus}`);
-  changed++;
-}
-
-console.log(
-  `\n  ${changed} changed${failed ? ` · ${failed} failed` : ""} — rebuild the site to publish.\n`
-);
-process.exit(failed ? 1 : 0);

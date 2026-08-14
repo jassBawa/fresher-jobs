@@ -11,7 +11,7 @@ locations: ["Pune", "Chennai", "Bengaluru"]
 applyUrl: "https://careers.ey.com/ey/job/Pune-Analyst-TAX-National-TAX-Indirect-Tax-Core-Pune-MH-411001/1415532233/"
 skills: ["Programming knowledge (Java / Python / C++ or any OOP language)", "Understanding of software development concepts", "Analytical and problem-solving skills", "Quick learning ability", "Basic knowledge of SAP (preferred)", "Good communication skills", "Preferred Skills: Knowledge of SAP applications and enterprise systems, Strong presentation and communication skills, Ability to work in teams and client-facing roles, Flexibility to travel and relocate, Problem-solving and consulting mindset"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:21.145Z"
+createdAt: "2026-08-14T11:53:34.579Z"
 postedAt: "2026-08-10"
 sourceRef: "https://freshersdunia.in/ey-off-campus-2026-hiring/"
 ---

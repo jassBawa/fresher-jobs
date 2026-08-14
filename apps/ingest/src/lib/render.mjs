@@ -87,12 +87,20 @@ export const yaml = (v) => {
  * "" and is dropped. The body's blank lines are structural (markdown needs
  * them) and must survive.
  */
-export function buildDraft({ facts, prose, slug, usedLLM, createdAt, postedAt = null }) {
+export function buildDraft({
+	facts,
+	prose,
+	slug,
+	usedLLM,
+	createdAt,
+	postedAt = null,
+	status = "draft",
+}) {
   const frontmatter = [
     `title: ${yaml(prose.title)}`,
     `description: ${yaml(prose.meta)}`,
     `slug: ${yaml(slug)}`,
-    "status: draft",
+    `status: ${status}`,
     `company: ${yaml(facts.company)}`,
     `role: ${yaml(facts.role)}`,
     facts.jobType ? `jobType: ${yaml(facts.jobType)}` : "",
@@ -108,7 +116,11 @@ export function buildDraft({ facts, prose, slug, usedLLM, createdAt, postedAt = 
     // When the employer announced it, not when we drafted it. Both the
     // freshness horizon and JSON-LD datePosted key off this.
     postedAt ? `postedAt: ${yaml(postedAt)}` : "",
-    facts.discoveredVia ? `sourceRef: ${yaml(facts.discoveredVia)}` : "",
+    // The facts records called this discoveredVia; the database column is
+    // source_ref. Accept either so the export and the old path agree.
+    facts.sourceRef ?? facts.discoveredVia
+      ? `sourceRef: ${yaml(facts.sourceRef ?? facts.discoveredVia)}`
+      : "",
   ].filter((l) => l !== "");
 
   return (

@@ -13,7 +13,7 @@ lastDateToApply: "ASAP"
 applyUrl: "https://careers.americanexpress.com/en/sites/CX_1/job/26009311/?intlink=us-amex-career-en-us-search&location=India&locationId=300000000228786&locationLevel=country&mode=location"
 skills: ["SQL", "Data Warehousing concepts", "Automation tools/techniques (RPA, ETL tools)", "Machine Learning", "Data Visualization tools (Power BI, Tableau)", "MS-Office (Excel, PowerPoint, Word)"]
 generatedBy: "llm+template"
-createdAt: "2026-08-14T03:47:17.284Z"
+createdAt: "2026-08-14T11:53:34.573Z"
 postedAt: "2026-08-13"
 sourceRef: "https://freshersdunia.in/american-express-off-campus-2026-apprentice/"
 ---

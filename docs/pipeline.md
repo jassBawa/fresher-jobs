@@ -4,13 +4,18 @@ How the current code works, end to end: ingest, review gate, static site.
 Nothing is hosted yet — the build produces a `dist/` and stops there.
 
 ```
-freshersdunia WP API ──► fetch.mjs ──► data/facts/*.json ──► draft.mjs ──► data/drafts/*.md ──► promote ──► apps/web ──► dist/
-                        facts only,                        template + prose   status: draft     human      Astro build
-                        prose discarded                                                          review
+freshersdunia WP API ──► fetch.mjs ──────────────────► draft.mjs ──► promote ──► export ──► apps/web ──► dist/
+                        facts only, prose discarded    template +    human      markdown    Astro build
+                        apply link verified            prose         review     projection
+                        unparseable postings dropped
 ```
 
-Node 22+ (the ingest app alone runs on 20+). The ingest app has **zero npm
-dependencies** — built-ins only.
+Node 22+. Postgres holds the listings (D22); the markdown files are exported
+from it so the data is never trapped in one schema, and so the site keeps
+working while it still reads files.
+
+The ingest app's zero-dependency rule ended here — it now depends on `@jobs/db`,
+and through it on drizzle and a Postgres driver.
 
 ---
 
@@ -18,14 +23,16 @@ dependencies** — built-ins only.
 
 | Path | Role |
 |---|---|
-| `apps/ingest/src/fetch.mjs` | Reads postings, extracts structured facts, writes `apps/ingest/data/facts/*.json` |
-| `apps/ingest/src/draft.mjs` | Renders `apps/ingest/data/drafts/*.md` from facts — templates plus a small LLM call |
+| `apps/ingest/src/fetch.mjs` | Reads postings, extracts facts, verifies the apply link, writes to Postgres |
+| `apps/ingest/src/draft.mjs` | Writes prose onto the stored facts — templates plus a small LLM call |
 | `apps/ingest/src/lib/extract.mjs` | Rule-based pre-extraction: HTML→text, link ranking, batch years |
 | `apps/ingest/src/lib/render.mjs` | Templates and frontmatter assembly. Pure — no clock, no I/O |
 | `apps/ingest/src/lib/dates.mjs` | Free-text deadline → ISO date |
 | `apps/ingest/src/lib/llm.mjs` | Provider-agnostic JSON-mode LLM call. 5 providers, all free-tier or local |
 | `apps/ingest/scripts/promote.mjs` | The review gate — flips `status` to published |
-| `apps/ingest/data/state.json` | Post IDs already seen, so reruns are incremental |
+| `apps/ingest/scripts/export-markdown.mjs` | Postgres → markdown, so the data stays portable |
+| `packages/db/src/schema.ts` | The jobs table, indexes and migrations |
+| `packages/db/src/verify-apply.ts` | Apply-link verification and the discard policy |
 | `packages/schema/src/index.ts` | The fact/draft contracts: types, zod, JSON Schema |
 | `apps/web/src/lib/listings.ts` | Expiry horizon and the D5 indexing gate |
 | `apps/web/src/lib/clusters.ts` | Cluster pages — the indexable surface |
@@ -44,7 +51,9 @@ Run from the repo root.
 | `pnpm run draft:nollm` | **No** — renders complete drafts from templates alone |
 | `pnpm run drafts` | **No** — lists every draft and whether it is live |
 | `pnpm run promote <slug>…` | **No** — publishes one or more drafts |
-| `pnpm run test` | **No** — 94 tests, no runner, no dependencies |
+| `pnpm run test` | **No** — 119 tests |
+| `pnpm run verify:apply` | **No** — re-checks every apply link, retires the dead |
+| `pnpm run db:up` / `db:down` | **No** — start or stop local Postgres |
 | `pnpm run build` | **No** — builds the static site into `apps/web/dist/` |
 | `pnpm run check` | **No** — build + typecheck + test, all at once |
 | `pnpm run daily` | Yes — the scheduled run, for cron or launchd |
