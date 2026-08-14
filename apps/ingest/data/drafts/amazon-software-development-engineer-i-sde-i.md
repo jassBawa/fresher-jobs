@@ -2,7 +2,7 @@
 title: "Amazon Software Development Engineer I (SDE I) - Full-time"
 description: "Amazon is hiring Software Development Engineer I (SDE I) for full-time positions in various locations."
 slug: "amazon-software-development-engineer-i-sde-i"
-status: draft
+status: published
 company: "Amazon"
 role: "Software Development Engineer I (SDE I)"
 jobType: "full-time"

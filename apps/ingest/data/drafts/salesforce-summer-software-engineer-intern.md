@@ -2,7 +2,7 @@
 title: "Salesforce Summer Software Engineer Intern 2028"
 description: "Salesforce is hiring for Summer Software Engineer Intern in Bangalore, Hyderabad. Open to 2025, 2026, 2027, 2028 batch."
 slug: "salesforce-summer-software-engineer-intern"
-status: draft
+status: published
 company: "Salesforce"
 role: "Summer Software Engineer Intern"
 jobType: "internship"

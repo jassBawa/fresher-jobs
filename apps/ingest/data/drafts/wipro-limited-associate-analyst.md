@@ -2,7 +2,7 @@
 title: "Wipro Limited Associate Analyst 2026"
 description: "Wipro Limited is hiring for Associate Analyst in Bengaluru, Hyderabad, Mumbai, Chennai. Open to 2024, 2025, 2026 batch."
 slug: "wipro-limited-associate-analyst"
-status: draft
+status: published
 company: "Wipro Limited"
 role: "Associate Analyst"
 jobType: "full-time"

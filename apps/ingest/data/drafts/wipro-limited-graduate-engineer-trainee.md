@@ -2,7 +2,7 @@
 title: "Wipro Limited - Graduate Engineer Trainee"
 description: "Wipro Limited hiring Graduate Engineer Trainees in Bengaluru, Hyderabad, Mumbai, Chennai from B.E/B.Tech, M.E/M.Tech, BCA, MCA, or B.Sc. Apply now for ₹4 to 6 LPA (Expected)."
 slug: "wipro-limited-graduate-engineer-trainee"
-status: draft
+status: published
 company: "Wipro Limited"
 role: "Graduate Engineer Trainee"
 jobType: "full-time"

@@ -2,7 +2,7 @@
 title: "Deloitte - Associate - Market Research and Insights"
 description: "Deloitte is hiring Associate - Market Research and Insights in Hyderabad, Karnataka for freshers with up to 3 years of experience."
 slug: "deloitte-associate-market-research-and-insights"
-status: draft
+status: published
 company: "Deloitte"
 role: "Associate - Market Research and Insights"
 jobType: "full-time"
