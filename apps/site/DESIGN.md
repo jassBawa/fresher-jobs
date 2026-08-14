@@ -1,59 +1,78 @@
 ---
 name: PehlaJob
-description: A fresher job board built as the confirmation screen its readers already know — outcome first, proof second, one action last.
+description: A fresher job board built as the Indian job feed its readers already know — navy bar, thumbnail cards, sidebar — with every thumbnail generated from the listing's own columns.
 colors:
   ink: "#12161a"
-  ink-2: "#4a545e"
-  ink-3: "#67717b"
-  ground: "#ffffff"
+  ink-2: "#48525c"
+  ink-3: "#616b75"
+  paper: "#ffffff"
+  page: "#eef1f5"
   ground-2: "#f4f6f8"
-  rule: "#dde3e8"
+  rule: "#dce2e8"
   rule-strong: "#12161a"
+  navy: "#13224b"
+  navy-dark: "#0e1936"
+  navy-lift: "#1e3068"
+  on-navy: "#ffffff"
+  on-navy-2: "#b9c7e4"
   live: "#0b6b35"
   live-field: "#0b6b35"
   live-field-press: "#095a2c"
   on-field: "#ffffff"
-  live-on: "#eaf4ee"
-  live-on-2: "#cfe3d7"
   soon: "#8a4700"
   closed: "#59636d"
-  closed-on-2: "#dbdfe3"
+  tg: "#1268b3"
+  wa: "#0f7a41"
+  li: "#0a5a8a"
   focus: "#0b6b35"
 typography:
-  display:
+  title:
     fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
     fontSize: "clamp(1.375rem, 1.05rem + 1.6vw, 1.875rem)"
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.02em"
+  brand:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 700
+    lineHeight: 1.5
+    letterSpacing: "-0.02em"
+  card-title:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
+    fontSize: "clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem)"
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: 1.5
     letterSpacing: "normal"
     fontFeature: "tabular-nums"
   label:
     fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
     fontSize: "1rem"
     fontWeight: 600
-    lineHeight: 1.45
+    lineHeight: 1.5
     letterSpacing: "0.08em"
   mark:
     fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
     fontSize: "1rem"
     fontWeight: 700
-    lineHeight: 1.45
+    lineHeight: 1.5
     letterSpacing: "0.06em"
   fine:
     fontFamily: "Archivo, ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif"
     fontSize: "0.8125rem"
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: 1.5
     letterSpacing: "normal"
 rounded:
   none: "0"
   focus: "1px"
+  dot: "50%"
 spacing:
   space-1: "0.25rem"
   space-2: "0.5rem"
@@ -63,19 +82,55 @@ spacing:
   space-6: "2rem"
   space-7: "3rem"
   gutter: "1.125rem"
+  shell: "70rem"
   measure: "44rem"
+  side: "20rem"
   rail: "6.5rem"
 components:
-  status-field:
-    backgroundColor: "{colors.live-field}"
-    textColor: "{colors.live-on}"
+  bar:
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.on-navy}"
+    rounded: "{rounded.none}"
+    padding: "0.75rem 1.125rem"
+  strip:
+    backgroundColor: "{colors.navy-dark}"
+    textColor: "{colors.on-navy-2}"
+    typography: "{typography.fine}"
+    rounded: "{rounded.none}"
+  menu-panel:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.rule}"
+    rounded: "{rounded.none}"
+    padding: "0.5rem 0"
+  head:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    typography: "{typography.title}"
     rounded: "{rounded.none}"
     padding: "1.5rem 1.125rem"
-  status-field-closed:
-    backgroundColor: "{colors.closed}"
-    textColor: "{colors.live-on}"
+  card:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.rule}"
     rounded: "{rounded.none}"
-    padding: "1.5rem 1.125rem"
+    padding: "1.5rem"
+  card-closed:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink-2}"
+  chip:
+    backgroundColor: "{colors.ground-2}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.rule}"
+    typography: "{typography.fine}"
+    rounded: "{rounded.none}"
+    padding: "0.15rem 0.75rem"
+  side:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.rule}"
+    rounded: "{rounded.none}"
+    padding: "1rem"
   apply:
     backgroundColor: "{colors.live-field}"
     textColor: "{colors.on-field}"
@@ -92,186 +147,173 @@ components:
     rounded: "{rounded.none}"
     padding: "0 1.5rem"
     height: "3rem"
-  row:
-    backgroundColor: "{colors.ground}"
-    textColor: "{colors.ink}"
+  join-telegram:
+    backgroundColor: "{colors.tg}"
+    textColor: "{colors.on-field}"
     rounded: "{rounded.none}"
-    padding: "1.5rem 0"
-  row-closed:
-    backgroundColor: "{colors.ground}"
-    textColor: "{colors.ink-2}"
-  nav:
-    backgroundColor: "{colors.ground-2}"
-    textColor: "{colors.ink}"
+    padding: "0 1rem"
+    height: "3rem"
+  join-whatsapp:
+    backgroundColor: "{colors.wa}"
+    textColor: "{colors.on-field}"
     rounded: "{rounded.none}"
-    padding: "0.75rem 1.125rem"
+    padding: "0 1rem"
+    height: "3rem"
+  share-linkedin:
+    backgroundColor: "{colors.li}"
+    textColor: "{colors.on-field}"
+    rounded: "{rounded.none}"
+    padding: "0 1rem"
+    height: "2.5rem"
   ad-slot:
-    backgroundColor: "transparent"
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink-3}"
+    borderColor: "{colors.rule}"
     rounded: "{rounded.none}"
-    padding: "0.5rem 0 0"
+    padding: "0.75rem"
+  foot:
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.on-navy-2}"
+    rounded: "{rounded.none}"
+    padding: "2rem 1.125rem 3rem"
 ---
 
 # Design System: PehlaJob
 
 ## Overview
 
-**Creative North Star: "The Confirmation Screen"**
+**Creative North Star: "Feed Standard"**
 
-The reference object is the transaction confirmation this audience reads a hundred times a month: the outcome states itself first in a field that owns the full width of the viewport, the facts that prove it follow as key-value rails, and one unmissable action closes the page. Nothing is decorated, because a confirmation screen that decorated itself would be suspicious. The whole system is built for a mid-range Android phone held at arm's length in daylight, on mobile data, by someone who wants a yes-or-no answer in twenty seconds and then wants to leave.
+The reference object is the Indian fresher-jobs feed this audience already reads daily: a navy bar of category menus, a column of thumbnail cards, a sidebar of what closes next. The format was not chosen for novelty. It was chosen because it is the one this reader can already operate without being taught — they arrive from a WhatsApp forward or a search result, and every affordance is where their thumb expects it.
 
-It refuses the vertical's two defaults with equal force. There is no sarkari bordered results table: no cell borders, no boxed grid, no coloured header bands. There is no SaaS job board either: no rounded cards, no shadows, no chips floating on tinted surfaces, no gradients. Separation is done by a single hairline and by whitespace. What remains is white ground, near-black ink, and one committed green that only ever appears at region scale — as a full-bleed field or as a full-width action — never as a decorative tint.
+What separates this from a skin over that format is the thumbnail. On the sites this borrows from, each posting's card is drawn by hand in a graphics tool, which is why only the recent or important ones have one and the rest of the feed is bare text. Here every field on that card — company, role, batch, salary, location — is already a column in Postgres, so the card is *rendered* rather than drawn. It exists for every listing without exception, it updates when the facts do, and it costs nobody an afternoon in Canva. The same drawing serves twice: 1200×630 as the `og:image` on the share card, and 800×600 as the feed thumbnail, because 1.91:1 stretched to a card's height loses a third of its width to cropping.
 
-The most consequential decision is that rank is never carried by size. Every listing surface is set at exactly one type size; hierarchy is produced by weight, case, colour, reversal and rule. Each page gets exactly one display moment, its heading inside the status field, and nothing else on the page is permitted to grow. The system ships zero JavaScript; the single third-party script is AdSense, and only once `PUBLIC_ADSENSE_CLIENT` is set.
+The system's discipline is that **only one colour ever means anything**. Navy is chrome — the bar, the date strip, the footer, the thumbnail's banner — and carries no information. Grey is ground. Green (`#0b6b35`) says exactly one thing, *this is open, apply here*, and appears nowhere decorative: not in the brand, not as a tint, not as a badge. The brand splits by tone instead of hue for precisely this reason.
+
+Everything is built for a mid-range Android phone held at arm's length in daylight, on mobile data. The site ships **zero JavaScript**: search is a GET form, the category menus are `<details>` elements, and the only third-party script is AdSense once `NEXT_PUBLIC_ADSENSE_CLIENT` is set.
 
 **Key Characteristics:**
-- One type size across every listing surface; one display moment per page.
+- Every listing has a generated thumbnail; there is no "no image" state to design around.
+- One green, one meaning. Navy is chrome, grey is ground, green is the only colour that carries information.
 - Status is a drawn glyph plus a word; colour never carries meaning alone.
-- Full-bleed colour fields, hairline separation, zero cards and zero shadows.
-- Fixed key column so the value edge never moves between page types.
-- Ad heights reserved up front; zero layout shift when the script goes live.
-- Every foreground/background pair clears 4.5:1 — measured across seventeen pairs, not eyeballed.
-- Zero JavaScript ships; Archivo self-hosted as two woff2 subsets (67.6KB total).
+- Content always sits on paper; the navy never touches body text.
+- Ad heights reserved up front; zero layout shift when the script goes live, and never above the first content block.
+- All 24 foreground/background pairs clear 4.5:1 — measured, not eyeballed.
+- Zero JavaScript ships. Archivo self-hosted as two woff2 subsets.
 
 ## Colors
 
-A white-ground, near-black-ink neutral field with one committed green that commits at region scale, plus two state colours that never appear without a glyph and a word beside them.
+A cool-grey page under white paper, with deep navy chrome and one committed green.
 
-Every foreground/background pair in the system clears 4.5:1, verified by measuring seventeen pairs rather than by eye — including the pairs most easily got wrong, the reversed type inside the status fields: Field White at 6.63:1 on green and 8.37:1 on Press Green, Field Reverse Two at 4.93:1 on green, Closed Reverse Two at 4.57:1 on slate. Reversed type is measured against its own ground and quiet ink against Ground Two, never against white; see The Contrast Guard.
+Every foreground/background pair in the system clears 4.5:1, verified by measuring all 24 rather than by eye. The pairs most easily got wrong are the reversed ones — Field White at 6.63:1 on green, Bar Light at 9.10:1 on navy and 7.36:1 on the menu hover — and quiet ink, which is measured against the *darkest* ground it ever sits on rather than against white. See The Contrast Guard.
 
 ### Primary
-- **Committed Green** (`{colors.live}` / `{colors.live-field}`): The one committed hue. It owns full-width status fields, the full-width apply action, the current-item underline in the category strip, the brand dot, the focus ring, and the `theme-color` meta. It is never used as a light tint, a badge fill, or a background for body text.
-- **Press Green** (`{colors.live-field-press}`): The apply action's hover and press ground, filling both background and border so the block darkens as one shape. The only place the committed green appears at a second value.
-- **Field White** (`{colors.on-field}`): The bright end of reversed type — the display heading on any status field, and the apply action's label.
-- **Field Reverse** (`{colors.live-on}`): The reversed value of a status mark sitting inside a green field, stated by direct rule because green on green is invisible. Also the `::selection` foreground — the browser surfaces we did not draw still belong to the world.
-- **Field Reverse Two** (`{colors.live-on-2}`): The meta line on an open green field, one step back from the bright end.
+- **Committed Green** (`{colors.live}` / `{colors.live-field}`): The one hue that means something. It owns the apply action, the "open" status mark, the in-card call to action, the sidebar's "see all", the focus ring, and the thumbnail's APPLY NOW bar. It is never a tint, a badge fill, a brand accent, or a background for body text.
+- **Press Green** (`{colors.live-field-press}`): The apply action's hover ground, filling background and border together so the block darkens as one shape.
+- **Field White** (`{colors.on-field}`): Reversed type on any green or channel ground.
 
-### Secondary
-- **Deadline Amber** (`{colors.soon}`): The closing-soon state only. It exists because "closes this week" is a different fact from "open", and a reader must be able to distinguish them without relying on hue — so it always ships with the clock glyph and the word "Closing".
-- **Closed Slate** (`{colors.closed}`): The lower register. It fills the closed status field on expired listings and the 404, colours the closed mark, and colours the disabled apply block.
-- **Closed Reverse Two** (`{colors.closed-on-2}`): The meta line and the status mark on a closed slate field — the same one-step-back position `{colors.live-on-2}` holds on green.
+### Chrome
+- **Bar Navy** (`{colors.navy}`): The main bar, the footer, and the thumbnail's banner. Structure only — it never encodes state.
+- **Strip Navy** (`{colors.navy-dark}`): The date strip above the bar, one step deeper so the two bands separate without a rule.
+- **Lift Navy** (`{colors.navy-lift}`): The hover and open ground for a bar item, and the bar's search field.
+- **Bar White** (`{colors.on-navy}`): The brand, an active bar item, and footer links.
+- **Bar Light** (`{colors.on-navy-2}`): Resting bar items, the date strip, the footer's body copy, and the second half of the brand — tone, not hue, so the brand never borrows the action green.
 
 ### Neutral
-- **Ink** (`{colors.ink}`): Body text, company names, the strong masthead rule, the skip link's ground.
-- **Ink Two** (`{colors.ink-2}`): The demoted register. Closed rows drop their company, role and values to this before they drop out of the page.
-- **Ink Three** (`{colors.ink-3}`): Micro-labels, key columns, posted dates, fine print, the advertisement marker, and both masthead lines. This is the lightest ink permitted on text anywhere in the system, on any ground.
-- **Ground** (`{colors.ground}`) / **Ground Two** (`{colors.ground-2}`): The page ground, and the quiet band used by the category strip and the footer. Ground Two is the only tinted surface in the system.
-- **Hairline** (`{colors.rule}`): Every separation job on the page — row separators, section tops, link underlines, table cells, the ad slot's top edge.
-- **Strong Rule** (`{colors.rule-strong}`): The 2px masthead border, and only that.
+- **Ink** (`{colors.ink}`): Headings, card titles, values in every key-value rail. 18.18:1 on paper.
+- **Ink Two** (`{colors.ink-2}`): Card excerpts, closed listings, the scan table's date column.
+- **Ink Three** (`{colors.ink-3}`): Labels, meta lines, counts, the ad marker. Held at 4.79:1 against `page`, the darkest ground it ever sits on — the previous value cleared white and failed there.
+- **Paper** (`{colors.paper}`): Every content surface. Content never sits directly on the page ground.
+- **Page** (`{colors.page}`): The ground behind the cards, visible only as the gaps between them.
+- **Ground Two** (`{colors.ground-2}`): Chip fills and hover states inside paper.
+- **Rule** (`{colors.rule}`): Every hairline. **Rule Strong** (`{colors.rule-strong}`) is reserved for the two places a border must read as structural: the search control and the scan table's header.
+
+### State and channels
+- **Soon** (`{colors.soon}`) and **Closed** (`{colors.closed}`): Status only, and never without their glyph and word.
+- **Telegram / WhatsApp / LinkedIn** (`{colors.tg}` / `{colors.wa}` / `{colors.li}`): Each network's own identity, darkened until white type clears 4.5:1 — 5.74, 5.41 and 7.39 respectively. They are borrowed identity, not palette, and appear only on a button that opens that network.
 
 ### Named Rules
-**The Region-Scale Rule.** Colour commits at region scale or not at all. Green appears as a full-bleed field or a full-width action; it is never a badge, a tint, a card background, or an accent on a word.
-
-**The Mark-Plus-Word Rule.** Colour never carries meaning alone anywhere in the system. Every status renders a drawn SVG glyph plus its word. On a green field the mark is restated explicitly to the reverse colour, because green on green is invisible.
-
-**The Contrast Guard.** Quiet text stops at Ink Three (`#67717b`), and the binding measurement is **4.59:1 on Ground Two** (`#f4f6f8`) — not the 4.97:1 it reaches on white. Ground Two is the harder ground and the one the category strip and the footer actually use, so a floor checked only against white will pass a value that fails where the label really sits. This matters most in the masthead, whose two lines are separated from the brand by colour alone: lighten the promise line and the trust claim goes with it. This is a floor, not a suggestion.
+- **One Green, One Meaning** — `{colors.live}` says *this is open, apply here*. If a green appears anywhere it does not mean that, it is a bug.
+- **Chrome Says Nothing** — navy is structure. The moment navy encodes a state, the reader has two colour systems to learn.
+- **Content On Paper** — body text never sits on `{colors.page}` or on navy. The page ground is the gap between cards, nothing more.
+- **The Contrast Guard** — quiet ink is measured against `{colors.page}`, and reversed type against its own ground, never against white.
 
 ## Typography
 
-**Display Font:** Archivo (self-hosted)
-**Body Font:** Archivo (self-hosted)
-**Label/Mono Font:** none — Archivo at `tabular-nums` does the numeric work
-
-**Character:** A single grotesque doing everything. Archivo is wide, plain and legible at small sizes on a cheap panel, which is the whole brief; the variable weight axis (400–700) supplies all the rank the system needs. It ships as two woff2 subsets, 67.6KB total: latin, plus latin-ext carried specifically because ₹ (U+20B9) lives there and salary lines are unreadable without it. The fallback stack ends in `'Noto Sans Devanagari'` so a future Hindi layer does not force a redesign.
+One family, Archivo, self-hosted as two woff2 subsets — the second carries ₹ (U+20B9), without which every salary line breaks.
 
 ### Hierarchy
-- **Display** (700, `{typography.display.fontSize}`, 1.15, -0.02em, balanced wrap): The page's one display moment. It appears only as the heading inside a status field. Nothing else on any page uses it.
-- **Body** (400, `{typography.body.fontSize}`, 1.45, tabular figures): Everything on a listing surface — row roles, rail values, prose, nav items, the brand mark. This is the one size.
-- **Label** (600, same size, 0.08em, uppercase, Ink Three): Micro-labels and key columns. The difference from its own value is case, weight and colour — never scale.
-- **Mark** (700, same size, 0.06em, uppercase): The status word beside its glyph. Glyph sized at 0.72em so it optically matches the cap height.
-- **Fine** (400, `{typography.fine.fontSize}`, Ink Three): Legal, provenance and the advertisement marker only. Never a listing surface.
+- **Title** (`{typography.title}`): One per page, in the head band. The only fluid step.
+- **Brand** (`{typography.brand}`): The bar's wordmark. The one fixed size above body.
+- **Card Title** (`{typography.card-title}`): The feed's headline link, a hair above body so a screen of cards has a scan line.
+- **Body** (`{typography.body}`): Everything else on a listing surface. Tabular numerals throughout, so batch years and salaries align down a column.
+- **Label** (`{typography.label}`): Uppercase, letterspaced, at body size — key columns, section titles, chip keys.
+- **Mark** (`{typography.mark}`): The status word beside its glyph.
+- **Fine** (`{typography.fine}`): Meta lines, counts, the ad marker, legal copy. Never a listing's facts.
 
 ### Named Rules
-**The One Size Rule.** Every listing surface is set at one size. Rank comes from weight, case, reversal, colour and rule — never from making something bigger. A key and its value are the same size; a label and its content are the same size. Audit test: if a new element needs a third size to read correctly, the hierarchy is wrong, not the scale.
-
-**The Two-Step Reverse Rule.** Type on a status field has exactly two steps: the mark and the display sit at the bright end (`{colors.on-field}`, `{colors.live-on}`), the meta line one step back (`{colors.live-on-2}` on green, `{colors.closed-on-2}` on slate). That gives a reversed field its own internal hierarchy without introducing a second type size — the same device as weight and case elsewhere, applied to a reversed ground. It is the One Size Rule holding under pressure, not being bent. Both back-steps are measured against their own ground rather than white.
-
-**The One Display Moment Rule.** A page gets exactly one display-sized element, and it lives inside the status field. A second display size on a page is a defect, including in the masthead — which is why the promise line is set at body size and ranked by colour instead.
+- **Rank By Weight, Not Scale** — labels and values share one size and differ by case, weight and colour. There are four sizes in the system and three of them appear once per page.
+- **Tabular Always** — `font-variant-numeric: tabular-nums` on `body`, so no number column ever wobbles.
 
 ## Layout
 
-A single reading column, `44rem` measure, centred, with a `1.125rem` gutter. Spacing runs on a seven-step scale (`0.25rem` to `3rem`); rows breathe at step 5, sections separate at step 6, and the footer detaches at step 7.
+A 70rem shell holding a fluid main column and a 20rem sidebar, collapsing to one column below 64rem. Prose is capped at 44rem inside it regardless of how wide the shell gets.
 
-Every key-value rail is a two-column grid with a fixed key column: `minmax(4.5rem, 6.5rem)` then `1fr`. The key column is fixed rather than content-sized on purpose, so the value edge sits in the same place on the homepage, a cluster page and a listing — a long scan never loses its anchor. Row anchors run the same way: the status mark and the posted date sit on a shared baseline rail at the top of every row.
-
-Two breakpoints only. At **46rem** the masthead goes from stacked to a baseline-aligned row, the in-feed ad widens from a 336×100 reservation to 728×90, and the apply block stops being full-width (min 22rem, left-aligned) with its note left-aligning under it. At **64rem** the desktop rail appears: the page becomes a `1fr / 300px` grid at `60rem` max width, and the sticky rail ad's hairline is offset to start level with the first listing rather than above it. Below 64rem the rail is not rendered at all rather than stacked into the reading column.
-
-The category strip scrolls horizontally below 64rem with a right-edge mask fade (so a clipped item reads as "there is more", not as a word cut in half) and wraps with the fade removed above it.
-
-Ad slots reserve fixed heights before the script exists: feed 100px (90px above 46rem), foot 280px, rail 600px, each with a max width matching the eventual unit. Reservations are fixed rather than responsive because `data-full-width-responsive` lets Google choose a height at runtime, which is exactly the shift being designed out. Verified by diffing builds with and without the env vars set: zero layout shift.
+The feed card is a two-column grid: thumbnail left, body right, side by side above 34rem and stacked below it, where a 280px image in a 320px column would be a stamp. The thumbnail is **centred** in its column rather than stretched — the body is always a little taller than a 4:3 image, and forcing the image to fill meant `object-fit: cover` sliced a third off both edges. The dividing rule lives on the body, which does run full height.
 
 ### Named Rules
-**The Never-Above Rule.** An ad is never placed above the first content block. It interleaves after the first four rows on long lists, sits at the end of content, or lives in the desktop rail. An ad may never be the LCP element or the first thing the visitor meets.
-
-**The Fixed Rail Rule.** The key column is a fixed width, not content-sized. Values must line up across every page type; a rail that resizes to its longest key breaks the scan.
+- **Cards, Not Boxes-In-Boxes** — a card is paper with a hairline. Nothing nests a bordered panel inside another bordered panel.
+- **Never Above The Fold's First Block** — no ad slot precedes the first content block on any page, so an ad can never be the LCP element.
+- **Reserve Before You Fill** — ad heights are declared at the size the eventual unit occupies, before AdSense exists.
 
 ## Elevation & Depth
 
-There are no shadows in this system. Not one `box-shadow` is declared anywhere in the build. Depth is carried entirely by three devices: the 1px hairline, the one tinted band (Ground Two, used by the category strip and the footer), and full-bleed colour fields that read as a layer above the page because they own its whole width. The masthead's 2px strong rule is the single heaviest separation in the world.
+Effectively flat. One shadow exists in the entire system, under the open bar menu, because a panel overlapping content is the one place a hairline cannot establish which surface is in front.
 
 ### Named Rules
-**The Flat Ground Rule.** Surfaces are flat, always. Depth is a rule, a tint band, or a full-bleed field — never a shadow, never a lift, never a border pretending to be one.
-
-**The Hairline Rule.** Separation is one 1px hairline. Rows are separated by it and never boxed by it; the last row in a list drops its border rather than closing the box.
+- **One Shadow, One Reason** — depth is only ever used to resolve overlap, never to decorate a resting surface.
 
 ## Shapes
 
-Square. `border-radius` is `0` everywhere in the system with exactly one exception: the focus ring carries a `1px` radius so the 2px green outline does not read as a hard corner artefact at its offset. There are no cards, no pills, no chips, no rounded containers. Form language is the hairline and the filled rectangle: full-bleed status fields, full-width filled actions, hairline-separated rows, hairline-underlined links.
-
-Links are underlined by their `text-decoration-color` at hairline strength and darken to `currentColor` on hover — the underline is always present, only its emphasis changes. Nav items and facet links use a bottom border in place of a text underline so the current item can thicken it to 2px green without shifting the text.
-
-Icons are inline SVG drawn on a 16×16 grid at one stroke weight (2px, square caps). No icon fonts, no glyph characters, no icon library.
+Square. `{rounded.none}` everywhere; the only curves are the focus ring's 1px softening, the status glyphs, and the 3px separator dot in a card's meta line. A radius here would be the only curve on the page and would read as a different product.
 
 ## Components
 
-### Status Field
-The signature component. A full-bleed band that names the page, its live count and the date checked. Green in the open register, Closed Slate on expired listings and the 404. It carries the page's one display heading at the bright end of the reverse (`{colors.on-field}`) plus a meta row of flex-wrapped facts at body size one step back (`{colors.live-on-2}` on green, `{colors.closed-on-2}` on slate). Padding is `space-5` block; the inner content sits in the standard `.wrap` measure while the background bleeds edge to edge.
+### Bar
+Navy, full width, holding brand, category menus and search. Menus are `<details>`/`<summary>` — no JavaScript, keyboard-accessible for free, and safe on touch where a hover menu is a trap. Below 48rem they wrap onto their own row rather than scrolling, because a panel inside an `overflow-x: auto` strip is clipped by it.
+
+### Job Card
+Generated thumbnail, title link, status and dates, fact chips, two-line excerpt, and a green way in. The thumbnail carries `alt=""` and is wrapped in an `aria-hidden` link: every word inside it appears as real text alongside, so it is decoration to a screen reader and information to everyone else.
 
 ### Status Mark
-Three authored glyphs on one 16×16 grid at one stroke weight: a filled disc (open), a ring with a clock hand (closing), a ring with a strike (closed). Each renders the glyph plus its word, uppercase, 700, 0.06em, `white-space: nowrap`. On a green or slate field the mark's colour is restated to the field's reverse tone by direct rule.
-
-### Listing Row (Receipt Line)
-- **Shape:** No card. A 1px bottom hairline, dropped on the last child. `space-5` block padding.
-- **Structure:** A top rail (status mark left, posted date right, shared baseline), then the role line — company at 700, role at 400, both inside one link — then the key-value rail: Batch, Where, Pay, Closes.
-- **Closed register:** Company, role and values drop to Ink Two at weight 400. Closed listings stay on the page in a lower register under a "Recently closed" head rather than vanishing; a reader who saw a listing yesterday should learn that it closed, not meet a gap.
+A drawn glyph plus a word — filled disc, clock, struck circle. Colour is never the only carrier.
 
 ### Apply Action
-- **Shape:** Square, 3rem min height, full-width on mobile, min 22rem left-aligned above 46rem.
-- **Primary:** Green fill, white text, 700, 0.02em, with a 0.8em inline external-link glyph. A fine note under it states where the link goes.
-- **Hover:** Fill and border both darken to Press Green (`{colors.live-field-press}`). No transition, no lift.
-- **Dead:** Transparent ground, Closed Slate text, hairline border, `aria-disabled="true"`, `not-allowed` cursor. Used for both expired listings and listings that published no application link — each with its own note explaining why.
+Full-width green block on a listing, with a note underneath stating that it opens the employer's own form in a new tab, and saying so only when the link has actually been checked.
 
-### Navigation
-The category strip sits on Ground Two under a hairline and travels with every page, because most sessions land deep. Built from clusters that actually exist, so it can never point at an empty page; grouped Batch, then Role, then City, separated by a vertical hairline with an uppercase Ink Three group label. Items are 700-weight with a 2px green bottom border when current, transparent otherwise, darkening to Ink on hover. Scrolls with an edge fade below 64rem; wraps with the fade removed above it.
+### Sidebar
+Closing this week, latest openings, channel buttons, a provenance note, then the ad. Ordered by what a returning visitor came for; the ad is last because above the fold in a sidebar is still above the fold. The channel buttons render only when a real channel URL is configured — a button that opens nothing is worse than no button for an audience already targeted by fake job channels.
 
 ### Ad Slot
-A hairline-topped block with a persistent uppercase "Advertisement" marker in fine type at Ink Three — it is small text a reader may specifically need in order to find an ad boundary, so it holds the same contrast floor as every other quiet label rather than fading toward the hairline. The marker stays whether or not the script is live — a reserved box with nothing in it reads as breakage. Height is reserved at the eventual unit's size in all three placements. Manual units only; Auto Ads are ruled out because runtime placement is the instability this component exists to prevent.
-
-### Prose
-Body copy at the one size with `space-4` stack rhythm. Section headings inside prose are uppercase 700 at body size with a hairline top rule — they rank by case and rule, not by scale. Tables are borderless except for row hairlines, with the key cell in Ink Three and `nowrap`, and scroll horizontally rather than compressing.
+Paper with a hairline, an uppercase marker that stays when the script goes live, and a reserved inner height per placement.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** set every listing surface at the one body size (`1rem`) and rank with weight, case, colour, reversal and rule.
-- **Do** give each page exactly one display-sized element, inside its status field.
-- **Do** ship every status as a drawn glyph plus a word, and restate the mark's colour when it sits on a coloured field.
-- **Do** hold quiet text at or above Ink Three (`#67717b`) and check it against Ground Two (4.59:1), not white — including the masthead promise line, which is separated from the line above by colour alone.
-- **Do** commit colour at region scale — a full-bleed field or a full-width action.
-- **Do** separate with one 1px hairline and drop it on the last item.
-- **Do** reserve ad heights at the eventual unit size before the script exists, and keep every ad below the first content block.
-- **Do** keep the key column fixed (`6.5rem`) so values line up across page types.
-- **Do** draw icons as inline SVG on a 16×16 grid at 2px square-capped stroke.
-- **Do** keep the build at zero shipped JavaScript; AdSense is the only third-party script, and only when its env var is set.
+- Generate the thumbnail from the listing's columns; never require a hand-made asset.
+- Keep green for "open / apply here" and nothing else.
+- Pair every status colour with a glyph and a word.
+- Put body content on paper, always.
+- Measure quiet ink against `{colors.page}`, not white.
+- Let the thumbnail keep its aspect ratio and centre it; do not stretch it to card height.
+- Reserve ad height before the script exists.
+- Keep the menus working with JavaScript disabled.
 
 ### Don't:
-- **Don't** introduce a third type size on a listing surface. Fine type is for legal and provenance only.
-- **Don't** box a row into a card, and don't add `border-radius` anywhere except the 1px focus ring.
-- **Don't** use a shadow. There are none in the system and depth does not need one.
-- **Don't** let colour carry a meaning on its own, anywhere, for any state.
-- **Don't** place an ad above the first content block, and don't enable Auto Ads or responsive ad heights.
-- **Don't** tint green or use it as a badge, chip or accent fill.
-- **Don't** hide a closed listing. Demote it to Ink Two at weight 400 and keep its URL.
-- **Don't** invent social proof, employer logos, counts or trust badges; none exist to render.
-
-<!-- CEILING: rule weight is an unspent rank axis. `--rule-strong` is declared and used exactly once (the 2px masthead border) while a single 1px hairline does every other separation job. The finish review's judgement was that a graded rule scale is the one thing this world has room for next; it was deliberately not built in this run and is recorded here as headroom, not as a defect. -->
+- Use green as a brand accent, a tint, or a badge fill.
+- Let navy encode state.
+- Add a border radius.
+- Add a shadow to a resting surface.
+- Place an ad above the first content block, or enable Auto Ads.
+- Introduce a fifth type size to create hierarchy — use weight, case and colour.
+- Ship a channel button whose URL is not configured.

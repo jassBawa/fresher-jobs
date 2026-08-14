@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { Nav } from '@/components/Nav';
+import { today, shortDay } from '@/lib/listings';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,45 +19,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang="en-IN">
 			<head>
 				<link rel="preload" href="/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossOrigin="" />
-				<meta name="theme-color" content="#0b6b35" />
+				<meta name="theme-color" content="#13224b" />
 			</head>
 			<body>
 				{/*
-				THESIS: A job listing read as the confirmation screen this audience already
-				reads a hundred times a month — outcome first, the facts that prove it
-				second, one action last. It refuses the vertical's two defaults equally:
-				the sarkari bordered results table, and the SaaS job board of rounded cards.
-				OWN-WORLD: White ground, near-black ink, one committed green owning full-width
-				status fields. Archivo, self-hosted. Rows separated by hairlines, never boxed
-				into cards. Key-value rails at one type size; rank by weight, case, reversal
-				and rule. Status is a drawn mark plus a word, never colour alone.
-				STORY: The visitor lands deep from a search or a WhatsApp forward, learns in
-				one glance whether it is open and whether their batch qualifies, and leaves
-				through the apply link — which is the success state, not a bounce.
-				FIRST VIEWPORT: Three-line masthead; a full-bleed green status field naming
-				the page, its live count and the date checked; then listing rows as receipt
-				lines. The reserved ad slot sits below the first rows, never above them.
-				FORM: Confirmation Screen, candidate 5 of 7, seed d785fe22.
+				THESIS: The Indian job-feed layout this audience already knows — navy bar,
+				thumbnail cards, right sidebar — built honestly. Every thumbnail is
+				generated from the listing's own columns rather than drawn by hand, so the
+				format's central promise (you can see the eligibility before you click)
+				holds on every posting instead of the twenty someone had time for.
+				OWN-WORLD: Deep navy chrome, cool grey ground, white cards with a hairline.
+				One committed green reserved for a single meaning — this is open, apply here
+				— so it never decorates. Archivo, self-hosted. Status is a drawn mark plus a
+				word, never colour alone.
+				STORY: The visitor lands deep from a search or a WhatsApp forward, reads the
+				card, learns whether their batch qualifies, and leaves through the apply
+				link — which is the success state, not a bounce.
+				FIRST VIEWPORT: Date strip, navy bar with category menus and search, then
+				the count of what is open and the first cards. The reserved ad slot sits
+				after the fourth card, never above the first.
+				FORM: Feed Standard, rebuilt from the reference layout, August 2026.
 				*/}
 				<a className="skip" href="#main">
 					Skip to listings
 				</a>
 
-				<header className="masthead">
-					<div className="wrap masthead__inner">
-						<Link className="brand" href="/">
-							PehlaJob<span className="brand__dot">.</span>
-						</Link>
-						<div className="masthead__lines">
-							<p className="masthead__line">
-								Fresher jobs in India — checked, dated, linked to the real form.
-							</p>
-							<p className="masthead__promise">
-								Nothing is published without a human reading it first.
-							</p>
-						</div>
+				<div className="strip">
+					<div className="wrap strip__inner">
+						<span>{shortDay(today())}</span>
+						<span className="strip__sep" aria-hidden="true" />
+						<span>Every apply link checked before it is published</span>
 					</div>
-				</header>
+				</div>
 
 				<Nav />
 
@@ -64,12 +58,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 				<footer className="foot">
 					<div className="wrap">
-						<nav className="foot__nav" aria-label="Browse">
-							<Link href="/">All openings</Link>
-							<Link href="/2026-batch-jobs/">2026 batch</Link>
-							<Link href="/software-engineer-jobs/">Software engineer</Link>
-							<Link href="/jobs-in-bengaluru/">Bengaluru</Link>
-						</nav>
+						<div className="foot__top">
+							<div className="foot__brand">
+								<span className="brand brand--foot">
+									Pehla<span className="brand__b">Job</span>
+								</span>
+								<p className="foot__tag">
+									Fresher jobs in India — checked, dated, linked to the real form.
+								</p>
+							</div>
+							<nav className="foot__nav" aria-label="Browse">
+								<Link href="/">All openings</Link>
+								<Link href="/2026-batch-jobs/">2026 batch</Link>
+								<Link href="/software-engineer-jobs/">Software engineer</Link>
+								<Link href="/jobs-in-bengaluru/">Bengaluru</Link>
+								<Link href="/search/">Search</Link>
+							</nav>
+						</div>
 						<p className="fine">
 							Listings are compiled from public announcements and rewritten from the facts.
 							Every apply link is fetched and checked before publishing, and again on a

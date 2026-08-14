@@ -684,6 +684,75 @@ That is the same trick D25 used to verify apply links, applied to assets.
 
 ---
 
+## D30 — The thumbnail is rendered, not drawn
+
+The reference layouts in this vertical are built around a per-posting banner
+image: company name, role, and an eligibility table, laid out in a graphics tool
+and uploaded with the post. It is the format's best idea — the reader can judge
+whether they qualify without opening anything — and its worst constraint, because
+someone has to draw one for every posting. On the sites that use it, the recent
+and important postings have a card and the long tail does not.
+
+Every field on those cards is already a column here. So the card is rendered from
+the row rather than drawn: `apps/site/lib/thumb.tsx` lays out company, role,
+batch, salary and location, and two routes render it through `next/og`.
+
+It exists for every listing, it cannot go stale against the facts, and it costs
+nothing per posting. It also replaces the thing D29 could not solve — a listing's
+visual identity no longer depends on finding an employer logo, so the 4-of-13
+resolution rate stops mattering for the feed. D29's monogram stays where a small
+inline mark is wanted, in the scan table.
+
+**Two shapes, one drawing.** 1200×630 is the `og:image`, because that is the crop
+every messaging preview expects, and PRODUCT.md names the WhatsApp forward as a
+main discovery channel — a forward with no preview card is a forward nobody opens.
+800×600 is the feed thumbnail: 1.91:1 stretched to a card's height lost a third of
+its width to `object-fit: cover`, arriving as "iemens" and "PLY NOW". Both derive
+every dimension from one scale factor, so they are the same drawing twice rather
+than two drawings to keep in sync. Type carries a second multiplier on the feed
+shape, which is drawn at 800px and displayed at ~320.
+
+**Rejected:** shipping a headless browser to screenshot a template (D25 already
+rejected ~300MB for a smaller win); a build-time image pipeline writing PNGs to
+disk (the facts change under the image, and ISR already caches the route).
+
+---
+
+## D31 — Feed Standard replaces Confirmation Screen
+
+The previous visual world was built on a defensible idea — a listing read as a
+transaction confirmation, one type size, hairlines instead of cards — and it was
+the wrong instrument. The reader arrives from a WhatsApp forward or a search
+result already fluent in one layout: navy bar with category menus, a column of
+thumbnail cards, a sidebar of what closes next. Making them learn a better layout
+is a cost they did not agree to pay.
+
+So the world is replaced, not softened. Navy chrome, cool-grey ground, white
+paper cards, a 70rem shell with a 20rem sidebar. `DESIGN.md` is rewritten rather
+than amended; the old one describes a site that no longer exists.
+
+What survived the change, because it was never about the look:
+
+- **One green, one meaning.** `#0b6b35` says *this is open, apply here* and is
+  allowed nowhere else — not as a brand accent, which is why the wordmark splits
+  by tone instead of hue.
+- **Status is a mark plus a word**, never colour alone.
+- **Zero JavaScript.** Search is a GET form; the category menus are `<details>`
+  elements, which are keyboard-accessible for free and safe on touch, where a
+  hover menu is a trap.
+- **Ad heights reserved**, never above the first content block.
+- **Every pair at 4.5:1** — all 24 measured, not eyeballed. Quiet ink is held
+  against the darkest ground it sits on rather than against white, which moved
+  `--ink-3` from `#67717b` (4.39 on the new page ground) to `#616b75` (4.79).
+
+**Not built:** the reference's Telegram and WhatsApp channel buttons. The markup
+and styling exist and render only when `NEXT_PUBLIC_TELEGRAM_URL` /
+`NEXT_PUBLIC_WHATSAPP_URL` are set. There is no channel yet, and a button that
+opens nothing is worse than no button for an audience already targeted by fake
+job channels.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |

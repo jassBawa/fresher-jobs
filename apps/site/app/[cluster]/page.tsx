@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { JobFeed } from '@/components/JobFeed';
 import { JobList } from '@/components/JobList';
+import { Sidebar } from '@/components/Sidebar';
 import { AdSlot } from '@/components/AdSlot';
 import {
 	allClusters,
@@ -55,34 +57,42 @@ export default async function ClusterPage({ params }: { params: Promise<{ cluste
 		clusterListings(cluster),
 		clusterClosed(cluster),
 	]);
-	const closingSoon = listings.filter((l) => statusOf(l, on) === 'closing').length;
+	const closing = listings.filter((l) => statusOf(l, on) === 'closing');
 	const thin = cluster.count < MIN_INDEXABLE_CLUSTER_SIZE;
 
 	return (
 		<>
-			<section className="field">
-				<div className="wrap field__inner">
-					<h1 className="display">{cluster.label}</h1>
-					<p className="field__meta">
+			<div className="head">
+				<div className="wrap">
+					<h1 className="head__title">{cluster.label}</h1>
+					<p className="head__meta">
 						<span>{listings.length} open now</span>
-						{closingSoon > 0 && <span>{closingSoon} closing this week</span>}
+						{closing.length > 0 && <span>{closing.length} closing this week</span>}
 						<span>Checked {shortDay(on)}</span>
 					</p>
 				</div>
-			</section>
+			</div>
 
-			<div className="wrap with-rail">
-				<div>
-					<JobList listings={listings} adAfter={4} />
+			<div className="wrap shell">
+				<div className="shell__main">
+					<section className="block">
+						<div className="block__head">
+							<h2 className="block__title">Open now</h2>
+							<span className="block__note">{listings.length}</span>
+						</div>
+						<JobFeed listings={listings} adAfter={4} />
+					</section>
 
 					{closed.length > 0 && (
-						<section className="closed-tail">
-							<h2 className="label closed-tail__head">Recently closed</h2>
+						<section className="block block--quiet">
+							<div className="block__head">
+								<h2 className="block__title">Recently closed</h2>
+							</div>
 							<JobList listings={closed} closed />
 						</section>
 					)}
 
-					<p className="back rule-top">
+					<p className="back">
 						<Link href="/">← All openings</Link>
 						{thin && <span className="fine"> · too few here to list in search yet</span>}
 					</p>
@@ -90,9 +100,7 @@ export default async function ClusterPage({ params }: { params: Promise<{ cluste
 					<AdSlot placement="foot" />
 				</div>
 
-				<aside className="rail" aria-label="Advertisement">
-					<AdSlot placement="rail" />
-				</aside>
+				<Sidebar closing={closing} recent={listings} />
 			</div>
 		</>
 	);

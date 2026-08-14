@@ -1,16 +1,20 @@
 /* ---------------------------------------------------------------------------
-   Confirmation Screen — the world.
+   Feed Standard — the world.
 
-   The reference object is the transaction confirmation this audience reads a
-   hundred times a month: outcome first in a field that owns its whole width,
-   the facts that prove it as key-value rails, one unmissable action last.
+   The reference object is the Indian fresher-jobs feed this audience already
+   reads daily: a navy bar of category menus, a column of thumbnail cards, a
+   sidebar of what closes next. The format is not copied for its own sake — it
+   is what the reader can already operate without being taught.
 
-   Two rules do most of the work and must not be softened:
+   What makes it honest here rather than a skin:
 
-   1. ONE TYPE SIZE across every listing surface. Rank is carried by weight,
-      case, reversal and rule — never by making something bigger. The page gets
-      exactly one display moment (its heading); everything else is --fs.
-   2. STATE IS A MARK, never colour alone. Every status carries a drawn glyph
+   1. EVERY THUMBNAIL IS GENERATED from the listing's own columns, so the
+      format's central promise — see the eligibility before you click — holds on
+      every posting rather than the twenty someone had time to draw.
+   2. ONE GREEN, ONE MEANING. #0b6b35 says "this is open, apply here" and is
+      allowed nowhere else. Navy is chrome; grey is ground; green is the only
+      colour that ever means something.
+   3. STATE IS A MARK, never colour alone. Every status carries a drawn glyph
       and a word, so it survives a cheap screen in daylight and a colourblind
       reader.
 --------------------------------------------------------------------------- */
@@ -41,45 +45,55 @@
 	color-scheme: light;
 
 	/* Ink and ground. Daylight, outdoors, mid-range phone: light ground, high
-	   contrast ink. A dark UI is the wrong instrument for this use scene. */
+	   contrast ink. A dark UI is the wrong instrument for this use scene — the
+	   navy is chrome only, and content always sits on paper. */
 	--ink: #12161a;
-	--ink-2: #4a545e;
-	/* Muted ink. Darkened from #6b757f, which cleared 4.5:1 on white but only
-	   managed 4.33:1 on --ground-2 — and --ground-2 is where it does most of its
-	   work, in the category strip and the footer. Now 4.97 on white, 4.59 on the
-	   grey. This is also the floor for the masthead promise line, which is
-	   separated from the tagline by colour alone. */
-	--ink-3: #67717b;
-	--ground: #ffffff;
+	--ink-2: #48525c;
+	/* Muted ink. Held at 4.5:1 against the *darkest* ground it ever sits on,
+	   which is --page (#eef1f5), not white: 4.79 there, 5.43 on paper. The
+	   previous #67717b cleared white but fell to 4.39 on this grey. */
+	--ink-3: #616b75;
+
+	--paper: #ffffff;
+	--page: #eef1f5;
 	--ground-2: #f4f6f8;
-	--rule: #dde3e8;
+	--rule: #dce2e8;
 	--rule-strong: #12161a;
+
+	/* Chrome. Carries no meaning, only structure — the bar, the strip, the
+	   footer and the thumbnail banner. */
+	--navy: #13224b;
+	--navy-dark: #0e1936;
+	--navy-lift: #1e3068;
+	--on-navy: #ffffff;
+	--on-navy-2: #b9c7e4;
 
 	/* Status. Each pairs with a drawn mark and a word; colour never carries
 	   meaning on its own. */
 	--live: #0b6b35;
 	--live-field: #0b6b35;
 	--live-field-press: #095a2c;
-	/* Type set on a status field. Two steps: the mark and the display sit at the
-	   bright end, the meta line one step back so the field has an internal
-	   hierarchy without a second size. Both measured against their own ground,
-	   not against white. */
 	--on-field: #ffffff;
-	--live-on: #eaf4ee;
-	--live-on-2: #cfe3d7;
 	--soon: #8a4700;
 	--closed: #59636d;
-	--closed-on-2: #dbdfe3;
 
-	/* One size. Everything on a listing surface is set here. */
+	/* Channels. Each is the network's own identity, darkened to hold white text
+	   at 4.5:1 — Telegram 5.74, WhatsApp 5.41. */
+	--tg: #1268b3;
+	--wa: #0f7a41;
+	--li: #0a5a8a;
+
 	--fs: 1rem;
-	--lh: 1.45;
-	/* The page's single display moment. */
-	--fs-display: clamp(1.375rem, 1.05rem + 1.6vw, 1.875rem);
-	/* Legal and provenance micro-copy only — never a listing surface. */
+	--lh: 1.5;
+	--fs-title: clamp(1.375rem, 1.05rem + 1.6vw, 1.875rem);
+	--fs-card: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
 	--fs-fine: 0.8125rem;
 
+	/* Two widths: the shell that holds feed plus sidebar, and the measure that
+	   prose is never allowed to exceed inside it. */
+	--shell: 70rem;
 	--measure: 44rem;
+	--side: 20rem;
 	/* The key column of every key-value rail. Fixed, not content-sized, so the
 	   value edge does not move between the homepage, a cluster and a listing. */
 	--rail: 6.5rem;
@@ -106,7 +120,7 @@ html {
 
 body {
 	margin: 0;
-	background: var(--ground);
+	background: var(--page);
 	color: var(--ink);
 	font-family: 'Archivo', ui-sans-serif, system-ui, 'Noto Sans Devanagari', sans-serif;
 	font-size: var(--fs);
@@ -122,16 +136,23 @@ video {
 	height: auto;
 }
 
-/* The browser surfaces we did not draw still belong to the design. */
 ::selection {
 	background: var(--live-field);
-	color: var(--live-on);
+	color: #fff;
 }
 
 :focus-visible {
 	outline: 2px solid var(--focus);
 	outline-offset: 2px;
 	border-radius: 1px;
+}
+
+/* Inside the navy chrome the green ring disappears; focus takes the light there
+   so it is visible on both grounds. */
+.strip :focus-visible,
+.bar :focus-visible,
+.foot :focus-visible {
+	outline-color: #fff;
 }
 
 a {
@@ -155,20 +176,37 @@ figure {
 	margin: 0;
 }
 
+.vh {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.skip {
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	background: var(--ink);
+	color: #fff;
+	padding: var(--space-3) var(--space-4);
+	z-index: 30;
+}
+
+.skip:focus {
+	left: 0;
+}
+
 /* --------------------------------------------------------------- structure */
 
 .wrap {
-	max-width: var(--measure);
+	max-width: var(--shell);
 	margin-inline: auto;
 	padding-inline: var(--gutter);
 }
 
-.rule-top {
-	border-top: 1px solid var(--rule);
-}
-
-/* Uppercase micro-label. Same size as its value — the difference is case,
-   weight and colour, never scale. */
 .label {
 	font-size: inherit;
 	font-weight: 600;
@@ -177,65 +215,713 @@ figure {
 	color: var(--ink-3);
 }
 
-.display {
-	font-size: var(--fs-display);
+.fine {
+	font-size: var(--fs-fine);
+	color: var(--ink-3);
+}
+
+/* ------------------------------------------------------------- date strip */
+
+.strip {
+	background: var(--navy-dark);
+	color: var(--on-navy-2);
+	font-size: var(--fs-fine);
+}
+
+.strip__inner {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	min-height: 2.25rem;
+	flex-wrap: wrap;
+}
+
+.strip__sep {
+	width: 1px;
+	height: 0.9em;
+	background: currentColor;
+	opacity: 0.4;
+}
+
+/* ---------------------------------------------------------------- the bar */
+
+.bar {
+	background: var(--navy);
+	color: var(--on-navy);
+	position: relative;
+	z-index: 20;
+}
+
+.bar__inner {
+	display: flex;
+	align-items: center;
+	gap: var(--space-4);
+	flex-wrap: wrap;
+	padding-block: var(--space-3);
+}
+
+.brand {
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+/* The brand splits by tone, not by hue. A green here would be the action
+   colour used decoratively, which is the one thing this world forbids. */
+.brand__b {
+	color: var(--on-navy-2);
+	font-weight: 500;
+}
+
+.bar__menus {
+	display: flex;
+	align-items: center;
+	gap: var(--space-1);
+	flex-wrap: wrap;
+	flex: 1;
+}
+
+.bar__link,
+.menu__top {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	min-height: 2.25rem;
+	padding-inline: var(--space-3);
+	color: var(--on-navy-2);
+	font-weight: 600;
+	font-size: var(--fs-fine);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+	list-style: none;
+}
+
+.menu__top::-webkit-details-marker {
+	display: none;
+}
+
+.bar__link:hover,
+.menu__top:hover,
+.menu[open] .menu__top {
+	background: var(--navy-lift);
+	color: var(--on-navy);
+}
+
+.menu {
+	position: relative;
+}
+
+.menu__chev {
+	width: 0.6em;
+	height: 0.6em;
+	flex: none;
+	transition: transform 0.12s ease;
+}
+
+.menu[open] .menu__chev {
+	transform: rotate(180deg);
+}
+
+.menu__panel {
+	list-style: none;
+	margin: 0;
+	padding: var(--space-2) 0;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 25;
+	min-width: 15rem;
+	max-height: 22rem;
+	overflow-y: auto;
+	background: var(--paper);
+	color: var(--ink);
+	border: 1px solid var(--rule);
+	box-shadow: 0 14px 34px rgb(14 25 54 / 0.22);
+}
+
+.menu__panel a {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	padding: var(--space-2) var(--space-4);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.menu__panel a:hover {
+	background: var(--ground-2);
+}
+
+.menu__n {
+	color: var(--ink-3);
+	font-size: var(--fs-fine);
+}
+
+.bar__search {
+	display: flex;
+	align-items: center;
+	background: var(--navy-lift);
+	border: 1px solid rgb(255 255 255 / 0.18);
+	min-width: 0;
+}
+
+.bar__search:focus-within {
+	outline: 2px solid #fff;
+	outline-offset: 1px;
+}
+
+.bar__search input {
+	font: inherit;
+	font-size: var(--fs-fine);
+	color: #fff;
+	background: transparent;
+	border: 0;
+	padding: 0 var(--space-3);
+	min-height: 2.25rem;
+	width: 9rem;
+	min-width: 0;
+}
+
+.bar__search input::placeholder {
+	color: var(--on-navy-2);
+}
+
+.bar__search input:focus {
+	outline: none;
+}
+
+.bar__search button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	flex: none;
+	border: 0;
+	background: transparent;
+	color: var(--on-navy);
+	cursor: pointer;
+}
+
+.bar__search button svg {
+	width: 1.05rem;
+	height: 1.05rem;
+}
+
+.bar__search button:hover {
+	background: rgb(255 255 255 / 0.12);
+}
+
+@media (max-width: 47.99rem) {
+	/* `width: 100%` alone did not drop the menus onto their own row — the base
+	   rule's `flex: 1` sets a basis of 0, so they kept squeezing in beside the
+	   brand and ran off the right edge. The basis has to be the thing that
+	   changes. They wrap rather than scroll, because a `<details>` panel inside
+	   an `overflow-x: auto` strip is clipped by it. */
+	.bar__menus {
+		order: 3;
+		flex: 1 0 100%;
+		flex-wrap: wrap;
+	}
+	.bar__search {
+		flex: 1;
+	}
+	.bar__search input {
+		width: auto;
+		flex: 1;
+	}
+	.menu__panel {
+		min-width: min(15rem, calc(100vw - 2.25rem));
+	}
+}
+
+/* ------------------------------------------------------------- page head */
+
+.head {
+	background: var(--paper);
+	border-bottom: 1px solid var(--rule);
+	padding-block: var(--space-5);
+}
+
+.head__title {
+	font-size: var(--fs-title);
 	line-height: 1.15;
 	letter-spacing: -0.02em;
 	font-weight: 700;
 	text-wrap: balance;
 }
 
-.fine {
+.head__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2) var(--space-4);
+	margin-top: var(--space-2);
+	color: var(--ink-3);
+}
+
+.head--closed .head__title {
+	color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------------ shell */
+
+.shell {
+	padding-block: var(--space-5) var(--space-7);
+	display: grid;
+	gap: var(--space-6);
+	align-items: start;
+}
+
+@media (min-width: 64rem) {
+	.shell {
+		grid-template-columns: minmax(0, 1fr) var(--side);
+		gap: var(--space-6);
+	}
+	.shell--solo {
+		grid-template-columns: minmax(0, 1fr);
+		max-width: 52rem;
+	}
+}
+
+.shell__main {
+	min-width: 0;
+}
+
+/* The listing page is one document rather than a feed, so its column is a
+   single sheet of paper instead of a stack of cards. */
+.shell__main--paper {
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding: var(--space-5);
+}
+
+@media (min-width: 46rem) {
+	.shell__main--paper {
+		padding: var(--space-6);
+	}
+}
+
+/* ----------------------------------------------------------------- blocks */
+
+.block + .block,
+.block + .ad {
+	margin-top: var(--space-6);
+}
+
+.block__head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	/* One heading treatment across the whole site: uppercase label over a navy
+	   underrule, the same as .side__head. An accent bar down the left edge was
+	   the alternative and it read as a second, competing convention. */
+	padding-bottom: var(--space-2);
+	margin-bottom: var(--space-4);
+	border-bottom: 2px solid var(--navy);
+}
+
+.block__title {
+	font-size: var(--fs);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.block__note {
+	color: var(--ink-3);
+	white-space: nowrap;
+}
+
+.block__note--lead {
+	white-space: normal;
+	margin-top: var(--space-4);
+}
+
+.block--quiet .block__head {
+	border-bottom-color: var(--rule);
+}
+
+/* ------------------------------------------------------------------- feed */
+
+.feed {
+	display: grid;
+	gap: var(--space-4);
+}
+
+.card {
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	display: grid;
+	overflow: hidden;
+}
+
+.card__thumb {
+	display: block;
+	background: var(--ground-2);
+	border-bottom: 1px solid var(--rule);
+}
+
+.card__thumb img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	object-position: center top;
+}
+
+.card__body {
+	padding: var(--space-4);
+	min-width: 0;
+}
+
+.card__title {
+	font-size: var(--fs-card);
+	line-height: 1.25;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	text-wrap: balance;
+}
+
+.card__title a {
+	text-decoration: none;
+}
+
+.card__title a:hover {
+	text-decoration: underline;
+	text-decoration-color: currentColor;
+}
+
+.card__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	margin-top: var(--space-2);
 	font-size: var(--fs-fine);
 	color: var(--ink-3);
 }
 
-/* ------------------------------------------------------------ status field */
-/* Colour commits at region scale: the field owns its full width. */
-
-.field {
-	background: var(--live-field);
-	color: var(--live-on);
+.card__dot {
+	width: 3px;
+	height: 3px;
+	border-radius: 50%;
+	background: currentColor;
+	flex: none;
+	opacity: 0.6;
 }
 
-.field a {
-	color: inherit;
-}
-
-.field--closed {
-	background: var(--closed);
-}
-
-.field__inner {
-	padding-block: var(--space-5) var(--space-5);
-}
-
-.field .display {
-	color: var(--on-field);
-}
-
-.field__meta {
-	margin-top: var(--space-2);
-	color: var(--live-on-2);
+.chips {
+	list-style: none;
+	margin: var(--space-3) 0 0;
+	padding: 0;
 	display: flex;
 	flex-wrap: wrap;
-	gap: var(--space-1) var(--space-4);
+	gap: var(--space-2);
 }
 
-.field--closed .field__meta {
-	/* 4.57:1 on --closed. The previous #d7dbdf sat at 4.40. */
-	color: var(--closed-on-2);
+.chips li {
+	background: var(--ground-2);
+	border: 1px solid var(--rule);
+	padding: 0.15rem var(--space-3);
+	font-size: var(--fs-fine);
 }
 
-/* Inside a status field the mark sits on its own colour, so the reversed value
-   has to be stated: `.mark--open{color:var(--live)}` is a direct rule and beats
-   anything the field inherits down. Green on green is invisible. */
-.field .mark {
-	color: var(--live-on);
+.chips b {
+	font-weight: 600;
+	color: var(--ink-3);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	margin-right: 0.35em;
 }
 
-.field--closed .mark {
-	color: var(--closed-on-2);
+.chips em {
+	font-style: normal;
+	color: var(--ink-3);
+}
+
+.card__excerpt {
+	margin-top: var(--space-3);
+	color: var(--ink-2);
+	max-width: var(--measure);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.card__go {
+	margin-top: var(--space-3);
+}
+
+.card__go a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45em;
+	font-weight: 700;
+	font-size: var(--fs-fine);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--live);
+	text-decoration: none;
+}
+
+.card__go svg {
+	width: 0.8em;
+	height: 0.8em;
+	transition: transform 0.15s ease;
+}
+
+.card__go a:hover {
+	text-decoration: underline;
+}
+
+.card__go a:hover svg {
+	transform: translateX(2px);
+}
+
+.card--closed .card__title a,
+.card--closed .card__excerpt {
+	color: var(--ink-2);
+}
+
+/* Side-by-side once there is room for the thumbnail to stay legible. Below
+   this, a 280px image in a 320px column is a stamp, so it goes full width. */
+@media (min-width: 34rem) {
+	.card {
+		grid-template-columns: 15rem minmax(0, 1fr);
+	}
+	/* The thumbnail keeps its own 4:3 and sits at the top of its column. It is
+	   deliberately not stretched to the card's height: the body is always
+	   taller, so filling it meant `object-fit: cover` scaling the drawing up
+	   and slicing a third off both sides — "Siemens" arrived as "iemens" and
+	   APPLY NOW as PLY NOW. The dividing rule moves to the body instead, which
+	   does run full height. */
+	.card__thumb {
+		border-bottom: 0;
+		/* Centred, not top-aligned. The body is always a little taller than a 4:3
+		   thumbnail, and hanging the image from the top left the slack pooled
+		   underneath as a void; split across both edges it reads as the media
+		   column's own padding. */
+		align-self: center;
+	}
+	.card__body {
+		padding: var(--space-5);
+		border-left: 1px solid var(--rule);
+	}
+}
+
+@media (min-width: 48rem) {
+	.card {
+		grid-template-columns: 19.5rem minmax(0, 1fr);
+	}
+}
+
+/* ---------------------------------------------------------------- sidebar */
+
+.side-col {
+	display: grid;
+	gap: var(--space-4);
+	align-content: start;
+	min-width: 0;
+}
+
+.side {
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding: var(--space-4);
+}
+
+.side__head {
+	font-size: var(--fs-fine);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ink);
+	padding-bottom: var(--space-3);
+	border-bottom: 2px solid var(--navy);
+	margin-bottom: var(--space-3);
+}
+
+.side__note,
+.side__body {
+	color: var(--ink-3);
+	font-size: var(--fs-fine);
+}
+
+.side__note {
+	margin-top: calc(var(--space-3) * -1 + var(--space-1));
+	margin-bottom: var(--space-3);
+}
+
+.side__all {
+	display: inline-block;
+	margin-top: var(--space-3);
+	font-weight: 700;
+	font-size: var(--fs-fine);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--live);
+	text-decoration: none;
+}
+
+.side__all:hover {
+	text-decoration: underline;
+}
+
+.side--flat {
+	background: transparent;
+	border-style: dashed;
+}
+
+.minis {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.minis li {
+	padding-block: var(--space-3);
+	border-bottom: 1px solid var(--rule);
+}
+
+.minis li:first-child {
+	padding-top: 0;
+}
+
+.minis li:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.minis a {
+	display: block;
+	font-weight: 600;
+	line-height: 1.35;
+	text-decoration: none;
+}
+
+.minis a:hover {
+	text-decoration: underline;
+}
+
+.minis__when {
+	display: block;
+	margin-top: 2px;
+	font-size: var(--fs-fine);
+	color: var(--ink-3);
+}
+
+/* Channel buttons. Rendered only when a real channel URL is configured — see
+   Sidebar.tsx. */
+.joins {
+	display: grid;
+	gap: var(--space-3);
+}
+
+.join {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	min-height: 3rem;
+	padding-inline: var(--space-4);
+	color: #fff;
+	font-weight: 700;
+	line-height: 1.2;
+	text-decoration: none;
+}
+
+.join svg {
+	width: 1.25rem;
+	height: 1.25rem;
+	flex: none;
+}
+
+.join--tg {
+	background: var(--tg);
+}
+
+.join--wa {
+	background: var(--wa);
+}
+
+.join:hover {
+	filter: brightness(0.92);
+}
+
+@media (min-width: 64rem) {
+	/* The sidebar is taller than the viewport on every page; pinning the ad
+	   alone would leave it floating beside nothing. */
+	.side-col .ad {
+		position: sticky;
+		top: var(--space-4);
+	}
+}
+
+/* ------------------------------------------------------------------ share */
+
+.share {
+	margin-top: var(--space-5);
+	padding-top: var(--space-4);
+	border-top: 1px solid var(--rule);
+}
+
+.share__label {
+	display: block;
+	font-size: var(--fs-fine);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	margin-bottom: var(--space-3);
+}
+
+.share__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2);
+}
+
+.share__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	min-height: 2.5rem;
+	padding-inline: var(--space-4);
+	color: #fff;
+	font-weight: 600;
+	font-size: var(--fs-fine);
+	text-decoration: none;
+}
+
+.share__btn svg {
+	width: 1rem;
+	height: 1rem;
+	flex: none;
+}
+
+.share__btn--wa {
+	background: var(--wa);
+}
+.share__btn--tg {
+	background: var(--tg);
+}
+.share__btn--li {
+	background: var(--li);
+}
+
+.share__btn:hover {
+	filter: brightness(0.92);
 }
 
 /* ------------------------------------------------------------------- marks */
@@ -266,25 +952,28 @@ figure {
 	color: var(--closed);
 }
 
-/* ------------------------------------------------------------- listing rows */
+/* --------------------------------------------------------- compact rows */
+/* Used for the closed tail, where a full card would over-serve a listing
+   nobody can act on. */
 
 .rows {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding-inline: var(--space-4);
 }
 
 .row {
 	border-bottom: 1px solid var(--rule);
-	padding-block: var(--space-5);
+	padding-block: var(--space-4);
 }
 
 .row:last-child {
 	border-bottom: 0;
 }
 
-/* The date rail: a fixed anchor every row shares, so a long scan never loses
-   its place. */
 .row__rail {
 	display: flex;
 	align-items: baseline;
@@ -309,6 +998,16 @@ figure {
 
 .row__role:hover .row__company {
 	text-decoration-color: currentColor;
+}
+
+.row--closed .row__company,
+.row--closed .row__role {
+	color: var(--ink-2);
+	font-weight: 400;
+}
+
+.row--closed .facts dd {
+	color: var(--ink-2);
 }
 
 /* Key-value rails. Label and value share one size. */
@@ -336,26 +1035,36 @@ figure {
 	color: var(--ink-3);
 }
 
-/* Closed listings stay on the page in a lower register rather than vanishing —
-   a reader who saw it yesterday should find out it closed, not meet a gap. */
-.row--closed .row__company,
-.row--closed .row__role {
+.facts--head {
+	margin-top: 0;
+	padding-bottom: var(--space-5);
+	border-bottom: 1px solid var(--rule);
+}
+
+/* Values that are also routes. The rail's other values are plain text, so
+   these need an underline a reader can actually see — the global link rule
+   tints it --rule, which vanishes against paper. */
+.links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-1) var(--space-3);
+}
+
+.links a {
+	text-decoration-color: var(--ink-3);
+}
+
+.links a:hover {
+	text-decoration-color: currentColor;
+	text-decoration-thickness: 2px;
+}
+
+.empty {
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding: var(--space-6) var(--space-4);
 	color: var(--ink-2);
-	font-weight: 400;
-}
-
-.row--closed .facts dd {
-	color: var(--ink-2);
-}
-
-.closed-tail {
-	margin-top: var(--space-6);
-	padding-top: var(--space-4);
-	border-top: 1px solid var(--rule);
-}
-
-.closed-tail__head {
-	margin-bottom: var(--space-2);
+	text-align: center;
 }
 
 /* ----------------------------------------------------------------- actions */
@@ -393,20 +1102,76 @@ figure {
 	cursor: not-allowed;
 }
 
+.apply__out {
+	width: 0.8em;
+	height: 0.8em;
+	flex: none;
+}
+
+.act {
+	margin-top: var(--space-5);
+	display: grid;
+	gap: var(--space-2);
+}
+
+.act__note {
+	text-align: center;
+}
+
+@media (min-width: 46rem) {
+	.act .apply--block {
+		width: auto;
+		min-width: 22rem;
+		justify-self: start;
+	}
+	.act__note {
+		text-align: left;
+	}
+}
+
+.src {
+	margin-top: var(--space-5);
+	padding-top: var(--space-4);
+	border-top: 1px solid var(--rule);
+}
+
+.back {
+	margin-top: var(--space-5);
+}
+
+.back a {
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.back a:hover {
+	text-decoration: underline;
+}
+
+.recent {
+	margin-top: var(--space-5);
+}
+
 /* --------------------------------------------------------------- ad slots */
 /* Height is reserved now so that adding the script later shifts nothing.
    Never placed above the first content block. */
 
 .ad {
 	display: block;
-	margin-block: var(--space-6);
-	padding-top: var(--space-2);
-	border-top: 1px solid var(--rule);
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding: var(--space-3);
 	overflow: hidden;
 }
 
-/* The marker stays when the script goes live — the label belongs above the
-   unit either way, and a reserved box with nothing in it reads as breakage. */
+.ad--feed {
+	margin-top: var(--space-4);
+}
+
+.ad--foot {
+	margin-top: var(--space-6);
+}
+
 .ad::before {
 	content: 'Advertisement';
 	display: block;
@@ -415,8 +1180,8 @@ figure {
 	font-size: var(--fs-fine);
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	/* The marker is quiet but it is still text a reader may need to identify as
-	   an ad boundary, so it holds 4.5:1 rather than fading toward the rule. */
+	/* Quiet, but still text a reader may need in order to identify an ad
+	   boundary, so it holds 4.5:1 rather than fading toward the rule. */
 	color: var(--ink-3);
 }
 
@@ -446,42 +1211,21 @@ figure {
 		min-height: 90px;
 		max-width: 728px;
 	}
-	.ad--foot .ad__inner {
-		min-height: 280px;
-		max-width: 336px;
-	}
-}
-
-/* The desktop margin was carrying nothing. Below this width the rail is not
-   rendered at all rather than stacked into the reading column. */
-.rail {
-	display: none;
-}
-
-@media (min-width: 64rem) {
-	.with-rail {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) 300px;
-		gap: var(--space-7);
-		max-width: 60rem;
-	}
-	.rail {
-		display: block;
-	}
-	.rail .ad {
-		position: sticky;
-		top: var(--space-5);
-		/* Matches the first row's top padding so the rail's hairline starts level
-		   with the first listing, never above it. */
-		margin-block: var(--space-5) 0;
-	}
 }
 
 /* ------------------------------------------------------------------ browse */
 
-.browse {
+.facets {
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding: var(--space-4);
 	display: grid;
 	gap: var(--space-5);
+}
+
+.facet__head {
+	font-size: var(--fs);
+	font-weight: 700;
 }
 
 .facet__list {
@@ -507,10 +1251,78 @@ figure {
 	color: var(--ink-3);
 }
 
+.more {
+	margin-top: var(--space-6);
+	padding-top: var(--space-4);
+	border-top: 1px solid var(--rule);
+}
+
+.more__head {
+	margin-bottom: var(--space-3);
+}
+
+.more__links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2) var(--space-4);
+}
+
+.more__links a {
+	text-decoration: none;
+	border-bottom: 1px solid var(--rule);
+}
+
+.more__links a:hover {
+	border-bottom-color: var(--ink);
+}
+
+/* ------------------------------------------------------------ category grid */
+
+.cats {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	/* Borders on the cells, not a 1px gap over a tinted ground: a grid whose
+	   last row is short leaves empty tracks, and the tinted-ground trick paints
+	   those as grey blocks that read as broken cards. */
+	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+	border-top: 1px solid var(--rule);
+	border-left: 1px solid var(--rule);
+}
+
+.cats li {
+	border-right: 1px solid var(--rule);
+	border-bottom: 1px solid var(--rule);
+}
+
+.cats a {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-3);
+	height: 100%;
+	background: var(--paper);
+	padding: var(--space-3) var(--space-4);
+	text-decoration: none;
+	font-weight: 600;
+	min-height: 3rem;
+}
+
+.cats a:hover {
+	background: var(--ground-2);
+}
+
+.cats span {
+	color: var(--ink-3);
+	font-weight: 400;
+}
+
 /* ------------------------------------------------------------------ prose */
 
 .prose {
 	margin-top: var(--space-5);
+	max-width: var(--measure);
 }
 
 .prose > * + * {
@@ -557,317 +1369,6 @@ figure {
 	text-decoration-color: var(--ink-3);
 }
 
-@media (prefers-reduced-motion: reduce) {
-	*,
-	*::before,
-	*::after {
-		animation-duration: 0.01ms !important;
-		transition-duration: 0.01ms !important;
-	}
-}
-
-
-/* ---------------------------------------------------------------------------
-   Component styles.
-
-   Astro scoped these per component; Next has no equivalent, and splitting them
-   into CSS modules would fragment a design system whose whole premise is a
-   small shared vocabulary. They live here, in source order, under the same
-   class names — so the markup that moved across did not have to change.
-
-   The `:global(...)` and `data-astro-cid` wrappers are gone; nothing else is.
---------------------------------------------------------------------------- */
-
-/* ---- layout: masthead, footer, skip link ---- */
-	.skip {
-		position: absolute;
-		left: -9999px;
-		top: 0;
-		background: var(--ink);
-		color: #fff;
-		padding: var(--space-3) var(--space-4);
-		z-index: 10;
-	}
-
-	.skip:focus {
-		left: 0;
-	}
-
-	.masthead {
-		border-bottom: 2px solid var(--rule-strong);
-	}
-
-	.masthead__inner {
-		padding-block: var(--space-4);
-	}
-
-	.brand {
-		display: inline-block;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		text-decoration: none;
-		font-size: var(--fs);
-	}
-
-	.brand__dot {
-		color: var(--live);
-	}
-
-	.masthead__lines {
-		margin-top: var(--space-1);
-	}
-
-	.masthead__line {
-		color: var(--ink-3);
-	}
-
-	/* The third line the contract promises, and the trust claim this audience
-	   needs: a job board that says what it checks. Kept to one line at every
-	   width — the masthead is the tax the visitor pays before the listings.
-	   Set at --fs like everything else: the world's rank comes from weight and
-	   colour, and a third size stacked in one block is the exception that
-	   would prove the rule wrong. */
-	.masthead__promise {
-		color: var(--ink-3);
-	}
-
-	.foot {
-		border-top: 1px solid var(--rule);
-		margin-top: var(--space-7);
-		padding-block: var(--space-5) var(--space-7);
-		background: var(--ground-2);
-	}
-
-	.foot__nav {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2) var(--space-5);
-		margin-bottom: var(--space-4);
-	}
-
-	.foot__nav a {
-		text-decoration: none;
-		border-bottom: 1px solid var(--rule);
-	}
-
-	.foot__nav a:hover {
-		border-bottom-color: var(--ink);
-	}
-
-	.foot .fine {
-		max-width: 42rem;
-	}
-
-	@media (min-width: 46rem) {
-		.masthead__inner {
-			display: flex;
-			align-items: baseline;
-			gap: var(--space-5);
-		}
-
-	}
-
-/* ---- category strip ---- */
-	.nav {
-		border-bottom: 1px solid var(--rule);
-		background: var(--ground-2);
-	}
-
-	.nav__scroll {
-		display: flex;
-		align-items: center;
-		gap: var(--space-4);
-		overflow-x: auto;
-		overscroll-behavior-x: contain;
-		padding-block: var(--space-3);
-		scrollbar-width: thin;
-		scrollbar-color: var(--rule) transparent;
-		/* Fade the right edge so a clipped item reads as "there is more" rather
-		   than as a word cut in half. A mask reads only the alpha channel, so the
-		   opaque stop is currentColor rather than a literal — there is no colour
-		   decision here to keep in the palette. */
-		mask-image: linear-gradient(to right, currentColor calc(100% - 2rem), transparent 100%);
-	}
-
-	.nav__scroll::-webkit-scrollbar {
-		height: 4px;
-	}
-
-	.nav__scroll::-webkit-scrollbar-thumb {
-		background: var(--rule);
-	}
-
-	.nav__group {
-		display: flex;
-		align-items: center;
-		gap: var(--space-3);
-		white-space: nowrap;
-	}
-
-	.nav__group + .nav__group {
-		border-left: 1px solid var(--rule);
-		padding-left: var(--space-4);
-	}
-
-	.nav__label {
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--ink-3);
-	}
-
-	.nav__item {
-		white-space: nowrap;
-		text-decoration: none;
-		border-bottom: 2px solid transparent;
-		padding-bottom: 1px;
-	}
-
-	.nav__item:hover {
-		border-bottom-color: var(--ink);
-	}
-
-	.nav__item.is-current {
-		font-weight: 700;
-		border-bottom-color: var(--live);
-	}
-
-	.nav__item--home {
-		font-weight: 600;
-	}
-
-	/* Desktop has the room, so nothing scrolls and nothing is clipped: the strip
-	   wraps and the fade comes off. */
-	@media (min-width: 64rem) {
-		.nav__scroll {
-			flex-wrap: wrap;
-			row-gap: var(--space-2);
-			overflow-x: visible;
-			mask-image: none;
-		}
-
-/* ---- listing rows ---- */
-	.empty {
-		padding-block: var(--space-6);
-		color: var(--ink-2);
-	}
-
-	.row--ad {
-		border-bottom: 0;
-		padding-block: 0;
-	}
-
-/* ---- homepage browse block ---- */
-	.browse {
-		margin-top: var(--space-6);
-		padding-top: var(--space-5);
-	}
-
-	.browse__title {
-		margin-bottom: var(--space-4);
-	}
-
-	.facet__head {
-		font-size: var(--fs);
-		font-weight: 700;
-	}
-
-/* ---- listing page ---- */
-	/* Values that are also routes. Underlined so they read as links inside a
-	   rail whose other values are plain text. */
-	.links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-1) var(--space-3);
-	}
-
-	.apply__out {
-		width: 0.8em;
-		height: 0.8em;
-		flex: none;
-	}
-
-	.more {
-		margin-top: var(--space-6);
-		padding-top: var(--space-4);
-	}
-
-	.more__head {
-		margin-bottom: var(--space-3);
-	}
-
-	.more__links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2) var(--space-4);
-	}
-
-	.more__links a {
-		text-decoration: none;
-		border-bottom: 1px solid var(--rule);
-	}
-
-	.more__links a:hover {
-		border-bottom-color: var(--ink);
-	}
-
-	.facts--head {
-		margin-top: var(--space-5);
-		padding-bottom: var(--space-5);
-		border-bottom: 1px solid var(--rule);
-	}
-
-	/* The draft's own quick-facts table opens the markdown body, and the rail
-	   above already states the same four facts directly under the status field.
-	   Showing both reads as a page that could not decide. The table stays in the
-	   markdown — the file is meant to stay portable to any other publisher — and
-	   nothing is lost from the page, because Qualification and Experience appear
-	   again under "Who Can Apply" a few lines further down. */
-	.prose--listing table:first-of-type {
-		display: none;
-	}
-
-	.act {
-		margin-top: var(--space-5);
-		display: grid;
-		gap: var(--space-2);
-	}
-
-	.act__note {
-		text-align: center;
-	}
-
-	.src {
-		margin-top: var(--space-5);
-		padding-top: var(--space-4);
-		border-top: 1px solid var(--rule);
-	}
-
-		.act .apply--block {
-			width: auto;
-			min-width: 22rem;
-		}
-
-/* ---- cluster page ---- */
-	.back {
-		margin-top: var(--space-6);
-		padding-top: var(--space-4);
-	}
-
-	.back a {
-		text-decoration: none;
-		font-weight: 600;
-	}
-
-	.back a:hover {
-		text-decoration: underline;
-	}
-
-/* ---- not found ---- */
-	.recent {
-		margin-top: var(--space-5);
-	}
-
 /* ---- company mark ---- */
 
 .mono {
@@ -880,8 +1381,6 @@ figure {
 	font-size: 0.8125rem;
 	letter-spacing: 0.02em;
 	line-height: 1;
-	/* Square, not round: the world has no radius anywhere else, and a circle
-	   here would be the only curve on the page. */
 	border-radius: 0;
 }
 
@@ -895,7 +1394,10 @@ figure {
 /* ---- search ---- */
 
 .search {
-	margin-block: var(--space-4);
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding: var(--space-4);
+	margin-bottom: var(--space-5);
 }
 
 .search__label {
@@ -926,7 +1428,7 @@ figure {
 	min-width: 0;
 	font: inherit;
 	color: var(--ink);
-	background: var(--ground);
+	background: var(--paper);
 	border: 0;
 	padding: 0.7rem 0.85rem;
 	min-height: 2.75rem;
@@ -940,8 +1442,6 @@ figure {
 	outline: none;
 }
 
-/* The whole control takes the focus ring, not the bare input — the button is
-   part of the same object. */
 .search__row:focus-within {
 	outline: 2px solid var(--focus);
 	outline-offset: 2px;
@@ -965,8 +1465,10 @@ figure {
 /* ---- scan table ---- */
 
 .tablewrap {
+	background: var(--paper);
+	border: 1px solid var(--rule);
+	padding-inline: var(--space-4);
 	overflow-x: auto;
-	margin-block: var(--space-4);
 }
 
 .jobtable {
@@ -991,7 +1493,7 @@ figure {
 	text-transform: uppercase;
 	color: var(--ink-3);
 	border-bottom: 2px solid var(--rule-strong);
-	padding: var(--space-2) var(--space-4) var(--space-2) 0;
+	padding: var(--space-3) var(--space-4) var(--space-3) 0;
 	white-space: nowrap;
 }
 
@@ -1005,12 +1507,38 @@ figure {
 	border-bottom: 0;
 }
 
+/* Not `display: flex`. A flex `<td>` stops being a table cell, gets wrapped in
+   an anonymous one, and shrinks to its content — which left the row's rule
+   visibly short under this column and continuous under every other. The
+   monogram is aligned inline instead. */
 .jobtable__co {
-	display: flex;
-	align-items: center;
-	gap: var(--space-3);
 	font-weight: 700;
 	white-space: nowrap;
+}
+
+.jobtable__co .mono {
+	vertical-align: middle;
+	margin-right: var(--space-3);
+}
+
+.jobtable__co a {
+	vertical-align: middle;
+}
+
+/* The table is two columns of links; the global rule tints their underline
+   --rule, which is invisible against paper. */
+.jobtable td a {
+	text-decoration-color: var(--ink-3);
+}
+
+.jobtable td a:hover {
+	text-decoration-color: currentColor;
+	text-decoration-thickness: 2px;
+}
+
+.jobtable__apply,
+.jobtable__apply:hover {
+	text-decoration: none;
 }
 
 .jobtable__closes {
@@ -1040,82 +1568,67 @@ figure {
 	padding-inline: 0;
 }
 
-/* ---- sections ---- */
+/* ----------------------------------------------------------------- footer */
 
-.section {
-	margin-top: var(--space-6);
-	padding-top: var(--space-4);
-	border-top: 1px solid var(--rule);
+.foot {
+	background: var(--navy);
+	color: var(--on-navy-2);
+	padding-block: var(--space-6) var(--space-7);
 }
 
-.section--lead {
-	border-top: 0;
-	padding-top: 0;
+.foot__top {
+	display: grid;
+	gap: var(--space-5);
+	padding-bottom: var(--space-5);
+	margin-bottom: var(--space-5);
+	border-bottom: 1px solid rgb(255 255 255 / 0.15);
 }
 
-.section__head {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: var(--space-4);
+@media (min-width: 46rem) {
+	.foot__top {
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: start;
+		gap: var(--space-6);
+	}
+}
+
+.brand--foot {
+	display: block;
+	color: var(--on-navy);
 	margin-bottom: var(--space-2);
 }
 
-.section__title {
-	font-size: var(--fs);
-	font-weight: 700;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+.foot__tag {
+	max-width: 28rem;
 }
 
-.section__more {
-	color: var(--ink-3);
-	white-space: nowrap;
-}
-
-.section__note {
-	color: var(--ink-3);
-	margin-bottom: var(--space-3);
-}
-
-/* ---- category grid ---- */
-
-.cats {
-	list-style: none;
-	margin: var(--space-3) 0 0;
-	padding: 0;
-	display: grid;
-	/* Borders on the cells, not a 1px gap over a tinted ground: a grid whose
-	   last row is short leaves empty tracks, and the tinted-ground trick paints
-	   those as grey blocks that read as broken cards. */
-	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-	border-top: 1px solid var(--rule);
-	border-left: 1px solid var(--rule);
-}
-
-.cats li {
-	border-right: 1px solid var(--rule);
-	border-bottom: 1px solid var(--rule);
-}
-
-.cats a {
+.foot__nav {
 	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: var(--space-3);
-	height: 100%;
-	background: var(--ground);
-	padding: var(--space-3) var(--space-4);
+	flex-wrap: wrap;
+	gap: var(--space-2) var(--space-5);
+}
+
+.foot__nav a {
+	color: var(--on-navy);
 	text-decoration: none;
 	font-weight: 600;
-	min-height: 3rem;
+	border-bottom: 1px solid rgb(255 255 255 / 0.3);
 }
 
-.cats a:hover {
-	background: var(--ground-2);
+.foot__nav a:hover {
+	border-bottom-color: currentColor;
 }
 
-.cats span {
-	color: var(--ink-3);
-	font-weight: 400;
+.foot .fine {
+	color: var(--on-navy-2);
+	max-width: 46rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
 }

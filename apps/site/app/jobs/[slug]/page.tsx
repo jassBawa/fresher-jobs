@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation';
 import { StatusMark } from '@/components/StatusMark';
 import { AdSlot } from '@/components/AdSlot';
 import { JobPostingSchema } from '@/components/JobPostingSchema';
-import { listingBySlug, publishedSlugs } from '@/lib/db';
+import { Share } from '@/components/Share';
+import { Sidebar } from '@/components/Sidebar';
+import { listingBySlug, publishedSlugs, liveListings, closingSoon } from '@/lib/db';
 import {
 	isExpired,
 	isIndexable,
@@ -44,6 +46,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 	const job = await listingBySlug(slug);
 	if (!job) notFound();
 
+	const [recent, closing] = await Promise.all([liveListings(), closingSoon()]);
 	const on = today();
 	const expired = isExpired(job, on);
 	const canonical = new URL(`/jobs/${job.slug}/`, process.env.SITE ?? 'http://localhost:3000').href;
@@ -61,12 +64,12 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 				<JobPostingSchema job={job} canonical={canonical} />
 			)}
 
-			<section className={expired ? 'field field--closed' : 'field'}>
-				<div className="wrap field__inner">
-					<h1 className="display">
+			<div className={expired ? 'head head--closed' : 'head'}>
+				<div className="wrap">
+					<h1 className="head__title">
 						{job.company} — {job.role}
 					</h1>
-					<p className="field__meta">
+					<p className="head__meta">
 						<StatusMark
 							status={statusOf(job, on)}
 							label={expired ? 'Applications closed' : undefined}
@@ -75,10 +78,11 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 						{job.postedAt && <span>Posted {shortDay(job.postedAt)}</span>}
 					</p>
 				</div>
-			</section>
+			</div>
 
-			<div className="wrap">
-				<dl className="facts facts--head">
+			<div className="wrap shell">
+				<div className="shell__main shell__main--paper">
+					<dl className="facts facts--head">
 					{batchLinks.length > 0 && (
 						<>
 							<dt>Batch</dt>
@@ -164,6 +168,8 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 					)}
 				</p>
 
+				<Share slug={job.slug} company={job.company} role={job.role} />
+
 				<div className="prose">
 					{job.summary && <p>{job.summary}</p>}
 
@@ -222,7 +228,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 					)}
 				</div>
 
-				<nav className="more rule-top" aria-label="More like this">
+				<nav className="more" aria-label="More like this">
 					<h2 className="label more__head">More like this</h2>
 					<p className="more__links">
 						{job.roleFamily && familyLabel && (
@@ -248,6 +254,9 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
 						.
 					</p>
 				)}
+				</div>
+
+				<Sidebar closing={closing} recent={recent.filter((r) => r.slug !== job.slug)} />
 			</div>
 		</article>
 	);

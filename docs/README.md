@@ -37,7 +37,9 @@ The pipeline and the site both work end to end on real data. Nothing is hosted.
   anything goes live, and a discarded listing needs `--force`.
 - **Site** — Next.js App Router on the database, prerendered with 15-minute
   revalidation. D5 implemented: listings mostly `noindex`, cluster pages as the
-  indexable surface, expiry, `JobPosting` structured data.
+  indexable surface, expiry, `JobPosting` structured data. Every listing renders
+  its own card image from its columns (D30), used as both the feed thumbnail and
+  the `og:image`.
 - **Not built** — hosting, and a second source. Domain is still open decision D2;
   the ATS adapters in [data-sources.md](./data-sources.md) are the bigger gap.
 

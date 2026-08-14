@@ -30,37 +30,39 @@ export default async function SearchPage({
 
 	return (
 		<>
-			<section className="field">
-				<div className="wrap field__inner">
-					<h1 className="display">
+			<div className="head">
+				<div className="wrap">
+					<h1 className="head__title">
 						{query ? `${results.length} matched “${query}”` : 'Search openings'}
 					</h1>
-					<p className="field__meta">
+					<p className="head__meta">
 						<span>Company, role, city, skill or batch year</span>
 					</p>
 				</div>
-			</section>
+			</div>
 
-			<div className="wrap">
-				<SearchBar q={query} />
+			<div className="wrap shell shell--solo">
+				<div className="shell__main">
+					<SearchBar q={query} />
 
-				{query && results.length === 0 && (
-					<p className="empty">
-						Nothing matched. Try a company name, a city, or a single skill —{' '}
-						<Link href="/">or browse everything open</Link>.
-					</p>
-				)}
+					{query && results.length === 0 && (
+						<p className="empty">
+							Nothing matched. Try a company name, a city, or a single skill —{' '}
+							<Link href="/">or browse everything open</Link>.
+						</p>
+					)}
 
-				{results.length > 0 && <JobTable listings={results} />}
+					{results.length > 0 && <JobTable listings={results} />}
 
-				{!query && (
-					<p className="section__note">
-						Type anything above. <Link href="/">Browse all openings</Link> if you would rather
-						look around.
-					</p>
-				)}
+					{!query && (
+						<p className="block__note block__note--lead">
+							Type anything above. <Link href="/">Browse all openings</Link> if you would
+							rather look around.
+						</p>
+					)}
 
-				<AdSlot placement="foot" />
+					<AdSlot placement="foot" />
+				</div>
 			</div>
 		</>
 	);
