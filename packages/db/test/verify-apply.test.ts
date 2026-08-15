@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyApplyPage, significantWords, visibleText, titleOf } from '../dist/verify-apply.js';
+import {
+	classifyApplyPage,
+	significantWords,
+	visibleText,
+	titleOf,
+	metaContent,
+	jsonLdTitles,
+} from '../dist/verify-apply.js';
 
 const page = (over = {}) => ({
 	status: 200,
@@ -113,4 +120,81 @@ test('the company being absent is its own signal', () => {
 	const r = classifyApplyPage(page({ html, role: '' }));
 	assert.equal(r.verdict, 'role_mismatch');
 	assert.match(r.note, /company absent/);
+});
+
+// ------------------------------------------------- client-rendered ATS shells
+
+test('a shell that names the role in og:title is live, not unverified', () => {
+	// The common case, and the reason a headless browser turned out unnecessary:
+	// the posting renders client-side but the shell still carries a link preview.
+	const html = `<title>Honeywell</title>
+		<meta property="og:title" content="Data Scientist I">
+		<body><div id="root"></div></body>`;
+	const r = classifyApplyPage(page({ html, role: 'Data Scientist & Data Analyst', company: 'Honeywell' }));
+	assert.equal(r.verdict, 'live');
+});
+
+test("an apostrophe in a meta value does not truncate it", () => {
+	// Honeywell's is literally "Intern (Bachelor's)". Capturing with [^"']+
+	// stops at the apostrophe and loses every word after it.
+	const html = `<meta property="og:title" content="Intern (Bachelor's) Software Engineer">`;
+	assert.equal(metaContent(html, 'og:title'), "Intern (Bachelor's) Software Engineer");
+});
+
+test('meta tags are read whichever order the attributes come in', () => {
+	assert.equal(metaContent('<meta content="Analyst-Data Science" property="og:title">', 'og:title'), 'Analyst-Data Science');
+});
+
+test('a JobPosting title in JSON-LD counts as the page naming the role', () => {
+	const ld = JSON.stringify({ '@type': 'JobPosting', title: 'Summer 2027 Intern - Software Engineer' });
+	const html = `<title>Workday</title><script type="application/ld+json">${ld}</script><body></body>`;
+	const r = classifyApplyPage(
+		page({
+			html,
+			// The company is its own signal, and on Workday it lives in the host.
+			finalUrl: 'https://salesforce.wd12.myworkdayjobs.com/External_Career_Site/job/JR337715',
+			role: 'Summer Software Engineer Intern',
+			company: 'Salesforce',
+		})
+	);
+	assert.equal(r.verdict, 'live');
+});
+
+test('malformed JSON-LD proves nothing and does not throw', () => {
+	assert.deepEqual(jsonLdTitles('<script type="application/ld+json">{not json</script>'), []);
+});
+
+test('a shell whose URL names the role is live, on weaker evidence', () => {
+	// Flex ships no og:title, but its path is /job/India-Pune/Junior-Engineer_WD.
+	const r = classifyApplyPage(
+		page({
+			html: '<title>Flex</title><body></body>',
+			finalUrl: 'https://flextronics.wd1.myworkdayjobs.com/en-US/Careers/job/India-Pune/Junior-Engineer_WD123',
+			role: 'Junior Engineer',
+			company: 'Flex',
+		})
+	);
+	assert.equal(r.verdict, 'live');
+	assert.match(r.note, /from the URL/);
+});
+
+test('the URL cannot rescue a page full of text about another job', () => {
+	// A careers category page has a role-shaped URL and plenty of prose, and is
+	// exactly what the HCLTech campus landing page looked like. The URL signal is
+	// allowed only when the page itself is empty.
+	const html = `<title>Careers</title><body>${filler(200)}</body>`;
+	const r = classifyApplyPage(
+		page({
+			html,
+			finalUrl: 'https://careers.example.com/graduate-engineer-trainee-jobs',
+			role: 'Graduate Engineer Trainee',
+			company: 'Example',
+		})
+	);
+	assert.equal(r.verdict, 'role_mismatch');
+});
+
+test('a shell with nothing naming the role still asks for a browser', () => {
+	const r = classifyApplyPage(page({ html: '<title>Careers</title><body></body>', role: 'Data Scientist' }));
+	assert.equal(r.verdict, 'needs_browser');
 });

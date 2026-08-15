@@ -31,20 +31,47 @@ if ! command -v pnpm >/dev/null 2>&1; then
   exit 127
 fi
 
+# The pipeline writes to Postgres now, so a scheduled run on a machine whose
+# Docker is not up fails deep inside the ingest with a connection error. Check
+# here instead, where the message can say what to do about it.
+DB_URL="${DATABASE_URL:-postgres://jobs:jobs@localhost:5432/jobs}"
+if ! docker compose ps --status running 2>/dev/null | grep -q jobs-db; then
+  log "db     not running — starting it"
+  docker compose up -d >>"$LOG" 2>&1 || { log "FAIL  could not start Postgres. Is Docker running?"; exit 1; }
+fi
+for _ in $(seq 1 20); do
+  docker exec jobs-db pg_isready -U jobs -d jobs >/dev/null 2>&1 && break
+  sleep 2
+done
+if ! docker exec jobs-db pg_isready -U jobs -d jobs >/dev/null 2>&1; then
+  log "FAIL  Postgres never became ready — check 'docker compose logs db'"
+  exit 1
+fi
+
 log "start  $(pnpm --version 2>/dev/null | tail -1) · node $(node -v)"
 
 if pnpm run ingest >>"$LOG" 2>&1; then
-  DRAFTS=$(find apps/ingest/data/drafts -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
-  PUBLISHED=$(grep -l '^status: published' apps/ingest/data/drafts/*.md 2>/dev/null | wc -l | tr -d ' ')
-  log "ok     $DRAFTS drafts on disk · $PUBLISHED published · review with 'pnpm run drafts'"
+  COUNTS=$(docker exec jobs-db psql -U jobs -d jobs -tAc \
+    "select count(*) filter (where status='published') || ' published, ' ||
+            count(*) filter (where status='draft')     || ' awaiting review, ' ||
+            count(*) filter (where status='rejected')  || ' discarded' from jobs" 2>/dev/null)
+  log "ok     ${COUNTS:-ingest complete} · review with 'pnpm run drafts'"
 else
   log "FAIL   ingest exited non-zero — see $LOG"
   exit 1
 fi
 
+# Re-check apply links and retire any that have died since they were drafted.
+# This is the half that only works with a database behind it.
+if pnpm run verify:apply >>"$LOG" 2>&1; then
+  log "ok     apply links re-checked"
+else
+  log "warn   link verification failed — listings are unchanged, see $LOG"
+fi
+
 if [ "${1:-}" = "--build" ]; then
-  if SITE="${SITE:-http://localhost:4321}" pnpm run build >>"$LOG" 2>&1; then
-    log "ok     site rebuilt into apps/web/dist"
+  if SITE="${SITE:-http://localhost:3000}" pnpm run build >>"$LOG" 2>&1; then
+    log "ok     site rebuilt"
   else
     log "FAIL   site build failed — see $LOG"
     exit 1

@@ -33,7 +33,6 @@ and through it on drizzle and a Postgres driver.
 | `apps/ingest/scripts/export-markdown.mjs` | Postgres → markdown, so the data stays portable |
 | `packages/db/src/schema.ts` | The jobs table, indexes and migrations |
 | `packages/db/src/verify-apply.ts` | Apply-link verification and the discard policy |
-| `packages/schema/src/index.ts` | The fact/draft contracts: types, zod, JSON Schema |
 | `apps/site/lib/listings.ts` | Expiry horizon and the D5 indexing gate |
 | `apps/site/lib/db.ts` | Every query the site makes; clusters as SQL aggregates |
 | `scripts/daily.sh` | The scheduled run — fetch, draft, log. cron or launchd |

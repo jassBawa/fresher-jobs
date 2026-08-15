@@ -539,6 +539,56 @@ git history if it is ever wanted.
 
 ---
 
+## D25 — Read the shell, not a browser
+
+**Decision.** Before calling an apply page unverifiable, read its `og:title`,
+`twitter:title` and any `JobPosting` JSON-LD, and fall back to the slug in its
+URL path. No headless browser.
+
+**Why.** Seven of nineteen links were sitting at `needs_browser` — client-rendered
+ATS shells with an empty body. The obvious fix was Playwright, at roughly 300MB
+of browser download for a pipeline whose whole point is that it costs ₹9 a
+month.
+
+Probing the shells first showed it was unnecessary: four of five carried the
+real role in `og:title`, because every ATS wants a link preview to work, and one
+shipped a full JobPosting JSON-LD. The fifth had the role slugified in its URL.
+That is the entire signal a browser would have rendered, already in the HTML.
+
+Result: **17 of 19 links now verify, up from 9.** One remains genuinely
+unverifiable — Honeywell titles a posting "Intern (Bachelor's)" where the
+listing says "Intern Bachelors Software Engineer", so the page really does not
+name the role. That is a correct verdict, not a gap.
+
+**The URL is weaker evidence than the page, and the code says so.** A slugified
+role in the path only counts when the body is empty. It must never rescue a page
+full of prose about something else, because that is exactly what a careers
+category page looks like — the HCLTech landing page that started all of this.
+
+**Also fixed here:** capturing a meta value with `[^"']+` truncates at the first
+apostrophe, which turned `Intern (Bachelor's)` into `Intern (Bachelor`. Values
+are now captured by the delimiter that opened them.
+
+---
+
+## D26 — @jobs/schema removed
+
+**Decision.** Delete the package. The database schema is the contract now.
+
+**Why.** Nothing imported it after the Astro app went. It existed to validate
+markdown frontmatter with zod at build time, and that build no longer exists.
+
+Keeping it would have meant two hand-maintained descriptions of one contract,
+which is precisely the failure D18 was written about — the interface and the zod
+schema there drifted apart silently and broke every consumer. The Drizzle schema
+in `@jobs/db` is generated from, and migrated with, the actual table.
+
+**What was given up:** the JSON Schema files describing the exported markdown.
+The portability promise in D22 is now carried by the export itself rather than
+by a document about it.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |

@@ -68,16 +68,6 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
-  packages/schema:
-    dependencies:
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
-    devDependencies:
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-
 packages:
 
   '@drizzle-team/brocli@0.10.2':
@@ -1049,9 +1039,6 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
-
 snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
@@ -1693,5 +1680,3 @@ snapshots:
   typescript@5.9.3: {}
 
   undici-types@8.3.0: {}
-
-  zod@4.4.3: {}

@@ -30,7 +30,6 @@ fresher-jobs/                pnpm + Turborepo monorepo
 │   └── data/drafts/         markdown exported from the database
 ├── apps/site/               Next.js site (@jobs/site) — listings, clusters, sitemap
 ├── packages/db/             Postgres schema, migrations, link verification (@jobs/db)
-├── packages/schema/         shared types + JSON Schema + zod (@jobs/schema)
 ├── docs/                    research, strategy, decisions
 └── package.json             root scripts
 ```

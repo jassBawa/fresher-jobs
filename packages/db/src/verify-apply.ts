@@ -69,6 +69,66 @@ export const visibleText = (html: string): string =>
 export const titleOf = (html: string): string =>
 	(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? '').replace(/\s+/g, ' ').trim();
 
+/**
+ * A meta tag's content, whichever order the attributes come in.
+ *
+ * Captured by the delimiter that opened the value, because these routinely
+ * contain apostrophes — Honeywell's is literally `Intern (Bachelor's)`, and a
+ * `[^"']+` capture truncates it to `Intern (Bachelor`.
+ */
+export function metaContent(html: string, prop: string): string | null {
+	const p = prop.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	return (
+		html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${p}["'][^>]*content="([^"]*)"`, 'i'))?.[1] ??
+		html.match(new RegExp(`<meta[^>]+content="([^"]*)"[^>]*(?:property|name)=["']${p}["']`, 'i'))?.[1] ??
+		null
+	);
+}
+
+/** Titles from any JobPosting JSON-LD the page ships. */
+export function jsonLdTitles(html: string): string[] {
+	const out: string[] = [];
+	for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+		try {
+			const parsed = JSON.parse(m[1]!);
+			for (const node of Array.isArray(parsed) ? parsed : [parsed]) {
+				if (node?.['@type'] === 'JobPosting' && typeof node.title === 'string') out.push(node.title);
+			}
+		} catch {
+			/* a malformed block proves nothing either way */
+		}
+	}
+	return out;
+}
+
+/**
+ * Everything on the page that claims to name the job.
+ *
+ * The reason this exists: most Indian ATS platforms render the posting
+ * client-side, so the body is an empty shell — but the shell almost always
+ * still carries og:title or JSON-LD for the sake of link previews. Reading
+ * those turned four of five "needs a browser" verdicts into real ones without
+ * shipping a headless browser to do it.
+ */
+export const pageTitles = (html: string): string[] =>
+	[
+		titleOf(html),
+		metaContent(html, 'og:title'),
+		metaContent(html, 'twitter:title'),
+		...jsonLdTitles(html),
+	].filter((t): t is string => Boolean(t));
+
+/** Words in the URL path. Slugified role names live here — Flex's posting is
+ *  `/job/India-Pune/Junior-Engineer_WD123` — but a category page's URL reads
+ *  the same way, so this is weaker evidence than anything on the page. */
+export const pathWords = (url: string): string => {
+	try {
+		return decodeURIComponent(new URL(url).pathname).replace(/[^a-zA-Z0-9]+/g, ' ').toLowerCase();
+	} catch {
+		return '';
+	}
+};
+
 /** Only in a <title> is this phrasing trustworthy. In body text it matches
  *  cookie banners, related-jobs rails, and legal boilerplate — an earlier
  *  body-wide version of this check reported two live Amazon and Wipro
@@ -109,27 +169,44 @@ export function classifyApplyPage(input: {
 	}
 
 	const text = visibleText(html);
+	const titles = pageTitles(html).join(' ').toLowerCase();
 	const roleWords = significantWords(role);
 	const companyWords = significantWords(company);
-	const haystack = `${title.toLowerCase()} ${text}`;
 
-	const roleHits = roleWords.filter((w) => haystack.includes(w)).length;
-	const roleScore = roleWords.length === 0 ? 1 : roleHits / roleWords.length;
+	// What the page itself says, in descending order of trust: its own titles
+	// and body text. The URL is deliberately not in here.
+	const onPage = `${titles} ${text}`;
+	const score = (hay: string) =>
+		roleWords.length === 0 ? 1 : roleWords.filter((w) => hay.includes(w)).length / roleWords.length;
+
+	const roleScore = score(onPage);
 	const companySeen =
 		companyWords.length === 0 ||
-		companyWords.some((w) => haystack.includes(w) || finalUrl.toLowerCase().includes(w));
-
-	// A client-rendered shell: almost no text, and none of it about this job.
-	if (text.length < 1200 && roleScore < 0.5) {
-		return {
-			verdict: 'needs_browser',
-			note: `client-rendered shell (${text.length} chars of text)`,
-			finalUrl,
-		};
-	}
+		companyWords.some((w) => onPage.includes(w) || finalUrl.toLowerCase().includes(w));
 
 	if (roleScore >= 0.5 && companySeen) {
 		return { verdict: 'live', note: `role match ${Math.round(roleScore * 100)}%`, finalUrl };
+	}
+
+	// A client-rendered shell: almost no text, and nothing on the page naming
+	// this job. The URL is allowed to speak only here — a slugified role in the
+	// path is real evidence when there is nothing else, but it must never rescue
+	// a page that is full of text about something other than this job, which is
+	// exactly what a careers category page looks like.
+	if (text.length < 1200) {
+		const fromPath = score(pathWords(finalUrl));
+		if (fromPath >= 0.5 && companySeen) {
+			return {
+				verdict: 'live',
+				note: `role match ${Math.round(fromPath * 100)}% from the URL; page renders client-side`,
+				finalUrl,
+			};
+		}
+		return {
+			verdict: 'needs_browser',
+			note: `client-rendered shell (${text.length} chars, no title names the role)`,
+			finalUrl,
+		};
 	}
 
 	// Plenty of text, but not about this job. A careers landing page reads

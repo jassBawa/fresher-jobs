@@ -25,16 +25,20 @@ labelled as estimates. Anything that could not be verified says so.
 
 ## Current build status
 
-The ingest pipeline and the site both exist; nothing is hosted.
+The pipeline and the site both work end to end on real data. Nothing is hosted.
 
-- **Ingest** — two stages, reads postings, extracts facts, writes drafts. Real
-  data flowing: 8 listings from freshersdunia's WordPress API.
-- **Review gate** — everything lands `status: draft`; `pnpm run promote` is the
-  only way anything goes live.
-- **Site** — Astro static build with the D5 indexing policy implemented:
-  listings mostly `noindex`, cluster pages as the indexable surface, expiry,
-  and `JobPosting` structured data.
-- **Not built** — hosting. `deploy.yml` targets Cloudflare Pages but the
-  project, secrets and domain do not exist. Domain is still open decision D2.
+- **Data** — Postgres (Docker locally, Neon in production per D6). 22 postings
+  ingested from freshersdunia's WordPress API; 13 published, 5 awaiting review,
+  4 discarded.
+- **Ingest** — extracts facts, **verifies the apply link before drafting**, and
+  discards anything it cannot parse into something a reader could act on.
+  Markdown is exported from the database so the data stays portable.
+- **Review gate** — everything lands `draft`; `pnpm run promote` is the only way
+  anything goes live, and a discarded listing needs `--force`.
+- **Site** — Next.js App Router on the database, prerendered with 15-minute
+  revalidation. D5 implemented: listings mostly `noindex`, cluster pages as the
+  indexable surface, expiry, `JobPosting` structured data.
+- **Not built** — hosting, and a second source. Domain is still open decision D2;
+  the ATS adapters in [data-sources.md](./data-sources.md) are the bigger gap.
 
-No database, and none needed at this volume. See [pipeline.md](./pipeline.md).
+See [pipeline.md](./pipeline.md).
