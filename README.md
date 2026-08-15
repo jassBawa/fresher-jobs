@@ -12,8 +12,8 @@ Postgres holds the listings; the markdown files are exported from it so the data
 is never trapped in one schema.
 
 ```
-source posts ──► fetch.mjs ──────────────────► draft.mjs ──► promote ──► export ──► apps/web ──► dist/
-                 facts only · link verified    prose from    human      markdown    Astro build
+source posts ──► fetch.mjs ──────────────────► draft.mjs ──► promote ──► Postgres ──► apps/site
+                 facts only · link verified    prose from    human      markdown    Next.js
                  unparseable ones discarded    the facts     review     projection
 ```
 
@@ -28,7 +28,7 @@ fresher-jobs/                pnpm + Turborepo monorepo
 │   ├── scripts/promote.mjs  the review gate — flips status to published
 │   ├── test/                94 tests, node:test, no runner
 │   └── data/drafts/         markdown exported from the database
-├── apps/web/                static site (@jobs/web) — listings, clusters, sitemap
+├── apps/site/               Next.js site (@jobs/site) — listings, clusters, sitemap
 ├── packages/db/             Postgres schema, migrations, link verification (@jobs/db)
 ├── packages/schema/         shared types + JSON Schema + zod (@jobs/schema)
 ├── docs/                    research, strategy, decisions
@@ -66,7 +66,8 @@ Run from the repo root.
 | `pnpm run ingest` | Both, in order |
 | `pnpm run drafts` | Lists every draft and whether it is live. **No key needed** |
 | `pnpm run promote <slug>…` | Publishes one or more drafts. Add `draft` to pull one back |
-| `pnpm run build` | Builds the static site into `apps/web/dist/` |
+| `pnpm run build` | Builds the site |
+| `pnpm run dev` | Next.js dev server on :3000 |
 | `pnpm run verify:apply` | Re-checks every apply link and retires the ones that have died |
 | `pnpm run db:up` / `db:down` | Start or stop local Postgres |
 | `pnpm run test` | 119 tests |
@@ -162,7 +163,7 @@ kept and honestly marked unverified rather than guessed either way.
 
 ## The site
 
-`apps/web` builds a static site from the published drafts.
+`apps/site` is a Next.js App Router site reading directly from Postgres. Pages are prerendered and revalidate every 15 minutes, which is the shape D6 planned for: static where it can be, ISR where the volume needs it.
 
 **Listings expire.** On their stated deadline where there is one, otherwise 60
 days after posting. That fallback is the load-bearing rule, not the edge case —
@@ -171,8 +172,9 @@ keep their URL but lose the apply button and drop out of every index.
 
 **Most listings are `noindex`.** A page restating a scraped requisition adds
 tokens, not information, which is the pattern Google's spam policy names. A
-listing is indexed only with a live apply link, model-written prose, and at least
-three of salary, batch, location, skills or deadline.
+listing is indexed only with a **verified** apply link, model-written prose, and
+at least three of salary, batch, location, skills or deadline. A listing whose
+link failed its check never competes in search.
 
 **Cluster pages are the indexable surface** — `/software-engineer-jobs/`,
 `/jobs-in-bengaluru/`, `/software-engineer-jobs-in-bengaluru/`,
@@ -239,11 +241,11 @@ would have run, on your machine, before you commit.
 
 ## Publishing the site
 
-The build writes a plain static directory to `apps/web/dist/` — no server, no
-runtime, no platform assumed:
+The build prerenders every page and revalidates on a 15-minute window, so the
+site serves static HTML but picks up new listings without a redeploy:
 
 ```bash
-SITE=https://your-domain.example pnpm run build
+SITE=https://your-domain.example DATABASE_URL=… pnpm run build
 ```
 
 `SITE` is the canonical origin. Every canonical tag, the sitemap and robots.txt
@@ -251,16 +253,15 @@ derive from it, so the build refuses to run without it under `CI=1` rather than
 silently shipping the wrong domain. Locally it falls back to
 `http://localhost:4321`.
 
-From there `dist/` can be dropped anywhere that serves files — Cloudflare Pages,
-Netlify, a VPS, `python3 -m http.server` for a look. Cloudflare remains the
-recommendation on cost grounds (zero egress, free unlimited static requests;
-Vercel's Hobby tier bans AdSense by name) — see [D6](./docs/decisions.md) — but
-nothing in the repo is wired to it, and no deploy runs automatically.
+Cloudflare Workers via OpenNext is the target, on cost grounds — zero egress,
+and **Vercel's Hobby tier bans AdSense by name** while its ISR write costs were
+measured at ~$66/mo. See [D6](./docs/decisions.md). Nothing in the repo is wired
+to a host yet and no deploy runs automatically.
 
-Preview the built site locally:
+Run it locally:
 
 ```bash
-pnpm --filter @jobs/web run preview
+pnpm run dev      # :3000
 ```
 
 ## Adding sources later

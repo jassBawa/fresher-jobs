@@ -4,8 +4,8 @@ How the current code works, end to end: ingest, review gate, static site.
 Nothing is hosted yet — the build produces a `dist/` and stops there.
 
 ```
-freshersdunia WP API ──► fetch.mjs ──────────────────► draft.mjs ──► promote ──► export ──► apps/web ──► dist/
-                        facts only, prose discarded    template +    human      markdown    Astro build
+freshersdunia WP API ──► fetch.mjs ──────────────────► draft.mjs ──► promote ──► export ──► apps/site ──► dist/
+                        facts only, prose discarded    template +    human      markdown    Next.js
                         apply link verified            prose         review     projection
                         unparseable postings dropped
 ```
@@ -34,8 +34,8 @@ and through it on drizzle and a Postgres driver.
 | `packages/db/src/schema.ts` | The jobs table, indexes and migrations |
 | `packages/db/src/verify-apply.ts` | Apply-link verification and the discard policy |
 | `packages/schema/src/index.ts` | The fact/draft contracts: types, zod, JSON Schema |
-| `apps/web/src/lib/listings.ts` | Expiry horizon and the D5 indexing gate |
-| `apps/web/src/lib/clusters.ts` | Cluster pages — the indexable surface |
+| `apps/site/lib/listings.ts` | Expiry horizon and the D5 indexing gate |
+| `apps/site/lib/db.ts` | Every query the site makes; clusters as SQL aggregates |
 | `scripts/daily.sh` | The scheduled run — fetch, draft, log. cron or launchd |
 
 ## Commands
@@ -54,7 +54,7 @@ Run from the repo root.
 | `pnpm run test` | **No** — 119 tests |
 | `pnpm run verify:apply` | **No** — re-checks every apply link, retires the dead |
 | `pnpm run db:up` / `db:down` | **No** — start or stop local Postgres |
-| `pnpm run build` | **No** — builds the static site into `apps/web/dist/` |
+| `pnpm run build` | **No** — builds the static site into `apps/site/dist/` |
 | `pnpm run check` | **No** — build + typecheck + test, all at once |
 | `pnpm run daily` | Yes — the scheduled run, for cron or launchd |
 
@@ -166,9 +166,17 @@ expiry and JSON-LD `datePosted`.
 
 ## Stage 3 — the site
 
-`apps/web` is an Astro static build that reads `apps/ingest/data/drafts/*.md` as
-a content collection, validated against the shared zod schema, filtered to
-`status: published`.
+`apps/site` is a Next.js App Router site reading directly from Postgres. Pages
+are prerendered and revalidate on a 15-minute window, so the site serves static
+HTML but picks up new listings without a redeploy.
+
+Cluster pages are SQL aggregates rather than scans. City aliases, non-places and
+role families were resolved once at ingest and stored as indexed columns, so
+`/jobs-in-bengaluru/` is one `GROUP BY` instead of reading every listing and
+running a regex pass over it.
+
+The expiry rule is written twice — in SQL for filtering, in TypeScript for
+display. They have to agree, and a check confirms they return the same set.
 
 ### What gets shown
 
@@ -288,7 +296,7 @@ anything. Removed rather than documented.
    `addressRegion`) but a `/jobs-in-maharashtra/` cluster is still weaker than a
    city page.
 7. **Nothing is hosted, and nothing is automated.** The build produces
-   `apps/web/dist/` and stops. Scheduling is a local cron or launchd job, so
+   `apps/site/dist/` and stops. Scheduling is a local cron or launchd job, so
    the machine has to be on — there is no hosted runner behind it.
 
 ---

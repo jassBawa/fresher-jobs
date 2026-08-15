@@ -22,7 +22,9 @@
     "db:migrate": "pnpm --filter @jobs/db run db:migrate",
     "db:import": "pnpm --filter @jobs/db run import",
     "verify:apply": "pnpm --filter @jobs/db run verify:apply",
-    "daily": "./scripts/daily.sh"
+    "daily": "./scripts/daily.sh",
+    "dev": "pnpm --filter @jobs/site run dev",
+    "start": "pnpm --filter @jobs/site run start"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

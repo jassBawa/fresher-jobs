@@ -499,6 +499,46 @@ which is the same thing `needs_browser` is waiting on.
 
 ---
 
+## D24 — The site is Next.js on the database, and Astro is retired
+
+**Decision.** `apps/site` replaces `apps/web`. Next.js App Router reading
+Postgres directly, prerendered with 15-minute revalidation. The Astro app is
+deleted rather than kept alongside.
+
+**Why.** D6 chose this stack in the first place — Next.js via OpenNext on
+Cloudflare, because 500k pages need rendering that a static build cannot give
+you. Astro was the Phase 1 scope cut (D8), and the database made keeping it
+pointless: the site was reading markdown that was itself exported from Postgres,
+so every page load went through a projection of the real data.
+
+What the move actually buys, beyond the roadmap:
+
+- **Cluster pages are SQL aggregates, not scans.** `/jobs-in-bengaluru/` was
+  reading every markdown file, parsing frontmatter, normalizing city names and
+  grouping in memory. It is now one `GROUP BY` over an indexed column, because
+  the normalization happened once at ingest.
+- **The indexing gate can see the link check.** A listing whose apply link
+  failed verification is now excluded from the index — the file-backed site had
+  no way to know that.
+
+**Two rules kept, deliberately.** Markdown export stays (D22): the data must not
+be trapped in this schema. And the design is unchanged — the same class names,
+the same `globals.css`, the same direction contract in the layout. Porting the
+markup was mechanical; nothing about the visual world was reopened.
+
+**One thing the port broke and had to fix:** Astro scoped component styles per
+file, and copying only `global.css` left fifty rules behind — the masthead, the
+category strip, the apply action and the "more like this" block all rendered
+unstyled. They are in `globals.css` now under the same selectors. Splitting them
+into CSS modules would have fragmented a design system whose whole premise is a
+small shared vocabulary.
+
+**Rejected:** keeping both apps. Two frontends over one database is a
+maintenance trap and an ambiguity about which one is real. The Astro app is in
+git history if it is ever wanted.
+
+---
+
 ## Open decisions
 
 | # | Question | Blocks |
