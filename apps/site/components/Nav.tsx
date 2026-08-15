@@ -14,9 +14,8 @@ import { allClusters, type ClusterRow } from '@/lib/db';
  * wraps and nothing is clipped.
  */
 const short = (c: ClusterRow): string => {
-	if (c.kind === 'batch') return c.key;
-	if (c.kind === 'city') return c.key;
-	return c.label.replace(/ jobs for freshers$/, '');
+	if (c.kind === 'batch' || c.kind === 'city') return c.key;
+	return c.label.replace(/ jobs for freshers$/, '').replace(/ jobs$/, '').replace(/ openings$/, '');
 };
 
 export async function Nav({ current }: { current?: string }) {
@@ -26,9 +25,11 @@ export async function Nav({ current }: { current?: string }) {
 	const pick = (kind: ClusterRow['kind'], n: number) =>
 		clusters.filter((c) => c.kind === kind).slice(0, n);
 
+	// Category first: it is the top of the taxonomy and the level a reader
+	// actually browses by. Batch is the filter they apply before anything else.
 	const groups = [
+		{ label: 'Category', items: pick('category', 5) },
 		{ label: 'Batch', items: pick('batch', 4).sort((a, b) => b.key.localeCompare(a.key)) },
-		{ label: 'Role', items: pick('role', 4) },
 		{ label: 'City', items: pick('city', 4) },
 	];
 

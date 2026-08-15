@@ -15,6 +15,20 @@
       "when": 1786709029180,
       "tag": "0001_chunky_randall",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786711984020,
+      "tag": "0002_familiar_fixer",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786712240370,
+      "tag": "0003_fuzzy_redwing",
+      "breakpoints": true
     }
   ]
 }

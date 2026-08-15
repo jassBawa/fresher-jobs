@@ -867,3 +867,255 @@ figure {
 	.recent {
 		margin-top: var(--space-5);
 	}
+
+/* ---- company mark ---- */
+
+.mono {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	color: #fff;
+	font-weight: 700;
+	font-size: 0.8125rem;
+	letter-spacing: 0.02em;
+	line-height: 1;
+	/* Square, not round: the world has no radius anywhere else, and a circle
+	   here would be the only curve on the page. */
+	border-radius: 0;
+}
+
+.mono--img {
+	background: var(--ground-2);
+	object-fit: contain;
+	padding: 3px;
+	border: 1px solid var(--rule);
+}
+
+/* ---- search ---- */
+
+.search {
+	margin-block: var(--space-4);
+}
+
+.search__label {
+	display: block;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	margin-bottom: var(--space-2);
+}
+
+.search--compact .search__label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.search__row {
+	display: flex;
+	border: 2px solid var(--rule-strong);
+}
+
+.search__input {
+	flex: 1;
+	min-width: 0;
+	font: inherit;
+	color: var(--ink);
+	background: var(--ground);
+	border: 0;
+	padding: 0.7rem 0.85rem;
+	min-height: 2.75rem;
+}
+
+.search__input::placeholder {
+	color: var(--ink-3);
+}
+
+.search__input:focus {
+	outline: none;
+}
+
+/* The whole control takes the focus ring, not the bare input — the button is
+   part of the same object. */
+.search__row:focus-within {
+	outline: 2px solid var(--focus);
+	outline-offset: 2px;
+}
+
+.search__go {
+	font: inherit;
+	font-weight: 700;
+	color: #fff;
+	background: var(--live-field);
+	border: 0;
+	padding-inline: var(--space-5);
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.search__go:hover {
+	background: var(--live-field-press);
+}
+
+/* ---- scan table ---- */
+
+.tablewrap {
+	overflow-x: auto;
+	margin-block: var(--space-4);
+}
+
+.jobtable {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--fs);
+}
+
+.jobtable__caption {
+	text-align: left;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	padding-bottom: var(--space-3);
+}
+
+.jobtable th {
+	text-align: left;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ink-3);
+	border-bottom: 2px solid var(--rule-strong);
+	padding: var(--space-2) var(--space-4) var(--space-2) 0;
+	white-space: nowrap;
+}
+
+.jobtable td {
+	border-bottom: 1px solid var(--rule);
+	padding: var(--space-3) var(--space-4) var(--space-3) 0;
+	vertical-align: middle;
+}
+
+.jobtable tr:last-child td {
+	border-bottom: 0;
+}
+
+.jobtable__co {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.jobtable__closes {
+	white-space: nowrap;
+	color: var(--ink-2);
+}
+
+.jobtable__apply {
+	display: inline-flex;
+	align-items: center;
+	min-height: 2rem;
+	padding-inline: var(--space-4);
+	background: var(--live-field);
+	color: #fff;
+	font-weight: 700;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.jobtable__apply:hover {
+	background: var(--live-field-press);
+}
+
+.jobtable__apply--none {
+	background: transparent;
+	color: var(--ink-3);
+	padding-inline: 0;
+}
+
+/* ---- sections ---- */
+
+.section {
+	margin-top: var(--space-6);
+	padding-top: var(--space-4);
+	border-top: 1px solid var(--rule);
+}
+
+.section--lead {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.section__head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-4);
+	margin-bottom: var(--space-2);
+}
+
+.section__title {
+	font-size: var(--fs);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.section__more {
+	color: var(--ink-3);
+	white-space: nowrap;
+}
+
+.section__note {
+	color: var(--ink-3);
+	margin-bottom: var(--space-3);
+}
+
+/* ---- category grid ---- */
+
+.cats {
+	list-style: none;
+	margin: var(--space-3) 0 0;
+	padding: 0;
+	display: grid;
+	/* Borders on the cells, not a 1px gap over a tinted ground: a grid whose
+	   last row is short leaves empty tracks, and the tinted-ground trick paints
+	   those as grey blocks that read as broken cards. */
+	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+	border-top: 1px solid var(--rule);
+	border-left: 1px solid var(--rule);
+}
+
+.cats li {
+	border-right: 1px solid var(--rule);
+	border-bottom: 1px solid var(--rule);
+}
+
+.cats a {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-3);
+	height: 100%;
+	background: var(--ground);
+	padding: var(--space-3) var(--space-4);
+	text-decoration: none;
+	font-weight: 600;
+	min-height: 3rem;
+}
+
+.cats a:hover {
+	background: var(--ground-2);
+}
+
+.cats span {
+	color: var(--ink-3);
+	font-weight: 400;
+}

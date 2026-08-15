@@ -26,7 +26,12 @@ import {
 	index,
 	uniqueIndex,
 	primaryKey,
+	customType,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+
+/** Postgres full-text vector. Drizzle has no native mapping for it. */
+const tsvector = customType<{ data: string }>({ dataType: () => 'tsvector' });
 
 /**
  * `rejected` is a discard that leaves a record.
@@ -68,8 +73,13 @@ export const jobs = pgTable(
 		company: text('company').notNull(),
 		companySlug: text('company_slug').notNull(),
 		role: text('role').notNull(),
-		/** Resolved family slug — "software-engineer". Null when nothing matched. */
+		/** Broad category — "it-software". The level a reader browses by. */
+		category: text('category'),
+		/** Finer family within it — "software-engineer". */
 		roleFamily: text('role_family'),
+		/** Company logo, when one could be resolved. The UI falls back to a
+		 *  monogram, so a missing value is a normal state and not a broken image. */
+		logoUrl: text('logo_url'),
 		jobType: jobType('job_type'),
 		batchYears: text('batch_years').array().notNull().default([]),
 		qualifications: text('qualifications').array().notNull().default([]),
@@ -77,8 +87,10 @@ export const jobs = pgTable(
 		salary: text('salary'),
 		/** As the source wrote it, including "PAN India" and "Hyderabad, Karnataka". */
 		locations: text('locations').array().notNull().default([]),
-		/** Normalized, aliased, non-places removed. What clusters group by. */
+		/** Normalized, aliased, non-places and states removed. What clusters group by. */
 		cities: text('cities').array().notNull().default([]),
+		/** States named by the posting, kept apart from its cities. */
+		regions: text('regions').array().notNull().default([]),
 		lastDateToApply: text('last_date_to_apply'),
 		applyByDate: date('apply_by_date'),
 		applyUrl: text('apply_url'),
@@ -111,6 +123,33 @@ export const jobs = pgTable(
 		rejectedReason: text('rejected_reason'),
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+
+		/**
+		 * What search matches against, maintained by Postgres rather than by us.
+		 *
+		 * A generated column cannot drift from the row the way a trigger or an
+		 * application-side write can, and search over a job board is exactly the
+		 * kind of thing that quietly goes stale when it is someone's job to
+		 * remember to update it.
+		 *
+		 * 'simple' rather than 'english': the corpus is Indian job titles, company
+		 * names and city names. Stemming "Bengaluru" or "Wipro" gains nothing and
+		 * English stopword removal would drop "IT" from "IT Engineering Streams".
+		 */
+		searchDoc: tsvector('search_doc').generatedAlwaysAs(
+			sql`to_tsvector('simple',
+				coalesce(company, '') || ' ' ||
+				coalesce(role, '') || ' ' ||
+				coalesce(role_family, '') || ' ' ||
+				coalesce(job_type::text, '') || ' ' ||
+				array_to_string(skills, ' ') || ' ' ||
+				array_to_string(cities, ' ') || ' ' ||
+				array_to_string(regions, ' ') || ' ' ||
+				array_to_string(locations, ' ') || ' ' ||
+				array_to_string(qualifications, ' ') || ' ' ||
+				array_to_string(batch_years, ' ')
+			)`
+		),
 	},
 	(t) => [
 		uniqueIndex('jobs_slug_key').on(t.slug),
@@ -118,10 +157,14 @@ export const jobs = pgTable(
 		index('jobs_status_posted_idx').on(t.status, t.postedAt),
 		index('jobs_apply_by_idx').on(t.applyByDate),
 		index('jobs_role_family_idx').on(t.roleFamily),
+		index('jobs_category_idx').on(t.category),
 		index('jobs_company_slug_idx').on(t.companySlug),
 		// Array containment for the city and batch clusters.
 		index('jobs_cities_idx').using('gin', t.cities),
 		index('jobs_batch_years_idx').using('gin', t.batchYears),
+		index('jobs_regions_idx').using('gin', t.regions),
+		index('jobs_search_idx').using('gin', t.searchDoc),
+		index('jobs_job_type_idx').on(t.jobType),
 	]
 );
 

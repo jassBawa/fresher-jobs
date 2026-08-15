@@ -98,13 +98,32 @@ export const isPlace = (raw: string): boolean => {
 	return key !== '' && !NON_PLACES.has(key);
 };
 
-/** Raw locations → the canonical, deduplicated city list a cluster groups by. */
+/**
+ * Raw locations → the canonical city list a cluster groups by.
+ *
+ * States are excluded. A posting writes "Maharashtra" in the same field as
+ * "Pune", and treating the two alike produced a /jobs-in-maharashtra/ page
+ * sitting beside real cities — a reader looking for work in Pune is not served
+ * by a page covering a state of 120 million people, and it is a weaker search
+ * target than either the city or the country.
+ */
 export function toCities(locations: readonly string[]): string[] {
 	const out: string[] = [];
 	for (const raw of locations) {
-		if (!isPlace(raw)) continue;
+		if (!isPlace(raw) || isState(raw)) continue;
 		const city = normalizeCity(raw);
 		if (city && !out.includes(city)) out.push(city);
+	}
+	return out;
+}
+
+/** The states a posting named, kept separate from its cities. */
+export function toRegions(locations: readonly string[]): string[] {
+	const out: string[] = [];
+	for (const raw of locations) {
+		if (!isState(raw)) continue;
+		const region = normalizeCity(raw);
+		if (region && !out.includes(region)) out.push(region);
 	}
 	return out;
 }
@@ -118,9 +137,11 @@ export function toCities(locations: readonly string[]): string[] {
  * general ones.
  */
 const ROLE_FAMILIES: ReadonlyArray<{ slug: string; label: string; test: RegExp }> = [
-	{ slug: 'data-analyst', label: 'Data Analyst', test: /\bdata\b.*\banalyst\b|\banalytics\b/i },
-	{ slug: 'data-scientist', label: 'Data Scientist', test: /\bdata scien|machine learning|\bml\b|\bai\b/i },
+	// Most specific first — the first match wins. "Data Scientist & Data Analyst"
+	// used to land in data-analyst because that pattern was tested first.
 	{ slug: 'data-engineer', label: 'Data Engineer', test: /\bdata engineer/i },
+	{ slug: 'data-scientist', label: 'Data Scientist', test: /data scien|machine learning|\bml\b|\bai\b/i },
+	{ slug: 'data-analyst', label: 'Data Analyst', test: /\bdata\b.*\banalyst\b|\banalytics\b/i },
 	{ slug: 'qa-engineer', label: 'QA Engineer', test: /\bqa\b|quality assurance|\btest(ing|er)?\b|automation/i },
 	{
 		slug: 'software-engineer',
@@ -130,21 +151,184 @@ const ROLE_FAMILIES: ReadonlyArray<{ slug: string; label: string; test: RegExp }
 	{ slug: 'support-engineer', label: 'Support Engineer', test: /support|help ?desk|service desk|technical support/i },
 	{ slug: 'business-analyst', label: 'Business Analyst', test: /business analyst|market research|consultant/i },
 	{ slug: 'analyst', label: 'Analyst', test: /\banalyst\b/i },
-	{ slug: 'graduate-trainee', label: 'Graduate Trainee', test: /trainee|graduate engineer|\bget\b|apprentice/i },
 	{ slug: 'engineer', label: 'Engineer', test: /\bengineer\b/i },
-	{ slug: 'internship', label: 'Internship', test: /\bintern(ship)?\b/i },
 ];
 
 export const ROLE_FAMILY_LABELS: Readonly<Record<string, string>> = Object.fromEntries(
 	ROLE_FAMILIES.map((f) => [f.slug, f.label])
 );
 
-export function roleFamily(role: string, jobType?: string | null): { slug: string; label: string } | null {
-	if (jobType === 'internship') return { slug: 'internship', label: 'Internship' };
+/**
+ * The broad category a posting belongs to — the top level of the taxonomy.
+ *
+ * Role families are too fine to browse by: "data-scientist" holds one listing
+ * and "qa-engineer" none, so a menu built on them is mostly empty and tells a
+ * reader nothing about what the site covers. Categories are the level a fresher
+ * actually thinks in, and they stay populated as volume grows.
+ *
+ * Core Engineering earns its place here even though a tech-only board would not
+ * have it: mechanical, electrical and civil graduates are a large share of this
+ * audience, and Volvo, Eaton and Carrier postings are exactly that.
+ *
+ * Order matters — first match wins, so a "Marketing Analyst" reads as Marketing
+ * rather than Business, and a "Data Engineer" as Data rather than IT.
+ */
+interface Category {
+	slug: string;
+	label: string;
+	/** Words that only ever mean this category. */
+	test: RegExp;
+	/** Words that appear across every function in Indian fresher postings —
+	 *  "Associate", "Engineer", "Trainee". Real signal, but only once nothing
+	 *  specific has matched anywhere. */
+	weak?: RegExp;
+}
+
+const CATEGORIES: ReadonlyArray<Category> = [
+	{
+		slug: 'design',
+		label: 'Design & Creative',
+		// "visual" alone is a trap: Data Visualization is a data skill, and a
+		// bare match filed an SQL apprenticeship under Design.
+		test: /\b(ux|ui\/ux|graphic design|visual design|motion design|animator|illustrat|figma|photoshop|adobe|video edit|copywrit|content writ)\w*/i,
+		weak: /\b(designer|creative)\b/i,
+	},
+	{
+		slug: 'marketing',
+		label: 'Marketing & Sales',
+		test: /\b(marketing|seo\b|sem\b|social media|branding|campaign|growth|business development|telecall|inside sales|pre.?sales)\w*/i,
+		weak: /\b(sales)\b/i,
+	},
+	{
+		slug: 'data-analytics',
+		label: 'Data & Analytics',
+		test: /\b(data scien|data analy|data engineer|analytics|machine learning|\bml\b|deep learning|statistic|power ?bi|tableau|big data)\w*/i,
+		weak: /\b(data)\b/i,
+	},
+	{
+		slug: 'it-software',
+		label: 'IT & Software',
+		// Skill tokens as well as title words: "Graduate Engineer Trainee" says
+		// nothing on its own, but Java and SQL beside it place the job here.
+		test: /\b(software|developer|programmer|\bsde\b|full.?stack|back.?end|front.?end|web dev|cloud|devops|cyber|information security|\bqa\b|tester|testing|automation|system admin|\bit\b|java|python|javascript|typescript|react|angular|node|spring|\.net|\bc\+\+\b|\bsql\b|\bapi\b|linux|kubernetes|docker|\baws\b|azure)\w*/i,
+		weak: /\b(technical support|application|network|system)\b/i,
+	},
+	{
+		slug: 'finance',
+		label: 'Finance & Accounts',
+		test: /\b(finance|financial|accounting|accountant|audit|taxation|\btax\b|treasury|payroll|invoic)\w*/i,
+		weak: /\b(banking|account)\b/i,
+	},
+	{
+		slug: 'hr',
+		label: 'HR & Recruitment',
+		test: /\b(human resource|\bhr\b|recruit|talent acquisition|staffing|people ops)\w*/i,
+	},
+	{
+		slug: 'business',
+		label: 'Business & Consulting',
+		test: /\b(business analyst|consult|strategy|market research|insights?|process improvement|supply chain|procurement)\w*/i,
+		weak: /\b(associate|analyst|management|operations|coordinator|executive|officer)\b/i,
+	},
+	{
+		slug: 'core-engineering',
+		label: 'Core Engineering',
+		// Mechanical, electrical and civil graduates are a large share of this
+		// audience — Volvo, Eaton and Carrier postings are exactly that.
+		test: /\b(mechanical|electrical|electronics|civil|chemical|manufactur|production engineer|maintenance|\bhvac\b|instrumentation|autocad|solidworks|catia)\w*/i,
+		weak: /\b(engineer|technician|apprentice|trainee|quality|production)\b/i,
+	},
+];
+
+export const CATEGORY_LABELS: Readonly<Record<string, string>> = Object.fromEntries(
+	CATEGORIES.map((c) => [c.slug, c.label])
+);
+
+export const ALL_CATEGORIES: ReadonlyArray<{ slug: string; label: string }> = CATEGORIES.map(
+	({ slug, label }) => ({ slug, label })
+);
+
+/**
+ * Which category a posting belongs to.
+ *
+ * Specific evidence is exhausted everywhere before generic evidence is used
+ * anywhere. Without that ordering "Associate — Market Research and Insights"
+ * lost to a "Database Expertise" skill and filed as Data, and an SQL
+ * apprenticeship filed as Design because "Data Visualization" contains
+ * "visual".
+ */
+export function jobCategory(
+	role: string,
+	skills: readonly string[] = []
+): { slug: string; label: string } | null {
+	const title = role ?? '';
+	const text = skills.join(' ');
+	const found = (c: Category | undefined) => (c ? { slug: c.slug, label: c.label } : null);
+
+	return (
+		found(CATEGORIES.find((c) => c.test.test(title))) ??
+		found(CATEGORIES.find((c) => text && c.test.test(text))) ??
+		found(CATEGORIES.find((c) => c.weak?.test(title))) ??
+		found(CATEGORIES.find((c) => text && c.weak?.test(text)))
+	);
+}
+
+export const categoryLabel = (slug: string | null | undefined): string | null =>
+	slug ? (CATEGORY_LABELS[slug] ?? null) : null;
+
+/**
+ * What the work is — never how it is arranged.
+ *
+ * These used to be one axis, and it went wrong in both directions: an
+ * internship jobType hijacked the family, so EY's "Analyst" was filed under
+ * Internship, while "Intern Bachelors Software Engineer" was filed under
+ * Software Engineer because its jobType happened to be null. A reader browsing
+ * "analyst jobs" wants analyst work whether it is an internship or not, and a
+ * reader browsing internships wants them across every function.
+ *
+ * Employment type is its own axis now. See `inferJobType`.
+ */
+export function roleFamily(role: string, _jobType?: string | null): { slug: string; label: string } | null {
 	for (const family of ROLE_FAMILIES) {
 		if (family.test.test(role ?? '')) return { slug: family.slug, label: family.label };
 	}
 	return null;
+}
+
+export const JOB_TYPE_LABELS: Readonly<Record<string, string>> = {
+	internship: 'Internship',
+	trainee: 'Trainee & apprentice',
+	'full-time': 'Full-time',
+	contract: 'Contract',
+};
+
+/**
+ * Employment type, filled in from the title when the extractor left it null.
+ *
+ * "Summer Software Engineer Intern" is an internship whether or not the model
+ * said so, and for this audience the internship/trainee/full-time split is one
+ * of the two questions they actually filter on.
+ */
+export function inferJobType(role: string, jobType?: string | null): string | null {
+	if (jobType) return jobType;
+	const r = role ?? '';
+	if (/\bintern(ship)?\b/i.test(r)) return 'internship';
+	if (/trainee|apprentice|\bget\b|graduate engineer/i.test(r)) return 'trainee';
+	return null;
+}
+
+/**
+ * Batch years worth a page.
+ *
+ * The extractor scrapes any four-digit year out of the posting body, which
+ * yields 2022 and 2028 alongside the real ones — a 2028 batch is two years from
+ * graduating and is not looking at this. Anything outside a plausible window
+ * around the current year is noise, and a cluster built on noise is a thin page
+ * Google is invited to judge.
+ */
+export function plausibleBatchYears(years: readonly string[], now = new Date()): string[] {
+	const y = now.getFullYear();
+	return years.filter((v) => /^\d{4}$/.test(v) && Number(v) >= y - 4 && Number(v) <= y + 1);
 }
 
 export const roleFamilyLabel = (slug: string | null | undefined): string | null =>
